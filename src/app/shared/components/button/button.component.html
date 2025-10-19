@@ -4,7 +4,11 @@
   [expand]="expand"
   [disabled]="disabled"
   (click)="onClick()">
-  <ion-icon *ngIf="icon" [slot]="iconPosition" [name]="icon"></ion-icon>
-  <span *ngIf="!loading">{{ text }}</span>
+  <ion-icon *ngIf="icon && iconPosition === 'start'" slot="start" [name]="icon"></ion-icon>
+  <span *ngIf="!loading">
+    {{ text }}
+    <ng-content></ng-content>
+  </span>
   <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+  <ion-icon *ngIf="icon && iconPosition === 'end'" slot="end" [name]="icon"></ion-icon>
 </ion-button>

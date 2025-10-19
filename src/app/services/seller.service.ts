@@ -12,6 +12,8 @@ export interface Perfume {
   fecha_lanzamiento?: string;
   marca_id?: number;
   categoria_id?: number;
+  categoria?: string;
+  marca?: string;
 }
 
 export interface Store {

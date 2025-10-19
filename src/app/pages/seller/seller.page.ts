@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SellerService, Perfume, Store } from '../../services/seller.service';
 import { NotificationService } from '../../services/notification.service';
+import { StepperService } from '../../services/stepper.service';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -34,7 +35,13 @@ export class SellerPage implements OnInit {
     propietario: ''
   };
 
-  constructor(private sellerService: SellerService, private notificationService: NotificationService, private router: Router, private location: Location) {
+  constructor(
+    private sellerService: SellerService, 
+    private notificationService: NotificationService,
+    private stepperService: StepperService,
+    private router: Router, 
+    private location: Location
+  ) {
     this.store = this.sellerService.getStore();
   }
 
@@ -62,37 +69,11 @@ export class SellerPage implements OnInit {
     this.sellerService.createStore(this.newStore);
     this.store = { ...this.newStore };
     this.showCreateStore = false;
+    this.stepperService.setStoreCreated(true);
   }
 
-  addPerfume() {
-    if (!this.newPerfume.nombre.trim() || !this.newPerfume.descripcion.trim() || 
-        this.newPerfume.precio <= 0 || this.newPerfume.stock < 0 || this.newPerfume.tamano_ml <= 0) {
-      alert('Por favor completa todos los campos correctamente');
-      return;
-    }
-    this.sellerService.addPerfume({
-      nombre: this.newPerfume.nombre,
-      descripcion: this.newPerfume.descripcion,
-      precio: this.newPerfume.precio,
-      stock: this.newPerfume.stock,
-      tamano_ml: this.newPerfume.tamano_ml,
-      genero: this.newPerfume.genero
-    });
-    this.newPerfume = {
-      nombre: '',
-      descripcion: '',
-      precio: 0,
-      stock: 0,
-      tamano_ml: 100,
-      genero: ''
-    };
-    this.showAddForm = false;
-  }
-
-  deletePerfume(id: number) {
-    if (confirm('¿Estás seguro de que deseas eliminar este perfume?')) {
-      this.sellerService.deletePerfume(id);
-    }
+  openAddProductStepper() {
+    this.stepperService.openStepper();
   }
 
   toggleAddForm() {
@@ -143,33 +124,9 @@ export class SellerPage implements OnInit {
     this.editingPerfume = null;
   }
 
-  // Demo methods for testing notifications
-  testCustomerInterest() {
-    const customers = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez'];
-    const customer = customers[Math.floor(Math.random() * customers.length)];
-    const product = this.perfumes[Math.floor(Math.random() * this.perfumes.length)];
-    
-    if (product) {
-      this.notificationService.simulateCustomerInterest(customer, product.nombre);
-    }
-  }
-
-  testCustomerPurchase() {
-    const customers = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez'];
-    const customer = customers[Math.floor(Math.random() * customers.length)];
-    const product = this.perfumes[Math.floor(Math.random() * this.perfumes.length)];
-    
-    if (product) {
-      const amount = product.precio * Math.floor(Math.random() * 3 + 1);
-      this.notificationService.simulateCustomerPurchase(customer, product.nombre, amount);
-    }
-  }
-
-  testLowStock() {
-    const product = this.perfumes[Math.floor(Math.random() * this.perfumes.length)];
-    
-    if (product) {
-      this.notificationService.simulateLowStock(product.nombre, Math.floor(Math.random() * 5));
+  deletePerfume(id: number) {
+    if (confirm('Are you sure you want to delete this product?')) {
+      this.sellerService.deletePerfume(id);
     }
   }
 

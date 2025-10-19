@@ -27,7 +27,7 @@
         [(ngModel)]="newStore.propietario">
       </app-input>
       <div class="ion-margin-top">
-        <ion-button expand="block" color="success" (click)="createStore()">Create Store</ion-button>
+        <app-button [type]="'primary'" [text]="'Create Store'" (clicked)="createStore()"></app-button>
       </div>
     </ion-card-content>
   </ion-card>
@@ -44,61 +44,7 @@
   </ion-card>
 
   <!-- Add Products Button (show only after store is created) -->
-  <ion-button *ngIf="store.nombre" expand="block" color="primary" (click)="toggleAddForm()">
-    <ion-icon slot="start" name="add-circle"></ion-icon>
-    Add Products
-  </ion-button>
-
-  <!-- Form to Add Product (show only if toggled and store exists) -->
-  <ion-card *ngIf="showAddForm && store.nombre">
-    <ion-card-header>
-      <ion-card-title>New Product</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <app-input 
-        [label]="'Product Name'" 
-        [placeholder]="'e.g., Rose Perfume Premium'"
-        [type]="'text'"
-        [(ngModel)]="newPerfume.nombre">
-      </app-input>
-      <app-input 
-        [label]="'Description'" 
-        [placeholder]="'Describe the scent...'"
-        [type]="'text'"
-        [(ngModel)]="newPerfume.descripcion">
-      </app-input>
-      <app-input 
-        [label]="'Price ($)'" 
-        [placeholder]="'150'"
-        [type]="'number'"
-        [(ngModel)]="newPerfume.precio">
-      </app-input>
-      <app-input 
-        [label]="'Stock (Units)'" 
-        [placeholder]="'10'"
-        [type]="'number'"
-        [(ngModel)]="newPerfume.stock">
-      </app-input>
-      <app-input 
-        [label]="'Size (ml)'" 
-        [placeholder]="'100'"
-        [type]="'number'"
-        [(ngModel)]="newPerfume.tamano_ml">
-      </app-input>
-      <ion-item>
-        <ion-label position="floating">Gender</ion-label>
-        <ion-select [(ngModel)]="newPerfume.genero" placeholder="Select a gender">
-          <ion-select-option value="Masculine">Masculine</ion-select-option>
-          <ion-select-option value="Feminine">Feminine</ion-select-option>
-          <ion-select-option value="Unisex">Unisex</ion-select-option>
-        </ion-select>
-      </ion-item>
-      <div class="ion-margin-top">
-        <ion-button expand="block" color="success" (click)="addPerfume()">Save Product</ion-button>
-        <ion-button expand="block" color="medium" (click)="toggleAddForm()">Cancel</ion-button>
-      </div>
-    </ion-card-content>
-  </ion-card>
+  <app-button *ngIf="store.nombre" [type]="'primary'" [icon]="'add-circle'" [iconPosition]="'start'" [text]="'Add Products'" (clicked)="openAddProductStepper()"></app-button>
 
   <!-- Products List (show only after store is created) -->
   <div *ngIf="store.nombre">
@@ -109,14 +55,14 @@
       <ion-card-content>
         <!-- Toolbar with Delete Selected Button -->
         <div *ngIf="perfumes && perfumes.length > 0" class="ion-margin-bottom">
-          <ion-button 
-            expand="block" 
-            color="danger" 
+          <app-button 
+            [type]="'outline'"
             [disabled]="selectedPerfumes.size === 0"
-            (click)="deleteSelectedPerfumes()">
-            <ion-icon slot="start" name="trash"></ion-icon>
-            Delete Selected ({{ selectedPerfumes.size }})
-          </ion-button>
+            [icon]="'trash'"
+            [iconPosition]="'start'"
+            [text]="'Delete Selected (' + (selectedPerfumes.size || 0) + ')'"
+            (clicked)="deleteSelectedPerfumes()">
+          </app-button>
         </div>
 
         <ion-list *ngIf="perfumes && perfumes.length > 0">
@@ -132,6 +78,8 @@
                 <ion-label>
                   <h2>{{ perfume.nombre }}</h2>
                   <p>{{ perfume.descripcion }}</p>
+                  <p *ngIf="perfume.categoria"><strong>Category:</strong> {{ perfume.categoria }}</p>
+                  <p *ngIf="perfume.marca"><strong>Brand:</strong> {{ perfume.marca }}</p>
                   <p><strong>Price:</strong> ${{ perfume.precio }} | <strong>Stock:</strong> {{ perfume.stock }} | <strong>Size:</strong> {{ perfume.tamano_ml }}ml | <strong>Gender:</strong> {{ perfume.genero }}</p>
                 </ion-label>
               </ion-item>
@@ -190,8 +138,8 @@
                   </ion-select>
                 </ion-item>
                 <div class="ion-margin-top">
-                  <ion-button expand="block" color="success" (click)="saveEditPerfume()">Save Changes</ion-button>
-                  <ion-button expand="block" color="medium" (click)="cancelEditPerfume()">Cancel</ion-button>
+                  <app-button [type]="'primary'" [text]="'Save Changes'" (clicked)="saveEditPerfume()"></app-button>
+                  <app-button [type]="'outline'" [text]="'Cancel'" (clicked)="cancelEditPerfume()"></app-button>
                 </div>
               </ion-card-content>
             </ion-card>
@@ -207,5 +155,8 @@
   </div>
 
 </ion-content>
+
+<!-- Stepper Component Overlay -->
+<app-stepper></app-stepper>
 
 <app-footer></app-footer>
