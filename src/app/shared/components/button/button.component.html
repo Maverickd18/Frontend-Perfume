@@ -1,3 +1,10 @@
-<p>
-  button works!
-</p>
+<ion-button 
+  [color]="type === 'secondary' ? 'success' : type === 'outline' ? 'medium' : type === 'clear' ? 'light' : 'primary'"
+  [size]="size"
+  [expand]="expand"
+  [disabled]="disabled"
+  (click)="onClick()">
+  <ion-icon *ngIf="icon" [slot]="iconPosition" [name]="icon"></ion-icon>
+  <span *ngIf="!loading">{{ text }}</span>
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+</ion-button>

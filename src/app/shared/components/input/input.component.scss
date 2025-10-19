@@ -1,0 +1,56 @@
+.input-wrapper {
+  --padding-start: 0;
+  --padding-end: 0;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  --background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  --border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:focus-within {
+    --background: white;
+    border: 1px solid #c4356a;
+    box-shadow: 0 0 10px rgba(196, 53, 106, 0.1);
+  }
+
+  ion-label {
+    color: #7b68ee;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  ion-icon {
+    color: #7b68ee;
+    margin: 0 0.5rem;
+  }
+
+  ion-input {
+    --color: #333;
+    font-size: 1rem;
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+}
+
+.password-toggle {
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #c4356a;
+  }
+}
+
+.error-text {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+
+  p {
+    margin: 0;
+    color: #ff6b6b;
+  }
+}

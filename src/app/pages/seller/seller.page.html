@@ -1,8 +1,4 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>My Store</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header [title]="'My Store'" [showBackButton]="true" [unreadNotifications]="store.nombre ? unreadNotifications : 0" (backClicked)="onBackClick()"></app-header>
 
 <ion-content class="ion-padding">
   
@@ -12,18 +8,24 @@
       <ion-card-title>Create My Store</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-item>
-        <ion-label position="floating">Store Name</ion-label>
-        <ion-input [(ngModel)]="newStore.nombre" type="text" placeholder="e.g., My Perfume Shop"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Description</ion-label>
-        <ion-textarea [(ngModel)]="newStore.descripcion" placeholder="Describe your store..."></ion-textarea>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Owner Name</ion-label>
-        <ion-input [(ngModel)]="newStore.propietario" type="text" placeholder="Your name"></ion-input>
-      </ion-item>
+      <app-input 
+        [label]="'Store Name'" 
+        [placeholder]="'e.g., My Perfume Shop'"
+        [type]="'text'"
+        [(ngModel)]="newStore.nombre">
+      </app-input>
+      <app-input 
+        [label]="'Description'" 
+        [placeholder]="'Describe your store...'"
+        [type]="'text'"
+        [(ngModel)]="newStore.descripcion">
+      </app-input>
+      <app-input 
+        [label]="'Owner Name'" 
+        [placeholder]="'Your name'"
+        [type]="'text'"
+        [(ngModel)]="newStore.propietario">
+      </app-input>
       <div class="ion-margin-top">
         <ion-button expand="block" color="success" (click)="createStore()">Create Store</ion-button>
       </div>
@@ -53,26 +55,36 @@
       <ion-card-title>New Product</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-item>
-        <ion-label position="floating">Product Name</ion-label>
-        <ion-input [(ngModel)]="newPerfume.nombre" type="text" placeholder="e.g., Rose Perfume Premium"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Description</ion-label>
-        <ion-textarea [(ngModel)]="newPerfume.descripcion" placeholder="Describe the scent and characteristics..."></ion-textarea>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Price ($)</ion-label>
-        <ion-input [(ngModel)]="newPerfume.precio" type="number" placeholder="150"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Stock (Units)</ion-label>
-        <ion-input [(ngModel)]="newPerfume.stock" type="number" placeholder="10"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Size (ml)</ion-label>
-        <ion-input [(ngModel)]="newPerfume.tamano_ml" type="number" placeholder="100"></ion-input>
-      </ion-item>
+      <app-input 
+        [label]="'Product Name'" 
+        [placeholder]="'e.g., Rose Perfume Premium'"
+        [type]="'text'"
+        [(ngModel)]="newPerfume.nombre">
+      </app-input>
+      <app-input 
+        [label]="'Description'" 
+        [placeholder]="'Describe the scent...'"
+        [type]="'text'"
+        [(ngModel)]="newPerfume.descripcion">
+      </app-input>
+      <app-input 
+        [label]="'Price ($)'" 
+        [placeholder]="'150'"
+        [type]="'number'"
+        [(ngModel)]="newPerfume.precio">
+      </app-input>
+      <app-input 
+        [label]="'Stock (Units)'" 
+        [placeholder]="'10'"
+        [type]="'number'"
+        [(ngModel)]="newPerfume.stock">
+      </app-input>
+      <app-input 
+        [label]="'Size (ml)'" 
+        [placeholder]="'100'"
+        [type]="'number'"
+        [(ngModel)]="newPerfume.tamano_ml">
+      </app-input>
       <ion-item>
         <ion-label position="floating">Gender</ion-label>
         <ion-select [(ngModel)]="newPerfume.genero" placeholder="Select a gender">
@@ -139,26 +151,36 @@
                 <ion-card-title>Edit: {{ perfume.nombre }}</ion-card-title>
               </ion-card-header>
               <ion-card-content>
-                <ion-item>
-                  <ion-label position="floating">Product Name</ion-label>
-                  <ion-input [(ngModel)]="editingPerfume!.nombre" type="text" placeholder="e.g., Rose Perfume Premium"></ion-input>
-                </ion-item>
-                <ion-item>
-                  <ion-label position="floating">Description</ion-label>
-                  <ion-textarea [(ngModel)]="editingPerfume!.descripcion" placeholder="Describe the scent and characteristics..."></ion-textarea>
-                </ion-item>
-                <ion-item>
-                  <ion-label position="floating">Price ($)</ion-label>
-                  <ion-input [(ngModel)]="editingPerfume!.precio" type="number" placeholder="150"></ion-input>
-                </ion-item>
-                <ion-item>
-                  <ion-label position="floating">Stock (Units)</ion-label>
-                  <ion-input [(ngModel)]="editingPerfume!.stock" type="number" placeholder="10"></ion-input>
-                </ion-item>
-                <ion-item>
-                  <ion-label position="floating">Size (ml)</ion-label>
-                  <ion-input [(ngModel)]="editingPerfume!.tamano_ml" type="number" placeholder="100"></ion-input>
-                </ion-item>
+                <app-input 
+                  [label]="'Product Name'" 
+                  [placeholder]="'e.g., Rose Perfume Premium'"
+                  [type]="'text'"
+                  [(ngModel)]="editingPerfume!.nombre">
+                </app-input>
+                <app-input 
+                  [label]="'Description'" 
+                  [placeholder]="'Describe the scent...'"
+                  [type]="'text'"
+                  [(ngModel)]="editingPerfume!.descripcion">
+                </app-input>
+                <app-input 
+                  [label]="'Price ($)'" 
+                  [placeholder]="'150'"
+                  [type]="'number'"
+                  [(ngModel)]="editingPerfume!.precio">
+                </app-input>
+                <app-input 
+                  [label]="'Stock (Units)'" 
+                  [placeholder]="'10'"
+                  [type]="'number'"
+                  [(ngModel)]="editingPerfume!.stock">
+                </app-input>
+                <app-input 
+                  [label]="'Size (ml)'" 
+                  [placeholder]="'100'"
+                  [type]="'number'"
+                  [(ngModel)]="editingPerfume!.tamano_ml">
+                </app-input>
                 <ion-item>
                   <ion-label position="floating">Gender</ion-label>
                   <ion-select [(ngModel)]="editingPerfume!.genero" placeholder="Select a gender">
@@ -185,3 +207,5 @@
   </div>
 
 </ion-content>
+
+<app-footer></app-footer>

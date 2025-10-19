@@ -337,3 +337,36 @@ ion-text {
     --padding-end: 12px;
   }
 }
+
+/* ===================== DEMO CARD ===================== */
+.demo-card {
+  background: linear-gradient(135deg, rgba(123, 104, 238, 0.08) 0%, rgba(159, 122, 234, 0.08) 100%);
+  border: 2px dashed #7b68ee;
+  margin: 16px 0;
+
+  ion-card-header {
+    background: linear-gradient(135deg, #7b68ee 0%, #9f7aea 100%);
+  }
+
+  .button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+
+    ion-button {
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      font-size: 12px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    .button-group {
+      grid-template-columns: 1fr;
+    }
+  }
+}

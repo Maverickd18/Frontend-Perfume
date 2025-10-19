@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { StoreGuard } from './guards/store.guard';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'seller',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
@@ -21,12 +22,18 @@ const routes: Routes = [
   },
   {
     path: 'profile-seller',
-    loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule)
+    loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule),
+    canActivate: [StoreGuard]
   }
 
   ,{
     path: 'seller',
     loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule)
+  },
+  {
+    path: 'notifications',
+    loadChildren: () => import('./pages/notifications/notifications.module').then(m => m.NotificationsPageModule),
+    canActivate: [StoreGuard]
   }
 
 ];

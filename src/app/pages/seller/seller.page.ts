@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { SellerService, Perfume, Store } from '../../services/seller.service';
+import { NotificationService } from '../../services/notification.service';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-seller',
@@ -12,6 +15,7 @@ export class SellerPage implements OnInit {
   store: Store;
   perfumes: Perfume[] = [];
   selectedPerfumes: Set<number> = new Set();
+  unreadNotifications = 0;
   newPerfume: Perfume = {
     nombre: '',
     descripcion: '',
@@ -30,7 +34,7 @@ export class SellerPage implements OnInit {
     propietario: ''
   };
 
-  constructor(private sellerService: SellerService) {
+  constructor(private sellerService: SellerService, private notificationService: NotificationService, private router: Router, private location: Location) {
     this.store = this.sellerService.getStore();
   }
 
@@ -38,6 +42,11 @@ export class SellerPage implements OnInit {
     this.loadPerfumes();
     this.sellerService.perfumes$.subscribe(perfumes => {
       this.perfumes = perfumes;
+    });
+
+    // Subscribe to notification updates
+    this.notificationService.unreadCount$.subscribe(count => {
+      this.unreadNotifications = count;
     });
   }
 
@@ -132,6 +141,40 @@ export class SellerPage implements OnInit {
 
   cancelEditPerfume() {
     this.editingPerfume = null;
+  }
+
+  // Demo methods for testing notifications
+  testCustomerInterest() {
+    const customers = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez'];
+    const customer = customers[Math.floor(Math.random() * customers.length)];
+    const product = this.perfumes[Math.floor(Math.random() * this.perfumes.length)];
+    
+    if (product) {
+      this.notificationService.simulateCustomerInterest(customer, product.nombre);
+    }
+  }
+
+  testCustomerPurchase() {
+    const customers = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez'];
+    const customer = customers[Math.floor(Math.random() * customers.length)];
+    const product = this.perfumes[Math.floor(Math.random() * this.perfumes.length)];
+    
+    if (product) {
+      const amount = product.precio * Math.floor(Math.random() * 3 + 1);
+      this.notificationService.simulateCustomerPurchase(customer, product.nombre, amount);
+    }
+  }
+
+  testLowStock() {
+    const product = this.perfumes[Math.floor(Math.random() * this.perfumes.length)];
+    
+    if (product) {
+      this.notificationService.simulateLowStock(product.nombre, Math.floor(Math.random() * 5));
+    }
+  }
+
+  onBackClick() {
+    this.location.back();
   }
 
 }
