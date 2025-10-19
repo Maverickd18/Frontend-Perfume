@@ -1,0 +1,101 @@
+.custom-button {
+  --border-radius: 14px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --padding-start: 24px;
+  --padding-end: 24px;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  margin: 8px 0;
+  height: auto;
+  transition: all 0.3s ease;
+
+  &.custom-button-primary {
+    --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+    --background-hover: linear-gradient(135deg, #7b1fa2 0%, #c2185b 100%);
+    --background-activated: linear-gradient(135deg, #6a1b9a 0%, #ad1457 100%);
+    --color: white;
+    --box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+
+    &:hover {
+      --box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.custom-button-secondary {
+    --background: #f5f5f5;
+    --background-hover: #e0e0e0;
+    --background-activated: #d0d0d0;
+    --color: #333;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.custom-button-outline {
+    --border-width: 2px;
+    --border-color: #9c27b0;
+    --border-style: solid;
+    --background: transparent;
+    --background-hover: rgba(156, 39, 176, 0.05);
+    --background-activated: rgba(156, 39, 176, 0.1);
+    --color: #9c27b0;
+    --box-shadow: none;
+
+    &:hover {
+      --border-color: #7b1fa2;
+      --color: #7b1fa2;
+    }
+  }
+
+  &.custom-button-clear {
+    --background: transparent;
+    --background-hover: rgba(156, 39, 176, 0.05);
+    --background-activated: rgba(156, 39, 176, 0.1);
+    --color: #9c27b0;
+    --box-shadow: none;
+  }
+
+  &.custom-button-small {
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    font-size: 13px;
+  }
+
+  &.custom-button-large {
+    --padding-top: 18px;
+    --padding-bottom: 18px;
+    --padding-start: 32px;
+    --padding-end: 32px;
+    font-size: 17px;
+  }
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  ion-spinner {
+    --color: currentColor;
+    width: 18px;
+    height: 18px;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .custom-button {
+    &.custom-button-secondary {
+      --background: #3a3a3a;
+      --background-hover: #444;
+      --background-activated: #4a4a4a;
+      --color: #f0f0f0;
+    }
+  }
+}

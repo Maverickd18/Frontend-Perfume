@@ -1,3 +1,22 @@
-<p>
-  button works!
-</p>
+<ion-button
+  [expand]="expand"
+  [disabled]="disabled || loading"
+  [class]="'custom-button custom-button-' + type + ' custom-button-' + size"
+  (click)="onClick()">
+  
+  <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
+  
+  <ion-icon 
+    *ngIf="icon && !loading && iconPosition === 'start'" 
+    [name]="icon" 
+    slot="start">
+  </ion-icon>
+  
+  {{ text }}
+  
+  <ion-icon 
+    *ngIf="icon && !loading && iconPosition === 'end'" 
+    [name]="icon" 
+    slot="end">
+  </ion-icon>
+</ion-button>

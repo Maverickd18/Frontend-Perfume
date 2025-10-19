@@ -11,13 +11,13 @@
 
     <!-- Register Form Card -->
     <div class="form-card">
-      <h2 class="form-title">Crear Cuenta</h2>
+      <h2 class="form-title">Create Account</h2>
 
       <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
         <!-- Full Name Input -->
         <app-input
-          label="Nombre Completo"
-          placeholder="Juan Pérez"
+          label="Full Name"
+          placeholder=""
           type="text"
           icon="person-outline"
           [error]="getFullNameError()"
@@ -26,8 +26,8 @@
 
         <!-- Email Input -->
         <app-input
-          label="Correo Electrónico"
-          placeholder="ejemplo@correo.com"
+          label="Email"
+          placeholder=""
           type="email"
           icon="mail-outline"
           [error]="getEmailError()"
@@ -36,8 +36,8 @@
 
         <!-- Phone Input -->
         <app-input
-          label="Teléfono"
-          placeholder="3001234567"
+          label="Phone"
+          placeholder=""
           type="tel"
           icon="call-outline"
           [error]="getPhoneError()"
@@ -46,7 +46,7 @@
 
         <!-- Password Input -->
         <app-input
-          label="Contraseña"
+          label="Password"
           placeholder="••••••••"
           type="password"
           icon="lock-closed-outline"
@@ -56,7 +56,7 @@
 
         <!-- Confirm Password Input -->
         <app-input
-          label="Confirmar Contraseña"
+          label="Confirm Password"
           placeholder="••••••••"
           type="password"
           icon="lock-closed-outline"
@@ -68,13 +68,13 @@
         <ion-item lines="none" class="terms-item">
           <ion-checkbox [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}"></ion-checkbox>
           <ion-label class="terms-label">
-            Acepto los <a class="terms-link">Términos y Condiciones</a> y la <a class="terms-link">Política de Privacidad</a>
+            acceptTerms <a class="terms-link">Terms and Conditions</a> y la <a class="terms-link">Política de Privacidad</a>
           </ion-label>
         </ion-item>
 
         <!-- Register Button -->
         <app-button
-          text="Crear Cuenta"
+          text="Create Account"
           type="primary"
           expand="block"
           icon="person-add-outline"
@@ -85,7 +85,7 @@
 
       <!-- Divider -->
       <div class="divider">
-        <span>O regístrate con</span>
+        <span>Or register with</span>
       </div>
 
       <!-- Social Register Buttons -->
@@ -106,7 +106,7 @@
 
       <!-- Switch to Login -->
       <div class="switch-auth">
-        <p>¿Ya tienes una cuenta? <a (click)="goToLogin()">Inicia Sesión</a></p>
+        <p>¿Do you have an account? <a (click)="goToLogin()">Log In</a></p>
       </div>
     </div>
   </div>
