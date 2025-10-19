@@ -1,0 +1,16 @@
+ion-searchbar {
+	--background: rgba(255,255,255,0.12);
+	--border-radius: 12px;
+	--placeholder-color: rgba(255,255,255,0.85);
+	--icon-color: #fff;
+	width: 320px;
+	max-width: 45vw;
+}
+
+@media (max-width: 576px) {
+	ion-searchbar {
+		width: 180px;
+		max-width: 60vw;
+	}
+}
+

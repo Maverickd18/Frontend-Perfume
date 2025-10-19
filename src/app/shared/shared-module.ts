@@ -8,6 +8,7 @@ import { InputComponent } from './components/input/input.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { CardComponent } from './components/card/card.component';
+import { SearchbarComponent } from './components/searchbar/searchbar.component';
 
 @NgModule({
   declarations: [
@@ -15,19 +16,22 @@ import { CardComponent } from './components/card/card.component';
     ButtonComponent,
     InputComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
   ],
   imports: [
     CommonModule,
     IonicModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SearchbarComponent
   ],
   exports: [
     ButtonComponent,
     InputComponent,
     HeaderComponent,
     FooterComponent,
+    SearchbarComponent,
+    CommonModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
