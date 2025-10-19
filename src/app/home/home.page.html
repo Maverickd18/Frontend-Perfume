@@ -1,10 +1,10 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header
+  [showBackButton]="true"
+  (backClicked)="goBack()"
+  (logoutClicked)="logout()"
+  (homeClicked)="goHome()">
+</app-header>
+
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
@@ -13,8 +13,19 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="products-list">
+    <div class="grid">
+      <div class="col" *ngFor="let p of products">
+        <app-card
+          [title]="p.title"
+          [subtitle]="p.brand"
+          [description]="p.description"
+          [image]="p.image"
+          [price]="p.price"
+          (viewProduct)="onView(p)"
+          (buyProduct)="onBuy(p)"
+        ></app-card>
+      </div>
+    </div>
   </div>
 </ion-content>
