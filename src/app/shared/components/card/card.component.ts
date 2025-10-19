@@ -13,10 +13,11 @@ export class CardComponent  implements OnInit {
   ngOnInit() {}
 
   @Input() title: string = '';
-  @Input() subtitle: string = '';
   @Input() description: string = '';
   @Input() image: string = '';
   @Input() price: number | null = null;
+  @Input() size: string = '';
+  @Input() stock: number = 0;
 
   @Output() viewProduct = new EventEmitter<void>();
   @Output() buyProduct = new EventEmitter<void>();

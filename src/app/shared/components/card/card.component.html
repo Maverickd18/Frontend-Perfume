@@ -1,18 +1,21 @@
 <ion-card class="product-card">
-  <img *ngIf="image" [src]="image" alt="{{ title }}" class="product-image"/>
+  <img *ngIf="image" [src]="image" [alt]="title" class="product-image"/>
   <ion-card-header>
     <ion-card-title>{{ title }}</ion-card-title>
-    <ion-card-subtitle *ngIf="subtitle">{{ subtitle }}</ion-card-subtitle>
   </ion-card-header>
 
   <ion-card-content>
     <p class="description">{{ description }}</p>
-    <div class="meta">
-      <div class="price" *ngIf="price">{{ price | currency:'USD' }}</div>
-      <div class="actions">
-        <app-button text="Ver" type="outline" size="small" (clicked)="view()"></app-button>
-        <app-button text="Comprar" type="primary" size="small" (clicked)="buy()"></app-button>
+    <div class="product-details">
+      <div class="specs">
+        <span class="size" *ngIf="size">Size: {{ size }}</span>
+        <span class="stock">Stock: {{ stock }}</span>
       </div>
+      <div class="price" *ngIf="price">{{ price | currency:'USD' }}</div>
+    </div>
+    <div class="actions">
+      <app-button text="View" type="outline" size="small" (clicked)="view()"></app-button>
+      <app-button text="Buy" type="primary" size="small" (clicked)="buy()"></app-button>
     </div>
   </ion-card-content>
 </ion-card>

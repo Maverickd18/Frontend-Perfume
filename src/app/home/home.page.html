@@ -18,10 +18,11 @@
       <div class="col" *ngFor="let p of products">
         <app-card
           [title]="p.title"
-          [subtitle]="p.brand"
           [description]="p.description"
           [image]="p.image"
           [price]="p.price"
+          [size]="p.size"
+          [stock]="p.stock"
           (viewProduct)="onView(p)"
           (buyProduct)="onBuy(p)"
         ></app-card>
