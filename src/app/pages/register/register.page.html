@@ -1,13 +1,113 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>register</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="auth-content">
+  <div class="auth-container">
+    <!-- Brand Section -->
+    <div class="brand-section">
+      <div class="logo-container">
+        <ion-icon name="storefront" class="brand-logo"></ion-icon>
+      </div>
+      <h1 class="brand-name">MarketPlace</h1>
+      <p class="brand-tagline">Crea tu cuenta y comienza a comprar</p>
+    </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Register Form Card -->
+    <div class="form-card">
+      <h2 class="form-title">Crear Cuenta</h2>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <!-- Full Name Input -->
+        <app-input
+          label="Nombre Completo"
+          placeholder="Juan Pérez"
+          type="text"
+          icon="person-outline"
+          [error]="getFullNameError()"
+          formControlName="fullName">
+        </app-input>
+
+        <!-- Email Input -->
+        <app-input
+          label="Correo Electrónico"
+          placeholder="ejemplo@correo.com"
+          type="email"
+          icon="mail-outline"
+          [error]="getEmailError()"
+          formControlName="email">
+        </app-input>
+
+        <!-- Phone Input -->
+        <app-input
+          label="Teléfono"
+          placeholder="3001234567"
+          type="tel"
+          icon="call-outline"
+          [error]="getPhoneError()"
+          formControlName="phone">
+        </app-input>
+
+        <!-- Password Input -->
+        <app-input
+          label="Contraseña"
+          placeholder="••••••••"
+          type="password"
+          icon="lock-closed-outline"
+          [error]="getPasswordError()"
+          formControlName="password">
+        </app-input>
+
+        <!-- Confirm Password Input -->
+        <app-input
+          label="Confirmar Contraseña"
+          placeholder="••••••••"
+          type="password"
+          icon="lock-closed-outline"
+          [error]="getConfirmPasswordError()"
+          formControlName="confirmPassword">
+        </app-input>
+
+        <!-- Terms and Conditions -->
+        <ion-item lines="none" class="terms-item">
+          <ion-checkbox [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+          <ion-label class="terms-label">
+            Acepto los <a class="terms-link">Términos y Condiciones</a> y la <a class="terms-link">Política de Privacidad</a>
+          </ion-label>
+        </ion-item>
+
+        <!-- Register Button -->
+        <app-button
+          text="Crear Cuenta"
+          type="primary"
+          expand="block"
+          icon="person-add-outline"
+          [disabled]="!acceptTerms"
+          (clicked)="onRegister()">
+        </app-button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>O regístrate con</span>
+      </div>
+
+      <!-- Social Register Buttons -->
+      <div class="social-buttons">
+        <app-button
+          text="Google"
+          type="outline"
+          icon="logo-google"
+          (clicked)="onGoogleRegister()">
+        </app-button>
+        <app-button
+          text="Facebook"
+          type="outline"
+          icon="logo-facebook"
+          (clicked)="onFacebookRegister()">
+        </app-button>
+      </div>
+
+      <!-- Switch to Login -->
+      <div class="switch-auth">
+        <p>¿Ya tienes una cuenta? <a (click)="goToLogin()">Inicia Sesión</a></p>
+      </div>
+    </div>
+  </div>
 </ion-content>

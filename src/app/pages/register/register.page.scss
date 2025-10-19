@@ -1,0 +1,225 @@
+.auth-content {
+  --background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
+}
+
+.auth-container {
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand-section {
+  text-align: center;
+  margin-bottom: 30px;
+
+  .logo-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+    border-radius: 50%;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 30px rgba(156, 39, 176, 0.4);
+    animation: float 3s ease-in-out infinite;
+
+    .brand-logo {
+      font-size: 40px;
+      color: white;
+    }
+  }
+
+  .brand-name {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 8px 0;
+  }
+
+  .brand-tagline {
+    color: #666;
+    font-size: 15px;
+    margin: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.form-card {
+  background: white;
+  border-radius: 28px;
+  padding: 32px 24px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+
+  .form-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 24px 0;
+    text-align: center;
+  }
+
+  .terms-item {
+    --background: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin: 16px 0 24px 0;
+    
+    ion-checkbox {
+      --border-color: #9c27b0;
+      --checkbox-background-checked: #9c27b0;
+      margin-right: 12px;
+      min-width: 20px;
+    }
+
+    .terms-label {
+      font-size: 13px;
+      color: #666;
+      white-space: normal;
+      line-height: 1.5;
+
+      .terms-link {
+        color: #9c27b0;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+
+        &:hover {
+          color: #7b1fa2;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .switch-auth {
+    text-align: center;
+    margin: 20px 0 0 0;
+
+    p {
+      color: #666;
+      font-size: 14px;
+      margin: 0;
+
+      a {
+        color: #9c27b0;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+
+        &:hover {
+          color: #7b1fa2;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #ddd, transparent);
+    }
+
+    span {
+      padding: 0 16px;
+      color: #999;
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+
+  .social-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-container {
+    padding: 16px;
+  }
+
+  .form-card {
+    padding: 24px 18px;
+
+    .social-buttons {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .brand-section {
+    margin-bottom: 24px;
+
+    .brand-name {
+      font-size: 28px;
+    }
+
+    .logo-container {
+      width: 70px;
+      height: 70px;
+
+      .brand-logo {
+        font-size: 35px;
+      }
+    }
+  }
+
+  .terms-item {
+    .terms-label {
+      font-size: 12px;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .auth-content {
+    --background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  .form-card {
+    background: #2a2a2a;
+
+    .form-title {
+      color: #f0f0f0;
+    }
+
+    .terms-item {
+      .terms-label {
+        color: #ccc;
+      }
+    }
+
+    .switch-auth p {
+      color: #ccc;
+    }
+  }
+
+  .brand-section .brand-tagline {
+    color: #ccc;
+  }
+}
