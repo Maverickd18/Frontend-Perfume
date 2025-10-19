@@ -7,9 +7,11 @@ import { ButtonComponent } from './components/button/button.component';
 import { InputComponent } from './components/input/input.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { CardComponent } from './components/card/card.component';
 
 @NgModule({
   declarations: [
+    CardComponent,
     ButtonComponent,
     InputComponent,
     HeaderComponent,
@@ -29,7 +31,8 @@ import { FooterComponent } from './components/footer/footer.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    IonicModule
+    IonicModule,
+    CardComponent
   ]
 })
 export class SharedModule { }

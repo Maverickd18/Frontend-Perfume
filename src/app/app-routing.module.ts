@@ -22,7 +22,11 @@ const routes: Routes = [
   {
     path: 'profile-seller',
     loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule)
+  },  {
+    path: 'profile-client',
+    loadChildren: () => import('./pages/profile-client/profile-client.module').then( m => m.ProfileClientPageModule)
   }
+
 ];
 
 @NgModule({
