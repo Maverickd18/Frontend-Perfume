@@ -2,9 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+
 import { LoginPageRoutingModule } from './login-routing.module';
 import { LoginPage } from './login.page';
-import { SharedModule } from '../../shared/shared-module';
+import { SharedModule } from 'src/app/shared/shared-module';
+
 
 @NgModule({
   imports: [
@@ -13,7 +15,7 @@ import { SharedModule } from '../../shared/shared-module';
     ReactiveFormsModule,
     IonicModule,
     LoginPageRoutingModule,
-    SharedModule
+    SharedModule 
   ],
   declarations: [LoginPage]
 })
