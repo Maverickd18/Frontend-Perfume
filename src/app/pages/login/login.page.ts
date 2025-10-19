@@ -27,7 +27,14 @@ export class LoginPage implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.loginForm.reset();
+    this.rememberMe = false;
+  }
 
   onLogin() {
     if (this.loginForm.invalid) {

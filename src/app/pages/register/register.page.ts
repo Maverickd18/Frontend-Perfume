@@ -18,6 +18,7 @@ export class RegisterPage implements OnInit {
   ) {
     this.registerForm = this.formBuilder.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
+      userType: ['client', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -25,7 +26,17 @@ export class RegisterPage implements OnInit {
     }, { validators: this.passwordMatchValidator });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.resetForm();
+  }
+
+ resetForm() {
+  this.registerForm.reset({
+    userType: 'client'
+  });
+  this.acceptTerms = false;
+}
+  
 
   passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password')?.value;
