@@ -22,7 +22,11 @@ const routes: Routes = [
   {
     path: 'profile-seller',
     loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule)
+  },  {
+    path: 'forgot-password',
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
   }
+
 ];
 
 @NgModule({

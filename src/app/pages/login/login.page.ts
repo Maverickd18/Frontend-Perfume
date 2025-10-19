@@ -22,7 +22,14 @@ export class LoginPage implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.loginForm.reset();
+    this.rememberMe = false;
+  }
 
   onLogin() {
     if (this.loginForm.valid) {
@@ -45,9 +52,9 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/register']);
   }
 
-  onForgotPassword() {
-    console.log('Forgot password');
-  }
+ onForgotPassword() {
+  this.router.navigate(['/forgot-password']);
+}
 
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(key => {

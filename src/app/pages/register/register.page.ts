@@ -25,7 +25,15 @@ export class RegisterPage implements OnInit {
     }, { validators: this.passwordMatchValidator });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.registerForm.reset();
+    this.acceptTerms = false;
+  }
+  
 
   passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password')?.value;
