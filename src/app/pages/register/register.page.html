@@ -23,6 +23,19 @@
           [error]="getFullNameError()"
           formControlName="fullName">
         </app-input>
+        <div class="user-type-section">
+  <label class="user-type-label">I am a:</label>
+  <ion-segment formControlName="userType" mode="ios" class="user-type-segment">
+    <ion-segment-button value="client">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Client</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="seller">
+      <ion-icon name="storefront-outline"></ion-icon>
+      <ion-label>Seller</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</div>
 
         <!-- Email Input -->
         <app-input
