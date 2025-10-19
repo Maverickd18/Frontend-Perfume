@@ -7,13 +7,15 @@ import { ButtonComponent } from './components/button/button.component';
 import { InputComponent } from './components/input/input.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { StepperComponent } from './components/stepper/stepper.component';
 
 @NgModule({
   declarations: [
     ButtonComponent,
     InputComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    StepperComponent
   ],
   imports: [
     CommonModule,
@@ -26,6 +28,7 @@ import { FooterComponent } from './components/footer/footer.component';
     InputComponent,
     HeaderComponent,
     FooterComponent,
+    StepperComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

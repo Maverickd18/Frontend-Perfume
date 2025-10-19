@@ -1,0 +1,372 @@
+/* Seller page styles */
+:host {
+  --ion-background-color: #f5f1ef;
+}
+
+h2 {
+  margin-top: 0;
+  color: #c4356a;
+  font-weight: 600;
+}
+
+/* ===================== ANIMACIONES ===================== */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* ===================== ION HEADER ===================== */
+ion-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
+    box-shadow: 0 4px 15px rgba(196, 53, 106, 0.2);
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  ion-title {
+    color: white;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* ===================== ION CONTENT ===================== */
+ion-content {
+  --background: #f5f1ef;
+}
+
+/* ===================== ION CARDS ===================== */
+ion-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(196, 53, 106, 0.12);
+  border: none;
+  margin: 16px 0;
+  animation: slideInUp 0.5s ease-out;
+  overflow: hidden;
+  --background: white;
+
+  &:hover {
+    box-shadow: 0 12px 32px rgba(196, 53, 106, 0.18);
+    transform: translateY(-4px);
+    transition: all 0.3s ease;
+  }
+
+  ion-card-header {
+    background: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
+    padding: 20px;
+    border-bottom: 3px solid #f0a0c0;
+
+    ion-card-title {
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin: 0;
+    }
+  }
+
+  ion-card-content {
+    padding: 20px;
+  }
+}
+
+/* ===================== ION BUTTONS ===================== */
+ion-button {
+  --border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+
+  &[color="primary"] {
+    --background: linear-gradient(135deg, #7b68ee 0%, #9f7aea 100%);
+    --background-activated: linear-gradient(135deg, #6a5adb 0%, #8e6b9d 100%);
+    animation: scaleIn 0.4s ease-out;
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(123, 104, 238, 0.4);
+      transform: scale(1.02);
+    }
+  }
+
+  &[color="success"] {
+    --background: linear-gradient(135deg, #50c878 0%, #6fdd99 100%);
+    --background-activated: linear-gradient(135deg, #45b866 0%, #64d68f 100%);
+    animation: scaleIn 0.4s ease-out;
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(80, 200, 120, 0.4);
+      transform: scale(1.02);
+    }
+  }
+
+  &[color="danger"] {
+    --background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+    --background-activated: linear-gradient(135deg, #ff5252 0%, #ff7676 100%);
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      transform: scale(1.02);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &[color="medium"] {
+    --background: linear-gradient(135deg, #d0d0d0 0%, #e0e0e0 100%);
+    --text-color: #333;
+    --background-activated: linear-gradient(135deg, #c0c0c0 0%, #d0d0d0 100%);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+/* ===================== ION INPUTS ===================== */
+ion-item {
+  --background: white;
+  --color: #333;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  animation: slideInLeft 0.4s ease-out;
+
+  ion-label {
+    color: #c4356a;
+    font-weight: 500;
+
+    &[position="floating"] {
+      color: #666;
+    }
+  }
+
+  ion-input,
+  ion-textarea,
+  ion-select {
+    --color: #333;
+    --placeholder-color: #aaa;
+    font-size: 16px;
+  }
+
+  ion-textarea {
+    min-height: 100px;
+  }
+
+  ion-select-option {
+    color: #333;
+  }
+}
+
+ion-input::part(container),
+ion-textarea::part(container),
+ion-select::part(container) {
+  border-bottom: 2px solid #e0e0e0;
+  transition: border-color 0.3s ease;
+}
+
+/* ===================== ION CHECKBOXES ===================== */
+ion-checkbox {
+  --checkmark-color: white;
+  --background: white;
+  --border-color: #c4356a;
+  --background-checked: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+/* ===================== ION LISTS ===================== */
+ion-list {
+  background: transparent;
+  padding: 0;
+
+  ion-item-sliding {
+    margin-bottom: 12px;
+    animation: slideInUp 0.5s ease-out;
+
+    ion-item {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(196, 53, 106, 0.08);
+      margin: 8px 0;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 8px 20px rgba(196, 53, 106, 0.15);
+        transform: translateX(4px);
+      }
+    }
+
+    ion-item-options {
+      background: transparent;
+
+      ion-item-option {
+        --background: transparent;
+        padding: 0 8px;
+        font-weight: 600;
+        border-radius: 8px;
+        animation: slideInLeft 0.3s ease-out;
+
+        &[color="primary"] {
+          --background: linear-gradient(135deg, #7b68ee 0%, #9f7aea 100%);
+          color: white;
+        }
+
+        &[color="danger"] {
+          --background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+          color: white;
+        }
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+}
+
+/* ===================== ION ICONS ===================== */
+ion-icon {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.15) rotate(10deg);
+  }
+}
+
+/* ===================== ION TEXT ===================== */
+ion-text {
+  color: #666;
+  
+  p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #888;
+  }
+
+  strong {
+    color: #c4356a;
+    font-weight: 600;
+  }
+}
+
+/* ===================== UTILITY CLASSES ===================== */
+.ion-padding {
+  padding: 20px;
+}
+
+.ion-margin-top {
+  margin-top: 16px;
+}
+
+.ion-margin-bottom {
+  margin-bottom: 16px;
+}
+
+.ion-text-center {
+  text-align: center;
+  color: #999;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  ion-card {
+    margin: 12px 0;
+  }
+
+  ion-button {
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    font-size: 14px;
+  }
+
+  ion-item {
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+}
+
+/* ===================== DEMO CARD ===================== */
+.demo-card {
+  background: linear-gradient(135deg, rgba(123, 104, 238, 0.08) 0%, rgba(159, 122, 234, 0.08) 100%);
+  border: 2px dashed #7b68ee;
+  margin: 16px 0;
+
+  ion-card-header {
+    background: linear-gradient(135deg, #7b68ee 0%, #9f7aea 100%);
+  }
+
+  .button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+
+    ion-button {
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      font-size: 12px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    .button-group {
+      grid-template-columns: 1fr;
+    }
+  }
+}

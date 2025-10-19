@@ -1,0 +1,211 @@
+<div *ngIf="state && state.isOpen" class="stepper-overlay">
+  <div class="stepper-modal">
+    <!-- Header -->
+    <div class="stepper-header">
+      <h2>Create Product</h2>
+      <button class="close-btn" (click)="closeStepper()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress" [style.width.%]="(state.currentStep / 4) * 100"></div>
+    </div>
+
+    <!-- Step Indicators -->
+    <div class="step-indicators">
+      <div class="step-indicator" 
+           [class.active]="state.currentStep === 1"
+           [class.completed]="state.currentStep > 1"
+           (click)="goToStep(1)">
+        <span>1</span>
+        <p>Product</p>
+      </div>
+      <div class="step-indicator" 
+           [class.active]="state.currentStep === 2"
+           [class.completed]="state.currentStep > 2"
+           (click)="state.currentStep >= 2 && goToStep(2)">
+        <span>2</span>
+        <p>Details</p>
+      </div>
+      <div class="step-indicator" 
+           [class.active]="state.currentStep === 3"
+           [class.completed]="state.currentStep > 3"
+           (click)="state.currentStep >= 3 && goToStep(3)">
+        <span>3</span>
+        <p>Category</p>
+      </div>
+      <div class="step-indicator" 
+           [class.active]="state.currentStep === 4"
+           [class.completed]="state.currentStep > 4"
+           (click)="state.currentStep >= 4 && goToStep(4)">
+        <span>4</span>
+        <p>Brand</p>
+      </div>
+    </div>
+
+    <!-- Content Container -->
+    <div class="stepper-content">
+      
+      <!-- STEP 1: Product Name and Basic Info -->
+      <div class="step-content" *ngIf="state.currentStep === 1">
+        <h3>Let's start with the basics</h3>
+        <p class="step-description">Enter your product name and initial details</p>
+        
+        <app-input 
+          [label]="'Product Name *'" 
+          [placeholder]="'e.g., Rose Perfume Premium'"
+          [type]="'text'"
+          [(ngModel)]="state.perfumeData.nombre"
+          (ngModelChange)="updatePerfumeData('nombre', $event)">
+        </app-input>
+
+        <app-input 
+          [label]="'Description'" 
+          [placeholder]="'Describe the scent...'"
+          [type]="'text'"
+          [(ngModel)]="state.perfumeData.descripcion"
+          (ngModelChange)="updatePerfumeData('descripcion', $event)">
+        </app-input>
+
+        <ion-item class="gender-select">
+          <ion-label position="floating">Gender</ion-label>
+          <ion-select [(ngModel)]="state.perfumeData.genero" 
+                      (ionChange)="updatePerfumeData('genero', $event)">
+            <ion-select-option value="Masculine">Masculine</ion-select-option>
+            <ion-select-option value="Feminine">Feminine</ion-select-option>
+            <ion-select-option value="Unisex">Unisex</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <!-- STEP 2: Price, Stock, Size -->
+      <div class="step-content" *ngIf="state.currentStep === 2">
+        <h3>Product Details</h3>
+        <p class="step-description">Enter pricing and inventory information</p>
+
+        <app-input 
+          [label]="'Price ($) *'" 
+          [placeholder]="'150'"
+          [type]="'number'"
+          [(ngModel)]="state.perfumeData.precio"
+          (ngModelChange)="updatePerfumeData('precio', $event)">
+        </app-input>
+
+        <app-input 
+          [label]="'Stock (Units)'" 
+          [placeholder]="'10'"
+          [type]="'number'"
+          [(ngModel)]="state.perfumeData.stock"
+          (ngModelChange)="updatePerfumeData('stock', $event)">
+        </app-input>
+
+        <app-input 
+          [label]="'Size (ml)'" 
+          [placeholder]="'100'"
+          [type]="'number'"
+          [(ngModel)]="state.perfumeData.tamano_ml"
+          (ngModelChange)="updatePerfumeData('tamano_ml', $event)">
+        </app-input>
+      </div>
+
+      <!-- STEP 3: Category Selection -->
+      <div class="step-content" *ngIf="state.currentStep === 3">
+        <h3>Select Category</h3>
+        <p class="step-description">Choose the fragrance category that best describes your product</p>
+
+        <div class="category-grid">
+          <div *ngFor="let category of state.categories" 
+               class="category-card"
+               [class.selected]="state.selectedCategory === category"
+               (click)="selectCategory(category)">
+            <div class="category-content">
+              <p>{{ category }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Brand Selection/Creation -->
+      <div class="step-content" *ngIf="state.currentStep === 4">
+        <h3>Select or Create Brand</h3>
+        <p class="step-description">Choose an existing brand or create a new one</p>
+
+        <div class="brand-input-section">
+          <app-input 
+            [label]="'Add New Brand'" 
+            [placeholder]="'e.g., Luxury Scents'"
+            [type]="'text'"
+            [(ngModel)]="newBrandName">
+          </app-input>
+          <app-button 
+            [type]="'primary'"
+            [icon]="'add'"
+            [iconPosition]="'start'"
+            [text]="'Add Brand'"
+            (clicked)="addNewBrand()">
+          </app-button>
+        </div>
+
+        <div class="brand-divider">OR SELECT EXISTING</div>
+
+        <div class="brand-grid">
+          <div *ngFor="let brand of state.brands" 
+               class="brand-card"
+               [class.selected]="state.selectedBrand === brand"
+               (click)="selectBrand(brand)">
+            <div class="brand-content">
+              <p>{{ brand }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="stepper-footer">
+      <app-button 
+        *ngIf="state.currentStep > 1"
+        [type]="'outline'"
+        [icon]="'chevron-back'"
+        [iconPosition]="'start'"
+        [text]="'Back'"
+        (clicked)="previousStep()">
+      </app-button>
+
+      <div class="flex-spacer"></div>
+
+      <app-button 
+        [type]="'outline'"
+        [text]="'Cancel'"
+        (clicked)="closeStepper()">
+      </app-button>
+
+      <app-button 
+        *ngIf="state.currentStep < 4"
+        [type]="'primary'"
+        [text]="'Next'"
+        [icon]="'chevron-forward'"
+        [iconPosition]="'end'"
+        [disabled]="
+          (state.currentStep === 1 && !isStep1Valid()) ||
+          (state.currentStep === 2 && !isStep2Valid()) ||
+          (state.currentStep === 3 && !isStep3Valid())
+        "
+        (clicked)="nextStep()">
+      </app-button>
+
+      <app-button 
+        *ngIf="state.currentStep === 4"
+        [type]="'primary'"
+        [icon]="'checkmark'"
+        [iconPosition]="'start'"
+        [text]="'Save Product'"
+        [disabled]="!isStep4Valid()"
+        (clicked)="savePerfume()">
+      </app-button>
+    </div>
+  </div>
+</div>

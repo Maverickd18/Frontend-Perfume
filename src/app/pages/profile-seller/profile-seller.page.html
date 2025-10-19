@@ -1,13 +1,84 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>profile-seller</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header [title]="'Seller Profile'" [showBackButton]="true" (backClicked)="onBackClick()"></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">profile-seller</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <!-- Store Info Display -->
+  <ion-card *ngIf="!isEditing && store.nombre" class="profile-card">
+    <ion-card-header>
+      <ion-card-title>{{ store.nombre }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="info-section">
+        <p><strong>Descripción:</strong></p>
+        <p>{{ store.descripcion }}</p>
+      </div>
+      <div class="info-section">
+        <p><strong>Propietario:</strong></p>
+        <p>{{ store.propietario }}</p>
+      </div>
+      <div class="info-section">
+        <p><strong>ID Tienda:</strong></p>
+        <p>{{ store.id }}</p>
+      </div>
+      <div class="button-group ion-margin-top">
+        <app-button 
+          [text]="'Edit'" 
+          [type]="'primary'" 
+          [expand]="'block'"
+          (clicked)="startEdit()">
+        </app-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Edit Form -->
+  <ion-card *ngIf="isEditing" class="edit-card">
+    <ion-card-header>
+      <ion-card-title>Editar Perfil</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <app-input 
+        [label]="'Nombre de Tienda'" 
+        [placeholder]="'Tu tienda'"
+        [type]="'text'"
+        [(ngModel)]="editStore.nombre">
+      </app-input>
+      <app-input 
+        [label]="'Descripción'" 
+        [placeholder]="'Describe tu tienda...'"
+        [type]="'text'"
+        [(ngModel)]="editStore.descripcion">
+      </app-input>
+      <app-input 
+        [label]="'Nombre del Propietario'" 
+        [placeholder]="'Tu nombre'"
+        [type]="'text'"
+        [(ngModel)]="editStore.propietario">
+      </app-input>
+      <div class="button-group ion-margin-top">
+        <app-button 
+          [text]="'Save'" 
+          [type]="'primary'" 
+          [expand]="'block'"
+          (clicked)="saveEdit()">
+        </app-button>
+        <app-button 
+          [text]="'Cancel'" 
+          [type]="'outline'" 
+          [expand]="'block'"
+          (clicked)="cancelEdit()">
+        </app-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Empty State -->
+  <ion-card *ngIf="!store.nombre">
+    <ion-card-content class="ion-text-center">
+      <p>No hay tienda creada aún</p>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>
+
+<app-footer></app-footer>
