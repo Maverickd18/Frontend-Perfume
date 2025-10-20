@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+
+// API Base URL - Cambiar según tu backend
+const API_URL = 'http://localhost:3000/api'; // Cambiar a tu URL del backend
 
 export interface Perfume {
   id?: number;
@@ -59,7 +63,7 @@ export class SellerService {
   private perfumesSubject = new BehaviorSubject<Perfume[]>(this.perfumes);
   public perfumes$ = this.perfumesSubject.asObservable();
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   getStore(): Store {
     return this.store;
@@ -99,5 +103,79 @@ export class SellerService {
       this.perfumesSubject.next([...this.perfumes]);
     }
   }
+
+  // ============= MÉTODOS HTTP PARA CONSUMIR BACKEND =============
+  // NOTA: Estos métodos están listos pero comentados para desarrollo local.
+  // Se activarán cuando el backend esté listo.
+
+  /**
+   * GET /stores/:id - Obtener tienda del usuario
+   */
+  /* getStoreFromBackend(storeId: number): Observable<Store> {
+    return this.http.get<Store>(`${API_URL}/stores/${storeId}`);
+  }
+
+  /**
+   * POST /stores - Crear nueva tienda
+   */
+  /* createStoreBackend(store: Omit<Store, 'id'>): Observable<Store> {
+    return this.http.post<Store>(`${API_URL}/stores`, store);
+  }
+
+  /**
+   * PUT /stores/:id - Actualizar tienda
+   */
+  /* updateStoreBackend(storeId: number, store: Partial<Store>): Observable<Store> {
+    return this.http.put<Store>(`${API_URL}/stores/${storeId}`, store);
+  }
+
+  /**
+   * GET /stores/:storeId/perfumes - Obtener todos los perfumes de la tienda
+   */
+  /* getPerfumesFromBackend(storeId: number): Observable<Perfume[]> {
+    return this.http.get<Perfume[]>(`${API_URL}/stores/${storeId}/perfumes`);
+  }
+
+  /**
+   * POST /stores/:storeId/perfumes - Crear nuevo perfume
+   */
+  /* createPerfumeBackend(storeId: number, perfume: Omit<Perfume, 'id'>): Observable<Perfume> {
+    return this.http.post<Perfume>(`${API_URL}/stores/${storeId}/perfumes`, perfume);
+  }
+
+  /**
+   * PUT /perfumes/:id - Actualizar perfume
+   */
+  /* updatePerfumeBackend(perfumeId: number, perfume: Partial<Perfume>): Observable<Perfume> {
+    return this.http.put<Perfume>(`${API_URL}/perfumes/${perfumeId}`, perfume);
+  }
+
+  /**
+   * DELETE /perfumes/:id - Eliminar perfume
+   */
+  /* deletePerfumeBackend(perfumeId: number): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${API_URL}/perfumes/${perfumeId}`);
+  }
+
+  /**
+   * GET /categories - Obtener todas las categorías
+   */
+  /* getCategoriesBackend(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_URL}/categories`);
+  }
+
+  /**
+   * GET /brands - Obtener todas las marcas
+   */
+  /* getBrandsBackend(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_URL}/brands`);
+  }
+
+  /**
+   * POST /brands - Crear nueva marca
+   */
+  /* createBrandBackend(brand: { nombre: string }): Observable<any> {
+    return this.http.post<any>(`${API_URL}/brands`, brand);
+  } */
 
 }

@@ -18,6 +18,13 @@ ion-header {
 
 ion-content {
   --background: #f5f1ef;
+
+  @media (min-width: 769px) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
 }
 
 /* ===================== FILTROS ===================== */
@@ -290,6 +297,8 @@ ion-button {
 }
 
 /* ===================== RESPONSIVE ===================== */
+
+/* MOBILE: max 768px */
 @media (max-width: 768px) {
   .notification-card {
     margin: 8px 0;
@@ -327,6 +336,135 @@ ion-button {
 
       h2 {
         font-size: 18px;
+      }
+    }
+  }
+}
+
+/* DESKTOP: 769px and up */
+@media (min-width: 769px) {
+  ion-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    --padding-top: 20px;
+    --padding-bottom: 20px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+
+    .filter-card,
+    .notification-card,
+    .empty-state,
+    .action-buttons {
+      width: 100%;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .filter-card {
+    margin-top: 0;
+    margin-bottom: 24px;
+
+    .filter-segment {
+      display: flex;
+      justify-content: space-between;
+
+      ion-segment-button {
+        flex: 1;
+      }
+    }
+  }
+
+  .notification-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 12px auto;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 12px 32px rgba(196, 53, 106, 0.2);
+      transform: translateY(-2px);
+    }
+
+    ion-card-header {
+      padding: 20px;
+
+      .notification-header {
+        gap: 16px;
+        display: flex;
+        align-items: flex-start;
+
+        .notification-icon {
+          font-size: 40px;
+          flex-shrink: 0;
+        }
+
+        .notification-title {
+          flex: 1;
+
+          ion-card-title {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    ion-card-content {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+
+      .notification-product,
+      .notification-message,
+      .notification-details {
+        grid-column: 1;
+      }
+
+      .notification-badge {
+        grid-column: 2;
+        justify-self: end;
+        align-self: start;
+      }
+    }
+  }
+
+  .empty-state {
+    ion-card-content {
+      padding: 60px 40px;
+
+      ion-icon {
+        font-size: 80px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .action-buttons {
+    margin-top: 24px;
+    margin-bottom: 0;
+
+    ion-card-content {
+      padding: 20px;
+
+      div {
+        display: flex;
+        gap: 12px;
+        max-width: 400px;
+        margin: 0 auto;
+
+        app-button {
+          flex: 1;
+        }
       }
     }
   }

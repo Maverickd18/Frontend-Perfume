@@ -1,6 +1,6 @@
 <app-header [title]="'My Store'" [showBackButton]="true" [unreadNotifications]="store.nombre ? unreadNotifications : 0" (backClicked)="onBackClick()"></app-header>
 
-<ion-content class="ion-padding">
+<ion-content>
   
   <!-- Form to Create My Store (show only if store doesn't exist) -->
   <ion-card *ngIf="showCreateStore && !store.nombre">

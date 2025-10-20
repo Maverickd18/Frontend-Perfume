@@ -80,6 +80,12 @@ ion-header {
 /* ===================== ION CONTENT ===================== */
 ion-content {
   --background: #f5f1ef;
+
+  @media (min-width: 769px) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
 }
 
 /* ===================== ION CARDS ===================== */
@@ -321,6 +327,8 @@ ion-text {
 }
 
 /* ===================== RESPONSIVE ===================== */
+
+/* MOBILE: max 768px */
 @media (max-width: 768px) {
   ion-card {
     margin: 12px 0;
@@ -335,6 +343,192 @@ ion-text {
   ion-item {
     --padding-start: 12px;
     --padding-end: 12px;
+  }
+
+  .demo-card .button-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* DESKTOP: 769px and up */
+@media (min-width: 769px) {
+  :host {
+    --ion-padding: 40px 20px;
+  }
+
+  ion-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    --padding-top: 30px;
+    --padding-bottom: 30px;
+    --padding-start: 30px;
+    --padding-end: 30px;
+  }
+
+  ion-card {
+    width: 100%;
+    max-width: 1000px;
+    margin: 16px auto;
+    box-shadow: 0 8px 24px rgba(196, 53, 106, 0.12);
+
+    &:hover {
+      box-shadow: 0 16px 40px rgba(196, 53, 106, 0.18);
+      transform: translateY(-6px);
+    }
+
+    ion-card-header {
+      padding: 24px;
+
+      ion-card-title {
+        font-size: 22px;
+        font-weight: 700;
+      }
+    }
+
+    ion-card-content {
+      padding: 24px;
+    }
+  }
+
+  .profile-card {
+    ion-card-content {
+      .info-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #e0e0e0;
+
+        p {
+          margin: 0;
+          flex: 1;
+
+          &:first-of-type {
+            font-weight: 600;
+            color: #c4356a;
+            width: 150px;
+            flex: 0 0 auto;
+          }
+        }
+      }
+    }
+  }
+
+  .button-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+
+    app-button {
+      width: 100%;
+    }
+  }
+
+  /* Products List Layout */
+  ion-list {
+    width: 100%;
+  }
+
+  ion-item-sliding {
+    ion-item {
+      padding: 16px 12px;
+      border-bottom: 1px solid #e0e0e0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      ion-label {
+        margin: 16px 0;
+
+        h2 {
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0 0 8px 0;
+        }
+
+        p {
+          font-size: 13px;
+          color: #666;
+          margin: 4px 0;
+
+          &:last-of-type {
+            margin-top: 12px;
+            font-weight: 500;
+          }
+        }
+      }
+
+      ion-checkbox {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  /* Edit Form */
+  .edit-card {
+    max-width: 600px;
+    margin: 20px auto;
+
+    ion-card-content {
+      display: grid;
+      gap: 16px;
+
+      app-input {
+        width: 100%;
+      }
+
+      .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+    }
+  }
+
+  /* Toolbar with Delete Button */
+  .ion-margin-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    app-button {
+      min-width: 200px;
+    }
+  }
+
+  /* Store Form */
+  ion-card-content {
+    app-input {
+      margin-bottom: 16px;
+    }
+  }
+
+  ion-button {
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+    font-size: 16px;
+  }
+
+  ion-item {
+    margin-bottom: 16px;
+
+    ion-label {
+      font-size: 16px;
+      font-weight: 500;
+
+      &[position="floating"] {
+        font-size: 14px;
+      }
+    }
+
+    ion-input,
+    ion-textarea {
+      font-size: 16px;
+    }
   }
 }
 
