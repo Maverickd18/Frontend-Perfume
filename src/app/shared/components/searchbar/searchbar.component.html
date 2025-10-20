@@ -1,7 +1,28 @@
-<ion-searchbar
-  [(ngModel)]="value"
-  [showClearButton]="showClearButton"
-  (ionInput)="onInput($event)"
-  (ionClear)="onClear($event)"
-  placeholder="Search perfumes">
-</ion-searchbar>
+<div class="searchbar-filters">
+  <ion-searchbar
+    [(ngModel)]="value"
+    [showClearButton]="showClearButton"
+    (ionInput)="onInput($event)"
+    (ionClear)="onClear($event)"
+    placeholder="Search perfumes">
+  </ion-searchbar>
+  <div class="filters-row">
+    <ion-select [(ngModel)]="category" placeholder="Category" (ionChange)="emitFilters()">
+      <ion-select-option value="">All</ion-select-option>
+      <ion-select-option value="floral">Floral</ion-select-option>
+      <ion-select-option value="oriental">Oriental</ion-select-option>
+      <ion-select-option value="citrus">Citrus</ion-select-option>
+      <ion-select-option value="woody">Woody</ion-select-option>
+    </ion-select>
+    <ion-select [(ngModel)]="size" placeholder="Size" (ionChange)="emitFilters()">
+      <ion-select-option value="">All</ion-select-option>
+      <ion-select-option value="50ml">50ml</ion-select-option>
+      <ion-select-option value="75ml">75ml</ion-select-option>
+      <ion-select-option value="100ml">100ml</ion-select-option>
+    </ion-select>
+    <ion-range min="0" max="100" step="1" [(ngModel)]="priceRange" dualKnobs="true" (ionChange)="emitFilters()">
+      <ion-label slot="start">$0</ion-label>
+      <ion-label slot="end">$100</ion-label>
+    </ion-range>
+  </div>
+</div>

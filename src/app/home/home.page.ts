@@ -40,6 +40,17 @@ export class HomePage {
     }
   ];
 
+    // Estado del modal de filtro
+    filterOpen: boolean = false;
+
+    openFilter() {
+      this.filterOpen = true;
+    }
+
+    closeFilter() {
+      this.filterOpen = false;
+    }
+
   // 👉 Métodos de botones del header
   goBack() {
     this.navCtrl.back();

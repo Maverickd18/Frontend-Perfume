@@ -1,18 +1,26 @@
-<app-header
-  [showBackButton]="true"
-  (backClicked)="goBack()"
-  (logoutClicked)="logout()"
-  (homeClicked)="goHome()">
-</app-header>
-
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfumes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openFilter()">
+        <ion-icon name="filter" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Modal con el componente Searchbar -->
+  <ion-modal [isOpen]="filterOpen" (didDismiss)="closeFilter()" cssClass="filter-modal">
+    <ng-template>
+      <div class="filter-panel">
+        <app-searchbar></app-searchbar>
+        <ion-button expand="block" (click)="closeFilter()">Cerrar</ion-button>
+      </div>
+    </ng-template>
+  </ion-modal>
 
+  <!-- Lista de productos -->
   <div class="products-list">
     <div class="grid">
       <div class="col" *ngFor="let p of products">

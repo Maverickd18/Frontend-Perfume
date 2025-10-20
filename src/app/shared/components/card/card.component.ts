@@ -18,6 +18,7 @@ export class CardComponent  implements OnInit {
   @Input() price: number | null = null;
   @Input() size: string = '';
   @Input() stock: number = 0;
+  @Input() category: string = '';
 
   @Output() viewProduct = new EventEmitter<void>();
   @Output() buyProduct = new EventEmitter<void>();
