@@ -1,4 +1,5 @@
 <ion-header>
+<<<<<<< HEAD
   <ion-toolbar>
     <ion-buttons slot="start" *ngIf="showBackButton">
       <ion-back-button [icon]="backIcon" (click)="onBackClick()"></ion-back-button>
@@ -14,5 +15,49 @@
       </ion-button>
       <ng-content select="[slot='end']"></ng-content>
     </ion-buttons>
+=======
+  <ion-toolbar class="custom-header">
+    <div class="header-container">
+      <!-- 🔙 Botón atrás opcional -->
+      <app-button
+        *ngIf="showBackButton"
+        icon="arrow-back-outline"
+        type="clear"
+        size="small"
+        (clicked)="onBackClick()"
+        text="">
+      </app-button>
+
+      <!-- 🏠 Home -->
+      <app-button
+        icon="home-outline"
+        type="clear"
+        size="small"
+        (clicked)="onHomeClick()"
+        text="">
+      </app-button>
+
+      <!-- 🧑 Perfil -->
+      <app-button
+        icon="person-outline"
+        type="clear"
+        size="small"
+        (clicked)="onProfileClick()"
+        text="">
+      </app-button>
+
+      <!-- 🚪 Logout -->
+      <app-button
+        icon="log-out-outline"
+        type="clear"
+        size="small"
+        (clicked)="onLogoutClick()"
+        text="">
+      </app-button>
+
+      <!-- 🏷️ Título centrado -->
+      <h1 class="header-title">{{ title }}</h1>
+    </div>
+>>>>>>> client
   </ion-toolbar>
 </ion-header>

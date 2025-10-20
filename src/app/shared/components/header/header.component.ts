@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 export class HeaderComponent {
   @Input() title: string = '';
   @Input() showBackButton: boolean = false;
+<<<<<<< HEAD
   @Input() backIcon: string = 'arrow-back';
   @Input() unreadNotifications: number = 0;
   
@@ -29,3 +30,20 @@ export class HeaderComponent {
     this.router.navigate(['/notifications']);
   }
 }
+=======
+  @Input() showSearchbar: boolean = true;
+
+  @Output() homeClicked = new EventEmitter<void>();
+  @Output() profileClicked = new EventEmitter<void>();
+  @Output() logoutClicked = new EventEmitter<void>();
+  @Output() backClicked = new EventEmitter<void>();
+  @Output() filterClicked = new EventEmitter<void>(); // 👈 nuevo evento
+
+  onHomeClick() { this.homeClicked.emit(); }
+  onProfileClick() { this.profileClicked.emit(); }
+  onLogoutClick() { this.logoutClicked.emit(); }
+  onBackClick() { this.backClicked.emit(); }
+
+  onFilterClick() { this.filterClicked.emit(); } // 👈 lo dispara
+}
+>>>>>>> client

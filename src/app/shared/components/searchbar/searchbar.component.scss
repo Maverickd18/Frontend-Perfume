@@ -1,0 +1,52 @@
+ion-searchbar {
+	--background: rgba(255,255,255,0.12);
+	--border-radius: 12px;
+	--placeholder-color: rgba(255,255,255,0.85);
+	--icon-color: #fff;
+	width: 320px;
+	max-width: 45vw;
+}
+
+.searchbar-filters {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.filters-row {
+	display: flex;
+	flex-direction: row;
+	gap: 12px;
+	margin-top: 8px;
+	width: 100%;
+	justify-content: center;
+}
+
+.filters-row ion-select,
+.filters-row ion-range {
+	min-width: 100px;
+	max-width: 140px;
+	flex: 1 1 120px;
+}
+
+@media (max-width: 576px) {
+	.filters-row {
+		flex-direction: column;
+		gap: 8px;
+		align-items: stretch;
+	}
+	.filters-row ion-select,
+	.filters-row ion-range {
+		max-width: 100%;
+		min-width: 0;
+	}
+}
+
+@media (max-width: 576px) {
+	ion-searchbar {
+		width: 180px;
+		max-width: 60vw;
+	}
+}
+

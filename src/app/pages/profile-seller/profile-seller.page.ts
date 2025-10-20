@@ -3,6 +3,7 @@ import { SellerService, Store } from '../../services/seller.service';
 import { Location } from '@angular/common';
 
 @Component({
+  standalone: false,
   selector: 'app-profile-seller',
   templateUrl: './profile-seller.page.html',
   styleUrls: ['./profile-seller.page.scss'],

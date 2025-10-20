@@ -6,7 +6,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
+<<<<<<< HEAD
   standalone: false
+=======
+   standalone: false,
+>>>>>>> client
 })
 export class RegisterPage implements OnInit {
   registerForm: FormGroup;
