@@ -37,6 +37,10 @@ const routes: Routes = [
     path: 'notifications',
     loadChildren: () => import('./pages/notifications/notifications.module').then(m => m.NotificationsPageModule),
     canActivate: [StoreGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
   }
 ];
 

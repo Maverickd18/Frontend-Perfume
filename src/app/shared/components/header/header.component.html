@@ -5,11 +5,11 @@
     </ion-buttons>
     <ion-title>{{ title }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="onNotificationClick()" *ngIf="unreadNotifications > 0">
+      <ion-button *ngIf="showNotifications && unreadNotifications > 0" (click)="onNotificationClick()">
         <ion-icon name="notifications"></ion-icon>
         <ion-badge color="danger">{{ unreadNotifications }}</ion-badge>
       </ion-button>
-      <ion-button (click)="onNotificationClick()" *ngIf="unreadNotifications === 0">
+      <ion-button *ngIf="showNotifications && unreadNotifications === 0" (click)="onNotificationClick()">
         <ion-icon name="notifications-outline"></ion-icon>
       </ion-button>
       <ng-content select="[slot='end']"></ng-content>

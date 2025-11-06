@@ -13,6 +13,7 @@ export class HeaderComponent {
   @Input() showBackButton: boolean = false;
   @Input() backIcon: string = 'arrow-back';
   @Input() unreadNotifications: number = 0;
+  @Input() showNotifications: boolean = true;
   
   @Output() backClicked = new EventEmitter<void>();
   @Output() notificationClicked = new EventEmitter<void>();

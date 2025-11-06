@@ -1,0 +1,398 @@
+<app-header [title]="'Admin Panel'" [showBackButton]="false" [showNotifications]="false"></app-header>
+
+<ion-content>
+  <div class="admin-content">
+
+  <!-- ============= NAVEGACIÓN POR TABS ============= -->
+  <ion-segment [(ngModel)]="selectedTab" (ionChange)="selectTab(selectedTab)" class="admin-tabs">
+    <ion-segment-button value="dashboard" layout="icon-start">
+      <ion-icon name="stats-chart"></ion-icon>
+      <ion-label>Dashboard</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="users" layout="icon-start">
+      <ion-icon name="people"></ion-icon>
+      <ion-label>Usuarios</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="stores" layout="icon-start">
+      <ion-icon name="storefront"></ion-icon>
+      <ion-label>Tiendas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="orders" layout="icon-start">
+      <ion-icon name="cube"></ion-icon>
+      <ion-label>Pedidos</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- ============= DASHBOARD TAB ============= -->
+  <div *ngIf="selectedTab === 'dashboard'" class="tab-content">
+    <h1>Dashboard</h1>
+    
+    <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" *ngIf="dashboardStats && !isLoading">
+      <div class="kpi-card">
+        <div class="kpi-icon users-icon">
+          <ion-icon name="people"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Usuarios Totales</p>
+          <p class="kpi-value">{{ dashboardStats.totalUsers }}</p>
+          <p class="kpi-subtitle">{{ dashboardStats.activeUsers }} activos</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon stores-icon">
+          <ion-icon name="storefront"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Tiendas</p>
+          <p class="kpi-value">{{ dashboardStats.totalStores }}</p>
+          <p class="kpi-subtitle">{{ dashboardStats.pendingStores }} pendientes</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon orders-icon">
+          <ion-icon name="cube"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Pedidos</p>
+          <p class="kpi-value">{{ dashboardStats.totalOrders }}</p>
+          <p class="kpi-subtitle">{{ dashboardStats.pendingOrders }} pendientes</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon revenue-icon">
+          <ion-icon name="cash"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Ingresos Mes</p>
+          <p class="kpi-value">${{ dashboardStats.monthlyRevenue | number: '1.0-0' }}</p>
+          <p class="kpi-subtitle">Total: ${{ dashboardStats.totalRevenue | number: '1.0-0' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= USUARIOS TAB ============= -->
+  <div *ngIf="selectedTab === 'users'" class="tab-content">
+    <h1>Gestión de Usuarios</h1>
+    
+    <!-- Búsqueda y filtros -->
+    <ion-card class="filters-card">
+      <ion-card-content>
+        <div class="search-bar">
+          <ion-searchbar 
+            placeholder="Buscar por nombre o email..." 
+            [(ngModel)]="userSearchTerm"
+            (ionChange)="searchUsers(userSearchTerm)">
+          </ion-searchbar>
+        </div>
+        <ion-segment [(ngModel)]="userFilterStatus" (ionChange)="filterUsersByStatus(userFilterStatus)" class="filter-segment">
+          <ion-segment-button value="all">Todos</ion-segment-button>
+          <ion-segment-button value="activo">Activos</ion-segment-button>
+          <ion-segment-button value="bloqueado">Bloqueados</ion-segment-button>
+        </ion-segment>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+
+    <!-- Tabla de usuarios -->
+    <div class="table-container" *ngIf="!isLoading && filteredUsers.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of paginatedUsers">
+            <td>{{ user.id }}</td>
+            <td>{{ user.nombre }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <ion-badge [color]="user.tipoUsuario === 'vendedor' ? 'primary' : 'medium'">
+                {{ user.tipoUsuario }}
+              </ion-badge>
+            </td>
+            <td>
+              <ion-badge [color]="user.estado === 'activo' ? 'success' : user.estado === 'bloqueado' ? 'danger' : 'warning'">
+                {{ user.estado }}
+              </ion-badge>
+            </td>
+            <td>
+              <div class="actions">
+                <ion-button size="small" color="primary" (click)="viewUserDetails(user)">
+                  <ion-icon slot="icon-only" name="eye"></ion-icon>
+                </ion-button>
+                <ion-button 
+                  size="small" 
+                  [color]="user.estado === 'bloqueado' ? 'success' : 'danger'"
+                  (click)="user.estado === 'bloqueado' ? unbanUser(user.id) : banUser(user.id)">
+                  <ion-icon slot="icon-only" [name]="user.estado === 'bloqueado' ? 'checkmark' : 'close'"></ion-icon>
+                </ion-button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="totalUserPages > 1">
+      <ion-button (click)="userPage = userPage - 1" [disabled]="userPage === 1">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Anterior
+      </ion-button>
+      <span>Página {{ userPage }} de {{ totalUserPages }}</span>
+      <ion-button (click)="userPage = userPage + 1" [disabled]="userPage === totalUserPages">
+        Siguiente
+        <ion-icon slot="end" name="chevron-forward"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Modal de detalles -->
+    <div class="detail-modal" *ngIf="selectedUser" (click)="closeUserDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <ion-button fill="clear" class="close-btn" (click)="closeUserDetails()">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+        <h2>Detalles del Usuario</h2>
+        <div class="detail-info">
+          <p><strong>ID:</strong> {{ selectedUser.id }}</p>
+          <p><strong>Nombre:</strong> {{ selectedUser.nombre }}</p>
+          <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+          <p><strong>Teléfono:</strong> {{ selectedUser.telefono }}</p>
+          <p><strong>Tipo:</strong> {{ selectedUser.tipoUsuario }}</p>
+          <p><strong>Estado:</strong> {{ selectedUser.estado }}</p>
+          <p><strong>Fecha Registro:</strong> {{ selectedUser.fechaRegistro }}</p>
+          <p *ngIf="selectedUser.tienda"><strong>Tienda:</strong> {{ selectedUser.tienda }}</p>
+          <p><strong>Ordenes:</strong> {{ selectedUser.ordenes }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= TIENDAS TAB ============= -->
+  <div *ngIf="selectedTab === 'stores'" class="tab-content">
+    <h1>Gestión de Tiendas</h1>
+    
+    <!-- Búsqueda y filtros -->
+    <ion-card class="filters-card">
+      <ion-card-content>
+        <div class="search-bar">
+          <ion-searchbar 
+            placeholder="Buscar tiendas..." 
+            [(ngModel)]="storeSearchTerm"
+            (ionChange)="searchStores(storeSearchTerm)">
+          </ion-searchbar>
+        </div>
+        <ion-segment [(ngModel)]="storeFilterStatus" (ionChange)="filterStoresByStatus(storeFilterStatus)" class="filter-segment">
+          <ion-segment-button value="all">Todas</ion-segment-button>
+          <ion-segment-button value="verificada">Verificadas</ion-segment-button>
+          <ion-segment-button value="pendiente">Pendientes</ion-segment-button>
+          <ion-segment-button value="suspendida">Suspendidas</ion-segment-button>
+        </ion-segment>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+
+    <!-- Tabla de tiendas -->
+    <div class="table-container" *ngIf="!isLoading && filteredStores.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Propietario</th>
+            <th>Productos</th>
+            <th>Ventas Mes</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let store of paginatedStores">
+            <td>{{ store.nombre }}</td>
+            <td>{{ store.propietario }}</td>
+            <td>{{ store.productosActivos }}</td>
+            <td>${{ store.ventasMes | number: '1.0-0' }}</td>
+            <td>
+              <ion-badge [color]="store.estado === 'verificada' ? 'success' : store.estado === 'suspendida' ? 'danger' : 'warning'">
+                {{ store.estado }}
+              </ion-badge>
+            </td>
+            <td>
+              <div class="actions">
+                <ion-button size="small" color="primary" (click)="viewStoreDetails(store)">
+                  <ion-icon slot="icon-only" name="eye"></ion-icon>
+                </ion-button>
+                <ion-button 
+                  *ngIf="store.estado === 'pendiente'"
+                  size="small" 
+                  color="success"
+                  (click)="verifyStore(store.id)">
+                  <ion-icon slot="icon-only" name="checkmark"></ion-icon>
+                </ion-button>
+                <ion-button 
+                  *ngIf="store.estado !== 'suspendida'"
+                  size="small" 
+                  color="danger"
+                  (click)="suspendStore(store.id)">
+                  <ion-icon slot="icon-only" name="ban"></ion-icon>
+                </ion-button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="totalStorePages > 1">
+      <ion-button (click)="storePage = storePage - 1" [disabled]="storePage === 1">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Anterior
+      </ion-button>
+      <span>Página {{ storePage }} de {{ totalStorePages }}</span>
+      <ion-button (click)="storePage = storePage + 1" [disabled]="storePage === totalStorePages">
+        Siguiente
+        <ion-icon slot="end" name="chevron-forward"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Modal de detalles -->
+    <div class="detail-modal" *ngIf="selectedStore" (click)="closeStoreDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <ion-button fill="clear" class="close-btn" (click)="closeStoreDetails()">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+        <h2>Detalles de la Tienda</h2>
+        <div class="detail-info">
+          <p><strong>Nombre:</strong> {{ selectedStore.nombre }}</p>
+          <p><strong>Propietario:</strong> {{ selectedStore.propietario }}</p>
+          <p><strong>Email:</strong> {{ selectedStore.email }}</p>
+          <p><strong>Descripción:</strong> {{ selectedStore.descripcion }}</p>
+          <p><strong>Productos Activos:</strong> {{ selectedStore.productosActivos }}</p>
+          <p><strong>Ventas Este Mes:</strong> ${{ selectedStore.ventasMes | number: '1.0-0' }}</p>
+          <p><strong>Calificación:</strong> {{ selectedStore.calificacion }}/5 ⭐</p>
+          <p><strong>Estado:</strong> {{ selectedStore.estado }}</p>
+          <p><strong>Fecha Creación:</strong> {{ selectedStore.fechaCreacion }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= PEDIDOS TAB ============= -->
+  <div *ngIf="selectedTab === 'orders'" class="tab-content">
+    <h1>Gestión de Pedidos</h1>
+    
+    <!-- Filtros -->
+    <ion-card class="filters-card">
+      <ion-card-content>
+        <ion-segment [(ngModel)]="orderFilterStatus" (ionChange)="filterOrdersByStatus(orderFilterStatus)" class="filter-segment">
+          <ion-segment-button value="all">Todos</ion-segment-button>
+          <ion-segment-button value="pendiente">Pendientes</ion-segment-button>
+          <ion-segment-button value="procesando">Procesando</ion-segment-button>
+          <ion-segment-button value="enviado">Enviados</ion-segment-button>
+          <ion-segment-button value="entregado">Entregados</ion-segment-button>
+        </ion-segment>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+
+    <!-- Tabla de pedidos -->
+    <div class="table-container" *ngIf="!isLoading && filteredOrders.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Tienda</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of paginatedOrders">
+            <td>{{ order.numero }}</td>
+            <td>{{ order.cliente }}</td>
+            <td>{{ order.tienda }}</td>
+            <td>${{ order.total | number: '1.2-2' }}</td>
+            <td>
+              <ion-badge [color]="
+                order.estado === 'entregado' ? 'success' : 
+                order.estado === 'cancelado' ? 'danger' : 
+                order.estado === 'pendiente' ? 'warning' : 
+                'primary'">
+                {{ order.estado }}
+              </ion-badge>
+            </td>
+            <td>{{ order.fecha }}</td>
+            <td>
+              <div class="actions">
+                <ion-button size="small" color="primary" (click)="viewOrderDetails(order)">
+                  <ion-icon slot="icon-only" name="eye"></ion-icon>
+                </ion-button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="totalOrderPages > 1">
+      <ion-button (click)="orderPage = orderPage - 1" [disabled]="orderPage === 1">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Anterior
+      </ion-button>
+      <span>Página {{ orderPage }} de {{ totalOrderPages }}</span>
+      <ion-button (click)="orderPage = orderPage + 1" [disabled]="orderPage === totalOrderPages">
+        Siguiente
+        <ion-icon slot="end" name="chevron-forward"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Modal de detalles -->
+    <div class="detail-modal" *ngIf="selectedOrder" (click)="closeOrderDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <ion-button fill="clear" class="close-btn" (click)="closeOrderDetails()">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+        <h2>Detalles del Pedido</h2>
+        <div class="detail-info">
+          <p><strong>Número de Pedido:</strong> {{ selectedOrder.numero }}</p>
+          <p><strong>Cliente:</strong> {{ selectedOrder.cliente }}</p>
+          <p><strong>Tienda:</strong> {{ selectedOrder.tienda }}</p>
+          <p><strong>Total:</strong> ${{ selectedOrder.total | number: '1.2-2' }}</p>
+          <p><strong>Productos:</strong> {{ selectedOrder.productos }}</p>
+          <p><strong>Fecha:</strong> {{ selectedOrder.fecha }}</p>
+          <p><strong>Estado Actual:</strong> {{ selectedOrder.estado }}</p>
+          <div class="status-actions" *ngIf="selectedOrder.estado !== 'entregado' && selectedOrder.estado !== 'cancelado'">
+            <p><strong>Cambiar Estado:</strong></p>
+            <ion-button size="small" (click)="updateOrderStatus(selectedOrder.id, 'procesando')">Procesando</ion-button>
+            <ion-button size="small" (click)="updateOrderStatus(selectedOrder.id, 'enviado')">Enviado</ion-button>
+            <ion-button size="small" (click)="updateOrderStatus(selectedOrder.id, 'entregado')">Entregado</ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</ion-content>
+
+<app-footer></app-footer>
