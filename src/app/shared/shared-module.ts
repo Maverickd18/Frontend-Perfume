@@ -13,12 +13,12 @@ import { SearchbarComponent } from './components/searchbar/searchbar.component';
 
 @NgModule({
   declarations: [
-    CardComponent,
     ButtonComponent,
     InputComponent,
     HeaderComponent,
     FooterComponent,
-    StepperComponent
+    StepperComponent,
+    CardComponent
   ],
   imports: [
     CommonModule,
@@ -33,13 +33,12 @@ import { SearchbarComponent } from './components/searchbar/searchbar.component';
     HeaderComponent,
     FooterComponent,
     StepperComponent,
+    CardComponent,
     SearchbarComponent,
-    CommonModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    IonicModule,
-    CardComponent
+    IonicModule
   ]
 })
 export class SharedModule { }

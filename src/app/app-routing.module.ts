@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { StoreGuard } from './guards/store.guard';
 
 const routes: Routes = [
   {
@@ -21,13 +22,30 @@ const routes: Routes = [
   },
   {
     path: 'profile-seller',
-    loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule)
+    loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule),
+    canActivate: [StoreGuard]
   },
   {
     path: 'profile-client',
-    loadChildren: () => import('./pages/profile-client/profile-client.module').then( m => m.ProfileClientPageModule)
+    loadChildren: () => import('./pages/profile-client/profile-client.module').then(m => m.ProfileClientPageModule)
+  },
+  {
+    path: 'seller',
+    loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule)
+  },
+  {
+    path: 'notifications',
+    loadChildren: () => import('./pages/notifications/notifications.module').then(m => m.NotificationsPageModule),
+    canActivate: [StoreGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
+  },
+  {
+    path: 'forgot-password',
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
   }
-
 ];
 
 @NgModule({
