@@ -17,12 +17,27 @@ export class HeaderComponent {
   
   @Output() backClicked = new EventEmitter<void>();
   @Output() notificationClicked = new EventEmitter<void>();
+  @Output() homeClicked = new EventEmitter<void>();
+  @Output() profileClicked = new EventEmitter<void>();
+  @Output() logoutClicked = new EventEmitter<void>();
 
   constructor(private location: Location, private router: Router) {}
 
   onBackClick() {
     this.backClicked.emit();
     this.location.back();
+  }
+
+  onHomeClick() {
+    this.homeClicked.emit();
+  }
+
+  onProfileClick() {
+    this.profileClicked.emit();
+  }
+
+  onLogoutClick() {
+    this.logoutClicked.emit();
   }
 
   onNotificationClick() {

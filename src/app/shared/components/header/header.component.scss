@@ -1,0 +1,36 @@
+.custom-header {
+  --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+  color: white;
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 12px;
+    width: 100%;
+  }
+
+  .header-title {
+    margin: 0 auto; /* centra el titulo */
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    flex: 1 1 auto;
+  }
+
+  .header-search {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  app-button {
+    --color: white;
+
+    ion-icon {
+      font-size: 22px;
+    }
+  }
+}
