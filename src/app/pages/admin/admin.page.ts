@@ -50,14 +50,14 @@ export class AdminPage implements OnInit {
     this.loadDashboard();
   }
 
-  // ============= DASHBOARD =============
+
   loadDashboard() {
     this.isLoading = true;
     this.dashboardStats = this.adminService.getDashboardStats();
     this.isLoading = false;
   }
 
-  // ============= USERS MANAGEMENT =============
+ 
   loadUsers() {
     this.isLoading = true;
     this.users = this.adminService.getUsers();
