@@ -1,145 +1,145 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 export interface StepperState {
-  currentStep: number;
   isOpen: boolean;
-  storeCreated: boolean;
+  currentStep: number;
   perfumeData: {
-    nombre: string;
-    descripcion: string;
-    precio: number;
+    name: string;
+    description: string;
+    price: number;
     stock: number;
-    tamano_ml: number;
-    genero: string;
-    categoria?: string;
-    marca?: string;
+    sizeMl: number;
+    genre: string;
+    releaseDate: string;
   };
-  categories: string[];
-  brands: string[];
-  selectedCategory?: string;
-  selectedBrand?: string;
+  selectedBrand?: number;
+  selectedCategory?: number;
+  brands: any[];
+  categories: any[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StepperService {
-
   private initialState: StepperState = {
-    currentStep: 1,
     isOpen: false,
-    storeCreated: false,
+    currentStep: 1,
     perfumeData: {
-      nombre: '',
-      descripcion: '',
-      precio: 0,
+      name: '',
+      description: '',
+      price: 0,
       stock: 0,
-      tamano_ml: 100,
-      genero: '',
-      categoria: '',
-      marca: ''
+      sizeMl: 100,
+      genre: 'Masculino',
+      releaseDate: new Date().toISOString().split('T')[0]
     },
-    categories: ['Floral', 'Oriental', 'Fresh', 'Wood', 'Fruity', 'Spicy'],
-    brands: ['Brand A', 'Brand B', 'Brand C', 'Generic'],
-    selectedCategory: '',
-    selectedBrand: ''
+    brands: [],
+    categories: []
   };
 
-  private state$ = new BehaviorSubject<StepperState>(this.initialState);
+  private stateSubject = new BehaviorSubject<StepperState>(this.initialState);
+  public state$ = this.stateSubject.asObservable();
 
-  constructor() { }
+  constructor() {}
 
-  getState(): Observable<StepperState> {
-    return this.state$.asObservable();
+  getState() {
+    return this.state$;
   }
 
-  getCurrentState(): StepperState {
-    return this.state$.value;
-  }
-
-  openStepper() {
-    const current = this.state$.value;
-    this.state$.next({ ...current, isOpen: true, currentStep: 1 });
-  }
-
-  closeStepper() {
-    const current = this.state$.value;
-    this.state$.next({ 
-      ...current, 
-      isOpen: false,
-      perfumeData: {
-        nombre: '',
-        descripcion: '',
-        precio: 0,
-        stock: 0,
-        tamano_ml: 100,
-        genero: '',
-        categoria: '',
-        marca: ''
-      },
-      selectedCategory: '',
-      selectedBrand: ''
+  openStepper(): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      isOpen: true,
+      currentStep: 1
     });
   }
 
-  goToStep(step: number) {
-    const current = this.state$.value;
+  closeStepper(): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...this.initialState,
+      brands: currentState.brands,
+      categories: currentState.categories
+    });
+  }
+
+  nextStep(): void {
+    const currentState = this.stateSubject.value;
+    if (currentState.currentStep < 4) {
+      this.stateSubject.next({
+        ...currentState,
+        currentStep: currentState.currentStep + 1
+      });
+    }
+  }
+
+  previousStep(): void {
+    const currentState = this.stateSubject.value;
+    if (currentState.currentStep > 1) {
+      this.stateSubject.next({
+        ...currentState,
+        currentStep: currentState.currentStep - 1
+      });
+    }
+  }
+
+  goToStep(step: number): void {
+    const currentState = this.stateSubject.value;
     if (step >= 1 && step <= 4) {
-      this.state$.next({ ...current, currentStep: step });
+      this.stateSubject.next({
+        ...currentState,
+        currentStep: step
+      });
     }
   }
 
-  nextStep() {
-    const current = this.state$.value;
-    if (current.currentStep < 4) {
-      this.state$.next({ ...current, currentStep: current.currentStep + 1 });
-    }
-  }
-
-  previousStep() {
-    const current = this.state$.value;
-    if (current.currentStep > 1) {
-      this.state$.next({ ...current, currentStep: current.currentStep - 1 });
-    }
-  }
-
-  updatePerfumeData(data: Partial<StepperState['perfumeData']>) {
-    const current = this.state$.value;
-    this.state$.next({
-      ...current,
-      perfumeData: { ...current.perfumeData, ...data }
+  updatePerfumeData(updates: Partial<StepperState['perfumeData']>): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      perfumeData: {
+        ...currentState.perfumeData,
+        ...updates
+      }
     });
   }
 
-  selectCategory(category: string) {
-    const current = this.state$.value;
-    this.state$.next({ ...current, selectedCategory: category });
+  selectBrand(brandId: number): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      selectedBrand: brandId
+    });
   }
 
-  selectBrand(brand: string) {
-    const current = this.state$.value;
-    this.state$.next({ ...current, selectedBrand: brand });
+  selectCategory(categoryId: number): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      selectedCategory: categoryId
+    });
   }
 
-  addNewBrand(brand: string) {
-    const current = this.state$.value;
-    if (!current.brands.includes(brand)) {
-      const newBrands = [...current.brands, brand];
-      this.state$.next({ ...current, brands: newBrands, selectedBrand: brand });
-    }
+  setBrands(brands: any[]): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      brands
+    });
   }
 
-  setStoreCreated(created: boolean) {
-    const current = this.state$.value;
-    this.state$.next({ ...current, storeCreated: created });
+  setCategories(categories: any[]): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      categories
+    });
   }
 
-  getPerfumeData() {
-    return this.state$.value.perfumeData;
-  }
-
-  reset() {
-    this.state$.next(this.initialState);
+  setStoreCreated(created: boolean): void {
+    // Puedes implementar lógica adicional si es necesario
   }
 }
