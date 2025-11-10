@@ -2,10 +2,11 @@
   [color]="type === 'secondary' ? 'success' : type === 'outline' ? 'medium' : type === 'clear' ? 'light' : 'primary'"
   [size]="size"
   [expand]="expand"
-  [disabled]="disabled || loading"
+  [disabled]="disabled"
   (click)="onClick()">
-  <ion-icon *ngIf="icon && iconPosition === 'start' && !loading" slot="start" [name]="icon"></ion-icon>
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+  <ion-icon *ngIf="icon && iconPosition === 'start'" slot="start" [name]="icon"></ion-icon>
   <span>{{ text }}</span>
-  <ion-icon *ngIf="icon && iconPosition === 'end' && !loading" slot="end" [name]="icon"></ion-icon>
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+  <ion-icon *ngIf="icon && iconPosition === 'end'" slot="end" [name]="icon"></ion-icon>
 </ion-button>
+

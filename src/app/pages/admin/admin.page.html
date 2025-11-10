@@ -1,4 +1,9 @@
-<app-header [title]="'Admin Panel'" [showBackButton]="false" [showNotifications]="false"></app-header>
+<app-header 
+  [title]="'Admin Panel'" 
+  [showBackButton]="false" 
+  [showNotifications]="false"
+  (homeClicked)="onHomeClick()">
+</app-header>
 
 <ion-content>
   <div class="admin-content">

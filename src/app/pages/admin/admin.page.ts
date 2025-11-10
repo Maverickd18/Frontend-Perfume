@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService, DashboardStats, User, Store, Order } from '../../services/admin.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
@@ -44,7 +45,7 @@ export class AdminPage implements OnInit {
   selectedStore: Store | null = null;
   selectedOrder: Order | null = null;
 
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService, private router: Router) { }
 
   ngOnInit() {
     this.loadDashboard();
@@ -235,6 +236,10 @@ export class AdminPage implements OnInit {
 
   get totalOrderPages(): number {
     return Math.ceil(this.filteredOrders.length / this.itemsPerPage);
+  }
+
+  onHomeClick() {
+    this.router.navigate(['/home']);
   }
 
 }

@@ -131,4 +131,8 @@ export class NotificationsPage implements OnInit {
   onBackClick() {
     this.router.navigate(['/seller']);
   }
+
+  onHomeClick() {
+    this.router.navigate(['/home']);
+  }
 }

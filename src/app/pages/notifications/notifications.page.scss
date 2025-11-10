@@ -1,12 +1,12 @@
 /* Notifications page styles */
 :host {
-  --ion-background-color: #f5f1ef;
+  --ion-background-color: #fce4ec;
 }
 
 ion-header {
   ion-toolbar {
-    --background: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
-    box-shadow: 0 4px 15px rgba(196, 53, 106, 0.2);
+    --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
   }
 
   ion-title {
@@ -17,7 +17,7 @@ ion-header {
 }
 
 ion-content {
-  --background: #f5f1ef;
+  --background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
 
   @media (min-width: 769px) {
     display: flex !important;
@@ -47,7 +47,7 @@ ion-content {
   ion-segment-button {
     --color: #999;
     --color-checked: white;
-    --background-checked: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
+    --background-checked: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
     --border-radius: 6px;
     margin: 4px;
     font-weight: 600;
@@ -96,7 +96,7 @@ ion-content {
   border-radius: 12px;
   margin: 12px 0;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(196, 53, 106, 0.08);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.08);
   cursor: pointer;
   transition: all 0.3s ease;
   --background: white;
@@ -104,14 +104,14 @@ ion-content {
   position: relative;
 
   &:hover {
-    box-shadow: 0 8px 20px rgba(196, 53, 106, 0.15);
+    box-shadow: 0 8px 20px rgba(156, 39, 176, 0.15);
     transform: translateX(4px);
   }
 
   &.unread {
-    border-left: 4px solid #c4356a;
-    background: linear-gradient(135deg, rgba(196, 53, 106, 0.02) 0%, rgba(232, 93, 138, 0.02) 100%);
-    box-shadow: 0 4px 12px rgba(196, 53, 106, 0.15);
+    border-left: 4px solid #9c27b0;
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.02) 0%, rgba(233, 30, 99, 0.02) 100%);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.15);
     animation: pulse 2s ease-in-out infinite;
   }
 
@@ -155,7 +155,7 @@ ion-content {
         --padding-end: 4px;
 
         ion-icon {
-          color: #c4356a;
+          color: #9c27b0;
         }
       }
     }
@@ -170,7 +170,7 @@ ion-content {
       margin-bottom: 8px;
 
       strong {
-        color: #c4356a;
+        color: #9c27b0;
       }
     }
 
@@ -241,7 +241,7 @@ ion-content {
     }
 
     h2 {
-      color: #c4356a;
+      color: #9c27b0;
       font-size: 22px;
       font-weight: 700;
       margin: 0 0 8px 0;

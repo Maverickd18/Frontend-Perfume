@@ -1,11 +1,15 @@
 /* Seller page styles */
 :host {
-  --ion-background-color: #f5f1ef;
+  --ion-background-color: #fce4ec;
+}
+
+ion-content {
+  --background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
 }
 
 h2 {
   margin-top: 0;
-  color: #c4356a;
+  color: #9c27b0;
   font-weight: 600;
 }
 

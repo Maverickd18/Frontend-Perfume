@@ -1,3 +1,11 @@
+:host {
+  --ion-background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
+}
+
+ion-content {
+  --background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
+}
+
 .perfume-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

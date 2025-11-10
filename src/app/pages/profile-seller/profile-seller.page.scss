@@ -1,24 +1,24 @@
 // Profile Seller Page Styles
 ion-content {
-  --background: #f5f1ef;
+  --background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
   --ion-padding: 1.5rem;
 }
 
 .profile-card,
 .edit-card {
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(196, 53, 106, 0.15);
+  box-shadow: 0 4px 15px rgba(156, 39, 176, 0.15);
   border: none;
   background: white;
   margin-bottom: 1.5rem;
   animation: slideInUp 0.6s ease-out;
 
   ion-card-header {
-    border-bottom: 2px solid #c4356a;
+    border-bottom: 2px solid #9c27b0;
     padding-bottom: 1rem;
 
     ion-card-title {
-      color: #c4356a;
+      color: #9c27b0;
       font-weight: 700;
       font-size: 1.5rem;
     }

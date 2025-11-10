@@ -1,38 +1,36 @@
-<div class="input-wrapper">
-  <ion-item [class.ion-invalid]="error" [class.ion-touched]="error" lines="none" class="custom-input">
-    <ion-icon *ngIf="icon" [name]="icon" slot="start" class="input-icon"></ion-icon>
-    <ion-label position="floating" *ngIf="label">{{ label }}</ion-label>
-    
-    <ion-input
-      *ngIf="type !== 'password'"
-      [type]="type"
-      [placeholder]="placeholder"
-      [disabled]="disabled"
-      [value]="value"
-      (ionInput)="onInputChange($event)"
-      (ionBlur)="onTouched()">
-    </ion-input>
-
-    <ion-input
-      *ngIf="type === 'password'"
-      [type]="showPassword ? 'text' : 'password'"
-      [placeholder]="placeholder"
-      [disabled]="disabled"
-      [value]="value"
-      (ionInput)="onInputChange($event)"
-      (ionBlur)="onTouched()">
-    </ion-input>
-    
-    <ion-icon 
-      *ngIf="type === 'password'" 
-      [name]="showPassword ? 'eye-off' : 'eye'" 
-      slot="end" 
-      class="password-toggle"
-      (click)="showPassword = !showPassword">
-    </ion-icon>
-  </ion-item>
+<ion-item class="input-wrapper" lines="none">
+  <ion-label position="floating" *ngIf="label">{{ label }}</ion-label>
+  <ion-icon *ngIf="icon" slot="start" [name]="icon"></ion-icon>
   
-  <ion-text color="danger" *ngIf="error" class="error-text">
-    <p>{{ error }}</p>
-  </ion-text>
-</div>
+  <ion-input
+    *ngIf="type !== 'password'"
+    [type]="type"
+    [placeholder]="placeholder"
+    [value]="value"
+    (ionChange)="onInputChange($event)"
+    (ionBlur)="onTouched()"
+    [disabled]="disabled">
+  </ion-input>
+
+  <ion-input
+    *ngIf="type === 'password'"
+    [type]="showPassword ? 'text' : 'password'"
+    [placeholder]="placeholder"
+    [value]="value"
+    (ionChange)="onInputChange($event)"
+    (ionBlur)="onTouched()"
+    [disabled]="disabled">
+  </ion-input>
+
+  <ion-icon
+    *ngIf="type === 'password'"
+    slot="end"
+    [name]="showPassword ? 'eye-off' : 'eye'"
+    (click)="showPassword = !showPassword"
+    class="password-toggle">
+  </ion-icon>
+</ion-item>
+
+<ion-text color="danger" *ngIf="error" class="error-text">
+  <p>{{ error }}</p>
+</ion-text>

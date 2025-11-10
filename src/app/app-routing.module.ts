@@ -27,7 +27,11 @@ const routes: Routes = [
   },
   {
     path: 'profile-client',
-    loadChildren: () => import('./pages/profile-client/profile-client.module').then(m => m.ProfileClientPageModule)
+    loadChildren: () => import('./pages/profile-client/profile-client.module').then( m => m.ProfileClientPageModule)
+  },
+  {
+    path: 'forgot-password',
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
   },
   {
     path: 'seller',
@@ -41,10 +45,6 @@ const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
-  },
-  {
-    path: 'forgot-password',
-    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
   }
 ];
 

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { SellerService, Store } from '../../services/seller.service';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
+  standalone: false,
   selector: 'app-profile-seller',
   templateUrl: './profile-seller.page.html',
-  styleUrls: ['./profile-seller.page.scss'],
-  standalone: false
+  styleUrls: ['./profile-seller.page.scss']
 })
 export class ProfileSellerPage implements OnInit {
 
@@ -19,7 +20,7 @@ export class ProfileSellerPage implements OnInit {
     propietario: ''
   };
 
-  constructor(private sellerService: SellerService, private location: Location) {
+  constructor(private sellerService: SellerService, private location: Location, private router: Router) {
     this.store = this.sellerService.getStore();
   }
 
@@ -49,6 +50,14 @@ export class ProfileSellerPage implements OnInit {
 
   onBackClick() {
     this.location.back();
+  }
+
+  onHomeClick() {
+    this.router.navigate(['/home']);
+  }
+
+  onNotificationClick() {
+    this.router.navigate(['/notifications']);
   }
 
 }

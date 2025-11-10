@@ -1,4 +1,10 @@
-<app-header [title]="'Seller Profile'" [showBackButton]="true" (backClicked)="onBackClick()"></app-header>
+<app-header 
+  [title]="'Seller Profile'" 
+  [showBackButton]="true" 
+  (backClicked)="onBackClick()"
+  (homeClicked)="onHomeClick()"
+  (notificationClicked)="onNotificationClick()">
+</app-header>
 
 <ion-content class="ion-padding">
 

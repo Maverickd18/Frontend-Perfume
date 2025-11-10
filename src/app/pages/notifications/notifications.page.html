@@ -1,4 +1,9 @@
-<app-header [title]="'Notifications'" [showBackButton]="true" (backClicked)="onBackClick()"></app-header>
+<app-header 
+  [title]="'Notifications'" 
+  [showBackButton]="true" 
+  (backClicked)="onBackClick()"
+  (homeClicked)="onHomeClick()">
+</app-header>
 
 <ion-content class="ion-padding">
   <!-- Filtros -->

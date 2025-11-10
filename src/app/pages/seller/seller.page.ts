@@ -134,4 +134,16 @@ export class SellerPage implements OnInit {
     this.location.back();
   }
 
+  onProfileClick() {
+    this.router.navigate(['/profile-seller']);
+  }
+
+  onNotificationClick() {
+    this.router.navigate(['/notifications']);
+  }
+
+  onHomeClick() {
+    this.router.navigate(['/home']);
+  }
+
 }

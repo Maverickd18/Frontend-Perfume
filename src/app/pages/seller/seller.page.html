@@ -1,4 +1,12 @@
-<app-header [title]="'My Store'" [showBackButton]="true" [unreadNotifications]="store.nombre ? unreadNotifications : 0" (backClicked)="onBackClick()"></app-header>
+<app-header 
+  [title]="'My Store'" 
+  [showBackButton]="true" 
+  [unreadNotifications]="store.nombre ? unreadNotifications : 0" 
+  (backClicked)="onBackClick()"
+  (profileClicked)="onProfileClick()"
+  (notificationClicked)="onNotificationClick()"
+  (homeClicked)="onHomeClick()">
+</app-header>
 
 <ion-content>
   
