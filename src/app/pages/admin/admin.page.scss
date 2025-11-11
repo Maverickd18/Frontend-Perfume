@@ -1,6 +1,10 @@
 /* Admin Page Styles */
 :host {
+<<<<<<< HEAD
   --ion-background-color: #f0eded;
+=======
+  --ion-background-color: #fce4ec;
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
 
   ion-header {
     --ion-padding-top: 4px;
@@ -10,8 +14,13 @@
 
 ion-header {
   ion-toolbar {
+<<<<<<< HEAD
     --background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+=======
+    --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
     --padding-top: 0;
     --padding-bottom: 0;
     --padding-start: 12px;
@@ -29,7 +38,11 @@ ion-header {
 }
 
 ion-content {
+<<<<<<< HEAD
   --background: #f0eded;
+=======
+  --background: linear-gradient(135deg, #fce4ec 0%, #fff8e1 50%, #f3e5f5 100%);
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
 
   @media (min-width: 769px) {
     display: flex !important;

@@ -1,158 +1,164 @@
-<app-header [title]="'My Store'" [showBackButton]="true" [unreadNotifications]="store.nombre ? unreadNotifications : 0" (backClicked)="onBackClick()"></app-header>
+<app-header 
+  [title]="'My Products'" 
+  [showBackButton]="true" 
+  [unreadNotifications]="unreadNotifications" 
+  (backClicked)="onBackClick()">
+</app-header>
 
 <ion-content>
   
-  <!-- Form to Create My Store (show only if store doesn't exist) -->
-  <ion-card *ngIf="showCreateStore && !store.nombre">
+  <!-- Welcome Section -->
+  <ion-card class="welcome-card">
     <ion-card-header>
-      <ion-card-title>Create My Store</ion-card-title>
+      <ion-card-title>Gestión de Productos</ion-card-title>
+      <ion-card-subtitle>Administra tus perfumes y marcas</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      <app-input 
-        [label]="'Store Name'" 
-        [placeholder]="'e.g., My Perfume Shop'"
-        [type]="'text'"
-        [(ngModel)]="newStore.nombre">
-      </app-input>
-      <app-input 
-        [label]="'Description'" 
-        [placeholder]="'Describe your store...'"
-        [type]="'text'"
-        [(ngModel)]="newStore.descripcion">
-      </app-input>
-      <app-input 
-        [label]="'Owner Name'" 
-        [placeholder]="'Your name'"
-        [type]="'text'"
-        [(ngModel)]="newStore.propietario">
-      </app-input>
-      <div class="ion-margin-top">
-        <app-button [type]="'primary'" [text]="'Create Store'" (clicked)="createStore()"></app-button>
-      </div>
+      <p>Desde aquí puedes agregar nuevos perfumes, editar existentes y gestionar tus marcas y categorías.</p>
     </ion-card-content>
   </ion-card>
 
-  <!-- Store Info Card (show only after store is created) -->
-  <ion-card *ngIf="store.nombre">
-    <ion-card-header>
-      <ion-card-title>{{ store.nombre }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>{{ store.descripcion }}</p>
-      <p><strong>Owner:</strong> {{ store.propietario }}</p>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Add Products Button (show only after store is created) -->
-  <app-button *ngIf="store.nombre" [type]="'primary'" [icon]="'add-circle'" [iconPosition]="'start'" [text]="'Add Products'" (clicked)="openAddProductStepper()"></app-button>
-
-  <!-- Products List (show only after store is created) -->
-  <div *ngIf="store.nombre">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>My Products ({{ perfumes.length || 0 }})</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <!-- Toolbar with Delete Selected Button -->
-        <div *ngIf="perfumes && perfumes.length > 0" class="ion-margin-bottom">
-          <app-button 
-            [type]="'outline'"
-            [disabled]="selectedPerfumes.size === 0"
-            [icon]="'trash'"
-            [iconPosition]="'start'"
-            [text]="'Delete Selected (' + (selectedPerfumes.size || 0) + ')'"
-            (clicked)="deleteSelectedPerfumes()">
-          </app-button>
-        </div>
-
-        <ion-list *ngIf="perfumes && perfumes.length > 0">
-          <div *ngFor="let perfume of perfumes">
-            <!-- Product Card View -->
-            <ion-item-sliding *ngIf="editingPerfume?.id !== perfume.id">
-              <ion-item>
-                <ion-checkbox 
-                  slot="start" 
-                  [checked]="isSelected(perfume.id!)"
-                  (ionChange)="toggleSelectPerfume(perfume.id!)">
-                </ion-checkbox>
-                <ion-label>
-                  <h2>{{ perfume.nombre }}</h2>
-                  <p>{{ perfume.descripcion }}</p>
-                  <p *ngIf="perfume.categoria"><strong>Category:</strong> {{ perfume.categoria }}</p>
-                  <p *ngIf="perfume.marca"><strong>Brand:</strong> {{ perfume.marca }}</p>
-                  <p><strong>Price:</strong> ${{ perfume.precio }} | <strong>Stock:</strong> {{ perfume.stock }} | <strong>Size:</strong> {{ perfume.tamano_ml }}ml | <strong>Gender:</strong> {{ perfume.genero }}</p>
-                </ion-label>
-              </ion-item>
-              <ion-item-options side="end">
-                <ion-item-option color="primary" (click)="startEditPerfume(perfume)">
-                  <ion-icon slot="icon-only" name="pencil"></ion-icon>
-                </ion-item-option>
-                <ion-item-option color="danger" (click)="deletePerfume(perfume.id!)">
-                  <ion-icon slot="icon-only" name="trash"></ion-icon>
-                </ion-item-option>
-              </ion-item-options>
-            </ion-item-sliding>
-
-            <!-- Edit Form inside Product Card -->
-            <ion-card *ngIf="editingPerfume?.id === perfume.id" class="ion-margin-top ion-margin-bottom">
-              <ion-card-header>
-                <ion-card-title>Edit: {{ perfume.nombre }}</ion-card-title>
-              </ion-card-header>
-              <ion-card-content>
-                <app-input 
-                  [label]="'Product Name'" 
-                  [placeholder]="'e.g., Rose Perfume Premium'"
-                  [type]="'text'"
-                  [(ngModel)]="editingPerfume!.nombre">
-                </app-input>
-                <app-input 
-                  [label]="'Description'" 
-                  [placeholder]="'Describe the scent...'"
-                  [type]="'text'"
-                  [(ngModel)]="editingPerfume!.descripcion">
-                </app-input>
-                <app-input 
-                  [label]="'Price ($)'" 
-                  [placeholder]="'150'"
-                  [type]="'number'"
-                  [(ngModel)]="editingPerfume!.precio">
-                </app-input>
-                <app-input 
-                  [label]="'Stock (Units)'" 
-                  [placeholder]="'10'"
-                  [type]="'number'"
-                  [(ngModel)]="editingPerfume!.stock">
-                </app-input>
-                <app-input 
-                  [label]="'Size (ml)'" 
-                  [placeholder]="'100'"
-                  [type]="'number'"
-                  [(ngModel)]="editingPerfume!.tamano_ml">
-                </app-input>
-                <ion-item>
-                  <ion-label position="floating">Gender</ion-label>
-                  <ion-select [(ngModel)]="editingPerfume!.genero" placeholder="Select a gender">
-                    <ion-select-option value="Masculine">Masculine</ion-select-option>
-                    <ion-select-option value="Feminine">Feminine</ion-select-option>
-                    <ion-select-option value="Unisex">Unisex</ion-select-option>
-                  </ion-select>
-                </ion-item>
-                <div class="ion-margin-top">
-                  <app-button [type]="'primary'" [text]="'Save Changes'" (clicked)="saveEditPerfume()"></app-button>
-                  <app-button [type]="'outline'" [text]="'Cancel'" (clicked)="cancelEditPerfume()"></app-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
-          </div>
-        </ion-list>
-
-        <!-- Message if no products -->
-        <ion-text *ngIf="!perfumes || perfumes.length === 0" color="medium">
-          <p class="ion-text-center ion-margin-top">No products yet. Create your first product!</p>
-        </ion-text>
-      </ion-card-content>
-    </ion-card>
+  <!-- Add Products Button -->
+  <div class="ion-padding">
+    <ion-button 
+      expand="block" 
+      (click)="openAddProductStepper()">
+      <ion-icon slot="start" name="add-circle"></ion-icon>
+      Agregar Nuevo Perfume
+    </ion-button>
   </div>
+
+  <!-- Products List -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Mis Perfumes ({{ perfumes.length || 0 }})</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <!-- Toolbar with Delete Selected Button -->
+      <div *ngIf="perfumes && perfumes.length > 0" class="ion-margin-bottom">
+        <ion-button 
+          fill="outline"
+          [disabled]="selectedPerfumes.size === 0"
+          (click)="deleteSelectedPerfumes()">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          Eliminar Seleccionados ({{ selectedPerfumes.size || 0 }})
+        </ion-button>
+      </div>
+
+      <ion-list *ngIf="perfumes && perfumes.length > 0">
+        <div *ngFor="let perfume of perfumes">
+          <!-- Product Card View -->
+          <ion-item-sliding *ngIf="editingPerfume?.id !== perfume.id">
+            <ion-item>
+              <ion-checkbox 
+                slot="start" 
+                [checked]="isSelected(perfume.id!)"
+                (ionChange)="toggleSelectPerfume(perfume.id!)">
+              </ion-checkbox>
+              <ion-label>
+                <h2>{{ perfume.name }}</h2>
+                <p>{{ perfume.description }}</p>
+                <p *ngIf="perfume.brand"><strong>Marca:</strong> {{ perfume.brand.name }}</p>
+                <p *ngIf="perfume.category"><strong>Categoría:</strong> {{ perfume.category.name }}</p>
+                <p>
+                  <strong>Precio:</strong> ${{ perfume.price }} | 
+                  <strong>Stock:</strong> {{ perfume.stock }} | 
+                  <strong>Tamaño:</strong> {{ perfume.sizeMl }}ml | 
+                  <strong>Género:</strong> {{ perfume.genre }}
+                </p>
+              </ion-label>
+            </ion-item>
+            <ion-item-options side="end">
+              <ion-item-option color="primary" (click)="startEditPerfume(perfume)">
+                <ion-icon slot="icon-only" name="pencil"></ion-icon>
+              </ion-item-option>
+              <ion-item-option color="danger" (click)="deletePerfume(perfume.id!)">
+                <ion-icon slot="icon-only" name="trash"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+
+          <!-- Edit Form inside Product Card -->
+          <ion-card *ngIf="editingPerfume?.id === perfume.id" class="ion-margin-top ion-margin-bottom">
+            <ion-card-header>
+              <ion-card-title>Editar: {{ perfume.name }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item>
+                <ion-label position="stacked">Nombre del Producto *</ion-label>
+                <ion-input 
+                  [(ngModel)]="editingPerfume!.name" 
+                  placeholder="e.g., Rose Perfume Premium">
+                </ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-label position="stacked">Descripción *</ion-label>
+                <ion-textarea 
+                  [(ngModel)]="editingPerfume!.description" 
+                  placeholder="Describe el aroma..."
+                  rows="3">
+                </ion-textarea>
+              </ion-item>
+              
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Precio ($) *</ion-label>
+                      <ion-input 
+                        type="number" 
+                        [(ngModel)]="editingPerfume!.price" 
+                        placeholder="150">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Stock *</ion-label>
+                      <ion-input 
+                        type="number" 
+                        [(ngModel)]="editingPerfume!.stock" 
+                        placeholder="10">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+              
+              <ion-item>
+                <ion-label position="stacked">Tamaño (ml) *</ion-label>
+                <ion-input 
+                  type="number" 
+                  [(ngModel)]="editingPerfume!.sizeMl" 
+                  placeholder="100">
+                </ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-label position="stacked">Género</ion-label>
+                <ion-select [(ngModel)]="editingPerfume!.genre" placeholder="Selecciona un género">
+                  <ion-select-option value="Masculino">Masculino</ion-select-option>
+                  <ion-select-option value="Femenino">Femenino</ion-select-option>
+                  <ion-select-option value="Unisex">Unisex</ion-select-option>
+                </ion-select>
+              </ion-item>
+              
+              <div class="ion-margin-top">
+                <ion-button (click)="saveEditPerfume()">Guardar Cambios</ion-button>
+                <ion-button fill="outline" (click)="cancelEditPerfume()">Cancelar</ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-list>
+
+      <!-- Message if no products -->
+      <ion-text *ngIf="!perfumes || perfumes.length === 0" color="medium">
+        <p class="ion-text-center ion-margin-top">No hay perfumes aún. ¡Crea tu primer perfume!</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>
 

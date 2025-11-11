@@ -2,12 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { AuthService } from 'src/app/services/auth';
 
 =======
 import { User } from 'src/models/user';
 import { AuthService } from 'src/app/services/auth-service';
 >>>>>>> a9afdbc3660898d22baaed6bb0de8a0caae1cba2
+=======
+import { LoadingController, AlertController } from '@ionic/angular';
+import { AuthService, LoginRequest } from '../../services/auth.service';
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
 
 @Component({
   selector: 'app-login',
@@ -18,13 +23,23 @@ import { AuthService } from 'src/app/services/auth-service';
 export class LoginPage implements OnInit {
   loginForm: FormGroup;
   rememberMe: boolean = false;
+<<<<<<< HEAD
   loading = false;
   errorMessage = '';
+=======
+  isLoading: boolean = false;
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
+<<<<<<< HEAD
     private authService: AuthService
+=======
+    private authService: AuthService,
+    private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -41,6 +56,7 @@ export class LoginPage implements OnInit {
     this.rememberMe = false;
   }
 
+<<<<<<< HEAD
   onLogin() {
 <<<<<<< HEAD
     if (this.loginForm.valid) {
@@ -54,6 +70,55 @@ export class LoginPage implements OnInit {
         error: (err) => {
           console.error('❌ Error al iniciar sesión:', err);
           alert('Correo o contraseña incorrectos');
+=======
+  async onLogin() {
+    if (this.loginForm.valid) {
+      this.isLoading = true;
+      
+      const loading = await this.loadingCtrl.create({
+        message: 'Iniciando sesión...'
+      });
+      await loading.present();
+
+      const loginData: LoginRequest = this.loginForm.value;
+
+      console.log('Datos de login enviados:', loginData);
+
+      this.authService.login(loginData).subscribe({
+        next: (response) => {
+          loading.dismiss();
+          this.isLoading = false;
+          console.log('Login exitoso - Respuesta completa:', response);
+          
+          if (response.usuario && response.usuario.rol) {
+            console.log('Redirigiendo con rol:', response.usuario.rol);
+            this.redirectByRole(response.usuario.rol);
+          } else {
+            console.error('Estructura de usuario no válida:', response);
+            this.showErrorAlert('Error en la estructura de datos del usuario');
+          }
+        },
+        error: (error) => {
+          loading.dismiss();
+          this.isLoading = false;
+          console.error('Error completo en login:', error);
+          console.error('Error status:', error.status);
+          console.error('Error message:', error.message);
+          console.error('Error response:', error.error);
+          
+          let errorMessage = 'Error al iniciar sesión';
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 401) {
+            errorMessage = 'Credenciales incorrectas';
+          } else if (error.status === 0) {
+            errorMessage = 'No se puede conectar con el servidor. Verifica que el backend esté ejecutándose.';
+          } else if (error.status === 404) {
+            errorMessage = 'Endpoint no encontrado. Verifica la URL del servidor.';
+          }
+          
+          this.showErrorAlert(errorMessage);
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
         }
       });
     } else {
@@ -95,6 +160,38 @@ export class LoginPage implements OnInit {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  private redirectByRole(rol: string) {
+    console.log('Redirigiendo con rol:', rol);
+    
+    switch (rol.toUpperCase()) {
+      case 'ADMIN':
+        this.router.navigate(['/admin']);
+        break;
+      case 'VENDEDOR':
+        this.router.navigate(['/seller']);
+        break;
+      case 'CLIENTE':
+        this.router.navigate(['/home']);
+        break;
+      default:
+        console.warn('Rol no reconocido:', rol, 'redirigiendo a home');
+        this.router.navigate(['/home']);
+        break;
+    }
+  }
+
+  async showErrorAlert(message: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message: message,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
   onGoogleLogin() {
     console.log('Google login');
   }
@@ -110,12 +207,15 @@ export class LoginPage implements OnInit {
   onForgotPassword() {
     this.router.navigate(['/forgot-password']);
   }
+<<<<<<< HEAD
 =======
   onGoogleLogin() { console.log('Google login'); }
   onFacebookLogin() { console.log('Facebook login'); }
   goToRegister() { this.router.navigate(['/register']); }
   onForgotPassword() { console.log('Forgot password'); }
 >>>>>>> a9afdbc3660898d22baaed6bb0de8a0caae1cba2
+=======
+>>>>>>> 41607925e492db535f124d8cc06bb883e597727a
 
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(key => {
