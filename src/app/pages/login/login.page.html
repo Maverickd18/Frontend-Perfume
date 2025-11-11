@@ -17,7 +17,7 @@
         <!-- Email Input -->
         <app-input
           label="Email"
-          placeholder=""
+          placeholder="Correo electrónico"
           type="email"
           icon="mail-outline"
           [error]="getEmailError()"
@@ -40,9 +40,7 @@
             <ion-checkbox [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}"></ion-checkbox>
             <ion-label>Remember me</ion-label>
           </ion-item>
-          <a class="forgot-link" (click)="onForgotPassword()">
-            ¿forgot your password?
-          </a>
+          <a class="forgot-link" (click)="onForgotPassword()">¿Olvidaste tu contraseña?</a>
         </div>
 
         <!-- Login Button -->
@@ -57,7 +55,7 @@
 
       <!-- Divider -->
       <div class="divider">
-        <span>Or continue with</span>
+        <span>O continuar con</span>
       </div>
 
       <!-- Social Login Buttons -->
@@ -78,7 +76,7 @@
 
       <!-- Switch to Register -->
       <div class="switch-auth">
-        <p>¿Don't have an account? <a (click)="goToRegister()">Sign Up</a></p>
+        <p>¿No tienes cuenta? <a (click)="goToRegister()">Regístrate</a></p>
       </div>
     </div>
   </div>

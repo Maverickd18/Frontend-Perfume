@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth';
+
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,8 @@ export class LoginPage implements OnInit {
 
   constructor(
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private authService: AuthService
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -33,8 +36,18 @@ export class LoginPage implements OnInit {
 
   onLogin() {
     if (this.loginForm.valid) {
-      console.log('Login attempt:', this.loginForm.value);
-      this.router.navigate(['/home']);
+      const credentials = this.loginForm.value;
+      this.authService.login(credentials).subscribe({
+        next: (response) => {
+          console.log('✅ Login exitoso:', response);
+          localStorage.setItem('token', response.token);
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          console.error('❌ Error al iniciar sesión:', err);
+          alert('Correo o contraseña incorrectos');
+        }
+      });
     } else {
       this.markFormGroupTouched(this.loginForm);
     }
@@ -52,9 +65,9 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/register']);
   }
 
- onForgotPassword() {
-  this.router.navigate(['/forgot-password']);
-}
+  onForgotPassword() {
+    this.router.navigate(['/forgot-password']);
+  }
 
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(key => {
