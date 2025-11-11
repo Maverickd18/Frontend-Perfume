@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SellerService, Perfume, Store } from '../../services/seller.service';
+import { SellerService, Perfume } from '../../services/seller.service';
 import { NotificationService } from '../../services/notification.service';
 import { StepperService } from '../../services/stepper.service';
 import { Router } from '@angular/router';
@@ -13,27 +13,12 @@ import { Location } from '@angular/common';
 })
 export class SellerPage implements OnInit {
 
-  store: Store;
   perfumes: Perfume[] = [];
   selectedPerfumes: Set<number> = new Set();
   unreadNotifications = 0;
-  newPerfume: Perfume = {
-    nombre: '',
-    descripcion: '',
-    precio: 0,
-    stock: 0,
-    tamano_ml: 100,
-    genero: ''
-  };
-  showAddForm = false;
+  
   editingPerfume: Perfume | null = null;
-  showCreateStore = true;
-  newStore: Store = {
-    id: 1,
-    nombre: '',
-    descripcion: '',
-    propietario: ''
-  };
+  isLoading = false;
 
   constructor(
     private sellerService: SellerService, 
@@ -41,9 +26,7 @@ export class SellerPage implements OnInit {
     private stepperService: StepperService,
     private router: Router, 
     private location: Location
-  ) {
-    this.store = this.sellerService.getStore();
-  }
+  ) {}
 
   ngOnInit() {
     this.loadPerfumes();
@@ -55,29 +38,26 @@ export class SellerPage implements OnInit {
     this.notificationService.unreadCount$.subscribe(count => {
       this.unreadNotifications = count;
     });
+
+    // Inicializar datos
+    this.sellerService.initializeData();
   }
 
   loadPerfumes() {
-    this.perfumes = this.sellerService.getPerfumes();
-  }
-
-  createStore() {
-    if (!this.newStore.nombre.trim() || !this.newStore.descripcion.trim() || !this.newStore.propietario.trim()) {
-      alert('Please complete all fields');
-      return;
-    }
-    this.sellerService.createStore(this.newStore);
-    this.store = { ...this.newStore };
-    this.showCreateStore = false;
-    this.stepperService.setStoreCreated(true);
+    this.isLoading = true;
+    this.sellerService.getPerfumes().subscribe({
+      next: () => {
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading perfumes:', error);
+        this.isLoading = false;
+      }
+    });
   }
 
   openAddProductStepper() {
     this.stepperService.openStepper();
-  }
-
-  toggleAddForm() {
-    this.showAddForm = !this.showAddForm;
   }
 
   toggleSelectPerfume(id: number) {
@@ -97,11 +77,18 @@ export class SellerPage implements OnInit {
       alert('Please select at least one product to delete');
       return;
     }
+    
     if (confirm(`Are you sure you want to delete ${this.selectedPerfumes.size} product(s)?`)) {
-      this.selectedPerfumes.forEach(id => {
-        this.sellerService.deletePerfume(id);
+      const deletePromises = Array.from(this.selectedPerfumes).map(id => 
+        this.sellerService.deletePerfume(id).toPromise()
+      );
+
+      Promise.all(deletePromises).then(() => {
+        this.selectedPerfumes.clear();
+      }).catch(error => {
+        console.error('Error deleting perfumes:', error);
+        alert('Error deleting some products. Please try again.');
       });
-      this.selectedPerfumes.clear();
     }
   }
 
@@ -110,14 +97,23 @@ export class SellerPage implements OnInit {
   }
 
   saveEditPerfume() {
-    if (!this.editingPerfume) return;
-    if (!this.editingPerfume.nombre.trim() || !this.editingPerfume.descripcion.trim() || 
-        this.editingPerfume.precio <= 0 || this.editingPerfume.stock < 0 || this.editingPerfume.tamano_ml <= 0) {
+    if (!this.editingPerfume || !this.editingPerfume.id) return;
+    
+    if (!this.editingPerfume.name.trim() || !this.editingPerfume.description.trim() || 
+        this.editingPerfume.price <= 0 || this.editingPerfume.stock < 0 || this.editingPerfume.sizeMl <= 0) {
       alert('Please complete all fields correctly');
       return;
     }
-    this.sellerService.updatePerfume(this.editingPerfume.id!, this.editingPerfume);
-    this.editingPerfume = null;
+
+    this.sellerService.updatePerfume(this.editingPerfume.id, this.editingPerfume).subscribe({
+      next: () => {
+        this.editingPerfume = null;
+      },
+      error: (error) => {
+        console.error('Error updating perfume:', error);
+        alert('Error updating product. Please try again.');
+      }
+    });
   }
 
   cancelEditPerfume() {
@@ -126,12 +122,16 @@ export class SellerPage implements OnInit {
 
   deletePerfume(id: number) {
     if (confirm('Are you sure you want to delete this product?')) {
-      this.sellerService.deletePerfume(id);
+      this.sellerService.deletePerfume(id).subscribe({
+        error: (error) => {
+          console.error('Error deleting perfume:', error);
+          alert('Error deleting product. Please try again.');
+        }
+      });
     }
   }
 
   onBackClick() {
     this.location.back();
   }
-
 }

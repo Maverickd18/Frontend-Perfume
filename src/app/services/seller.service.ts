@@ -1,181 +1,304 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
+import { AuthService } from './auth.service';
 
-// API Base URL - Cambiar según tu backend
-const API_URL = 'http://localhost:3000/api'; // Cambiar a tu URL del backend
+const API_URL = 'http://localhost:8080/api';
 
 export interface Perfume {
   id?: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
+  name: string;
+  description: string;
+  price: number;
   stock: number;
-  tamano_ml: number;
-  genero?: string;
-  fecha_lanzamiento?: string;
-  marca_id?: number;
-  categoria_id?: number;
-  categoria?: string;
-  marca?: string;
+  sizeMl: number;
+  genre?: string;
+  releaseDate?: string;
+  brandId?: number;
+  categoryId?: number;
+  brand?: {
+    id: number;
+    name: string;
+    description: string;
+    countryOrigin?: string;
+  };
+  category?: {
+    id: number;
+    name: string;
+    description: string;
+  };
 }
 
-export interface Store {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  propietario: string;
+export interface Brand {
+  id?: number;
+  name: string;
+  description: string;
+  countryOrigin?: string;
+}
+
+export interface Category {
+  id?: number;
+  name: string;
+  description: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class SellerService {
-
-  private store: Store = {
-    id: 0,
-    nombre: '',
-    descripcion: '',
-    propietario: ''
-  };
-
-  private perfumes: Perfume[] = [
-    {
-      id: 1,
-      nombre: 'Perfume Rosa Clásico',
-      descripcion: 'Perfume elegante con notas de rosa',
-      precio: 150,
-      stock: 10,
-      tamano_ml: 100,
-      genero: 'Femenino'
-    },
-    {
-      id: 2,
-      nombre: 'Colonia Fresca Masculina',
-      descripcion: 'Colonia refrescante para hombre',
-      precio: 120,
-      stock: 15,
-      tamano_ml: 100,
-      genero: 'Masculino'
-    }
-  ];
-
-  private perfumesSubject = new BehaviorSubject<Perfume[]>(this.perfumes);
+  // Inicializar explícitamente con array vacío
+  private perfumesSubject = new BehaviorSubject<Perfume[]>([]);
   public perfumes$ = this.perfumesSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  private brands: Brand[] = [];
+  private categories: Category[] = [];
 
-  getStore(): Store {
-    return this.store;
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { 
+    // Inicializar el BehaviorSubject con array vacío
+    this.perfumesSubject.next([]);
   }
 
-  updateStore(store: Partial<Store>): void {
-    this.store = { ...this.store, ...store };
+  // Headers con token
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    
+    if (!token) {
+      console.warn('No authentication token found');
+      throw new Error('No authentication token available');
+    }
+
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  createStore(store: Store): void {
-    this.store = store;
-  }
-
-  getPerfumes(): Perfume[] {
-    return this.perfumes;
-  }
-
-  addPerfume(perfume: Omit<Perfume, 'id'>): Perfume {
-    const newPerfume: Perfume = {
-      ...perfume,
-      id: this.perfumes.length > 0 ? Math.max(...this.perfumes.map(p => p.id || 0)) + 1 : 1
-    };
-    this.perfumes.push(newPerfume);
-    this.perfumesSubject.next([...this.perfumes]);
-    return newPerfume;
-  }
-
-  deletePerfume(id: number): void {
-    this.perfumes = this.perfumes.filter(p => p.id !== id);
-    this.perfumesSubject.next([...this.perfumes]);
-  }
-
-  updatePerfume(id: number, perfume: Partial<Perfume>): void {
-    const index = this.perfumes.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.perfumes[index] = { ...this.perfumes[index], ...perfume };
-      this.perfumesSubject.next([...this.perfumes]);
+  // Manejo de errores
+  private handleError(error: HttpErrorResponse) {
+    console.error('HTTP Error:', error);
+    
+    if (error.status === 403) {
+      return throwError(() => new Error('Access forbidden. Please check your permissions.'));
+    } else if (error.status === 401) {
+      return throwError(() => new Error('Unauthorized. Please login again.'));
+    } else if (error.status === 0) {
+      return throwError(() => new Error('Network error. Please check your connection.'));
+    } else {
+      return throwError(() => new Error(error.message || 'An error occurred. Please try again.'));
     }
   }
 
-  // ============= MÉTODOS HTTP PARA CONSUMIR BACKEND =============
-  // NOTA: Estos métodos están listos pero comentados para desarrollo local.
-  // Se activarán cuando el backend esté listo.
-
-  /**
-   * GET /stores/:id - Obtener tienda del usuario
-   */
-  /* getStoreFromBackend(storeId: number): Observable<Store> {
-    return this.http.get<Store>(`${API_URL}/stores/${storeId}`);
+  // Verificar permisos
+  private checkPermissions(): void {
+    if (!this.authService.isAuthenticated()) {
+      throw new Error('User not authenticated');
+    }
+    
+    if (!this.authService.isSeller() && !this.authService.isAdmin()) {
+      throw new Error('User does not have seller permissions');
+    }
   }
 
-  /**
-   * POST /stores - Crear nueva tienda
-   */
-  /* createStoreBackend(store: Omit<Store, 'id'>): Observable<Store> {
-    return this.http.post<Store>(`${API_URL}/stores`, store);
+  // ============= MARCAS =============
+  getBrands(): Observable<Brand[]> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.get<Brand[]>(`${API_URL}/brands`, { headers })
+        .pipe(
+          tap(brands => {
+            this.brands = brands || [];
+            console.log('Brands loaded:', brands);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * PUT /stores/:id - Actualizar tienda
-   */
-  /* updateStoreBackend(storeId: number, store: Partial<Store>): Observable<Store> {
-    return this.http.put<Store>(`${API_URL}/stores/${storeId}`, store);
+  createBrand(brand: Omit<Brand, 'id'>): Observable<Brand> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.post<Brand>(`${API_URL}/brands`, brand, { headers })
+        .pipe(
+          tap(newBrand => {
+            this.brands = [...(this.brands || []), newBrand];
+            console.log('Brand created:', newBrand);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * GET /stores/:storeId/perfumes - Obtener todos los perfumes de la tienda
-   */
-  /* getPerfumesFromBackend(storeId: number): Observable<Perfume[]> {
-    return this.http.get<Perfume[]>(`${API_URL}/stores/${storeId}/perfumes`);
+  // ============= CATEGORÍAS =============
+  getCategories(): Observable<Category[]> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.get<Category[]>(`${API_URL}/categories`, { headers })
+        .pipe(
+          tap(categories => {
+            this.categories = categories || [];
+            console.log('Categories loaded:', categories);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * POST /stores/:storeId/perfumes - Crear nuevo perfume
-   */
-  /* createPerfumeBackend(storeId: number, perfume: Omit<Perfume, 'id'>): Observable<Perfume> {
-    return this.http.post<Perfume>(`${API_URL}/stores/${storeId}/perfumes`, perfume);
+  createCategory(category: Omit<Category, 'id'>): Observable<Category> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.post<Category>(`${API_URL}/categories`, category, { headers })
+        .pipe(
+          tap(newCategory => {
+            this.categories = [...(this.categories || []), newCategory];
+            console.log('Category created:', newCategory);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * PUT /perfumes/:id - Actualizar perfume
-   */
-  /* updatePerfumeBackend(perfumeId: number, perfume: Partial<Perfume>): Observable<Perfume> {
-    return this.http.put<Perfume>(`${API_URL}/perfumes/${perfumeId}`, perfume);
+  // ============= PERFUMES =============
+  getPerfumes(): Observable<Perfume[]> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.get<Perfume[]>(`${API_URL}/perfumes`, { headers })
+        .pipe(
+          tap(perfumes => {
+            // Asegurar que siempre sea un array
+            const safePerfumes = Array.isArray(perfumes) ? perfumes : [];
+            this.perfumesSubject.next(safePerfumes);
+            console.log('Perfumes loaded:', safePerfumes);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * DELETE /perfumes/:id - Eliminar perfume
-   */
-  /* deletePerfumeBackend(perfumeId: number): Observable<{ success: boolean }> {
-    return this.http.delete<{ success: boolean }>(`${API_URL}/perfumes/${perfumeId}`);
+  createPerfume(perfume: Omit<Perfume, 'id'>): Observable<Perfume> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      console.log('Creating perfume with data:', perfume);
+      
+      return this.http.post<Perfume>(`${API_URL}/perfumes/nuevo`, perfume, { headers })
+        .pipe(
+          tap(newPerfume => {
+            console.log('Perfume created successfully in backend:', newPerfume);
+            
+            // Obtener el valor actual de manera segura
+            const currentValue = this.perfumesSubject.getValue();
+            const currentPerfumes = Array.isArray(currentValue) ? currentValue : [];
+            
+            // Agregar el nuevo perfume
+            const updatedPerfumes = [...currentPerfumes, newPerfume];
+            this.perfumesSubject.next(updatedPerfumes);
+            
+            console.log('Updated perfumes list:', updatedPerfumes);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * GET /categories - Obtener todas las categorías
-   */
-  /* getCategoriesBackend(): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/categories`);
+  updatePerfume(id: number, perfume: Partial<Perfume>): Observable<Perfume> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.put<Perfume>(`${API_URL}/perfumes/${id}`, perfume, { headers })
+        .pipe(
+          tap(updatedPerfume => {
+            const currentValue = this.perfumesSubject.getValue();
+            const currentPerfumes = Array.isArray(currentValue) ? currentValue : [];
+            const index = currentPerfumes.findIndex(p => p.id === id);
+            
+            if (index !== -1) {
+              currentPerfumes[index] = { ...currentPerfumes[index], ...updatedPerfume };
+              this.perfumesSubject.next([...currentPerfumes]);
+            }
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * GET /brands - Obtener todas las marcas
-   */
-  /* getBrandsBackend(): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/brands`);
+  deletePerfume(id: number): Observable<void> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.delete<void>(`${API_URL}/perfumes/${id}`, { headers })
+        .pipe(
+          tap(() => {
+            const currentValue = this.perfumesSubject.getValue();
+            const currentPerfumes = Array.isArray(currentValue) ? currentValue : [];
+            this.perfumesSubject.next(currentPerfumes.filter(p => p.id !== id));
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
 
-  /**
-   * POST /brands - Crear nueva marca
-   */
-  /* createBrandBackend(brand: { nombre: string }): Observable<any> {
-    return this.http.post<any>(`${API_URL}/brands`, brand);
-  } */
+  // ============= MÉTODOS AUXILIARES =============
+  getBrandsList(): Brand[] {
+    return this.brands || [];
+  }
 
+  getCategoriesList(): Category[] {
+    return this.categories || [];
+  }
+
+  canCreatePerfume(): boolean {
+    return this.authService.isSeller() || this.authService.isAdmin();
+  }
+
+  // Cargar datos iniciales
+  initializeData(): void {
+    if (this.canCreatePerfume()) {
+      this.getBrands().subscribe({
+        error: (error) => console.error('Error loading brands:', error)
+      });
+      this.getCategories().subscribe({
+        error: (error) => console.error('Error loading categories:', error)
+      });
+      this.getPerfumes().subscribe({
+        error: (error) => console.error('Error loading perfumes:', error)
+      });
+    }
+  }
+
+  // Método para resetear el estado si es necesario
+  resetPerfumes(): void {
+    this.perfumesSubject.next([]);
+  }
 }

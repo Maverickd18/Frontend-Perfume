@@ -1,6 +1,8 @@
+// src/app/app-routing.module.ts
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { StoreGuard } from './guards/store.guard';
+import { AuthGuard } from './guards/auth.guards';
+import { RoleGuard } from './guards/role.guard';
 
 const routes: Routes = [
   {
@@ -18,29 +20,37 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
-  },
-  {
-    path: 'profile-seller',
-    loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule),
-    canActivate: [StoreGuard]
-  },
-  {
-    path: 'forgot-password',
-    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
+    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'seller',
-    loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule)
+    loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['VENDEDOR'] }
   },
   {
     path: 'notifications',
     loadChildren: () => import('./pages/notifications/notifications.module').then(m => m.NotificationsPageModule),
+<<<<<<< HEAD
     canActivate: [StoreGuard]
   },
   {
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
+=======
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'forgot-password',
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
+>>>>>>> seller
   }
 ];
 
