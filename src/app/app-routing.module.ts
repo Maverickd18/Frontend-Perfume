@@ -26,31 +26,23 @@ const routes: Routes = [
   {
     path: 'seller',
     loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule),
-    canActivate: [AuthGuard, RoleGuard],
+    //canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['VENDEDOR'] }
   },
   {
     path: 'notifications',
     loadChildren: () => import('./pages/notifications/notifications.module').then(m => m.NotificationsPageModule),
-<<<<<<< HEAD
-    canActivate: [StoreGuard]
-  },
-  {
-    path: 'admin',
-    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
-=======
-    canActivate: [AuthGuard]
+    //canActivate: [AuthGuard]
   },
   {
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule),
-    canActivate: [AuthGuard, RoleGuard],
+    //canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN'] }
   },
   {
     path: 'forgot-password',
     loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
->>>>>>> seller
   }
 ];
 

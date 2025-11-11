@@ -1,16 +1,4 @@
 import { Injectable } from '@angular/core';
-<<<<<<< HEAD
-
-export interface DashboardStats {
-  totalUsers: number;
-  totalStores: number;
-  totalOrders: number;
-  totalRevenue: number;
-  monthlyRevenue: number;
-  activeUsers: number;
-  pendingStores: number;
-  pendingOrders: number;
-=======
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
@@ -24,7 +12,6 @@ export interface DashboardStats {
   pendingOrders: number;
   monthlyRevenue: number;
   totalRevenue: number;
->>>>>>> seller
 }
 
 export interface User {
@@ -32,13 +19,8 @@ export interface User {
   nombre: string;
   email: string;
   telefono: string;
-<<<<<<< HEAD
-  estado: 'activo' | 'bloqueado' | 'pendiente';
-  tipoUsuario: 'cliente' | 'vendedor' | 'admin';
-=======
   tipoUsuario: string;
   estado: string;
->>>>>>> seller
   fechaRegistro: string;
   tienda?: string;
   ordenes: number;
@@ -49,20 +31,11 @@ export interface Store {
   nombre: string;
   propietario: string;
   email: string;
-<<<<<<< HEAD
-  telefono: string;
-  descripcion: string;
-  estado: 'verificada' | 'pendiente' | 'suspendida';
-  productosActivos: number;
-  ventasMes: number;
-  calificacion: number;
-=======
   descripcion: string;
   productosActivos: number;
   ventasMes: number;
   calificacion: number;
   estado: string;
->>>>>>> seller
   fechaCreacion: string;
 }
 
@@ -72,14 +45,35 @@ export interface Order {
   cliente: string;
   tienda: string;
   total: number;
-<<<<<<< HEAD
-  estado: 'pendiente' | 'procesando' | 'enviado' | 'entregado' | 'cancelado';
-  fecha: string;
-  productos: number;
-=======
   productos: string;
   fecha: string;
   estado: string;
+}
+
+export interface Brand {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  activo?: boolean;
+}
+
+export interface Category {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  activo?: boolean;
+}
+
+export interface Perfume {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  precio: number;
+  stock: number;
+  marca?: string;
+  categoria?: string;
+  activo?: boolean;
+  fechaCreacion?: string;
 }
 
 export interface LoginResponse {
@@ -90,222 +84,12 @@ export interface LoginResponse {
     nombre: string;
     role: string;
   };
->>>>>>> seller
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-<<<<<<< HEAD
-
-  // Mock data - Usuarios
-  private users: User[] = [
-    {
-      id: 1,
-      nombre: 'Juan Pérez',
-      email: 'juan@example.com',
-      telefono: '+34 666 123 456',
-      estado: 'activo',
-      tipoUsuario: 'vendedor',
-      fechaRegistro: '2025-01-15',
-      tienda: 'Perfumes Premium',
-      ordenes: 45
-    },
-    {
-      id: 2,
-      nombre: 'María García',
-      email: 'maria@example.com',
-      telefono: '+34 666 234 567',
-      estado: 'activo',
-      tipoUsuario: 'cliente',
-      fechaRegistro: '2025-01-20',
-      ordenes: 12
-    },
-    {
-      id: 3,
-      nombre: 'Carlos López',
-      email: 'carlos@example.com',
-      telefono: '+34 666 345 678',
-      estado: 'bloqueado',
-      tipoUsuario: 'vendedor',
-      fechaRegistro: '2025-02-01',
-      tienda: 'Aromas del Mundo',
-      ordenes: 3
-    },
-    {
-      id: 4,
-      nombre: 'Ana Martínez',
-      email: 'ana@example.com',
-      telefono: '+34 666 456 789',
-      estado: 'activo',
-      tipoUsuario: 'cliente',
-      fechaRegistro: '2025-02-10',
-      ordenes: 28
-    }
-  ];
-
-  // Mock data - Tiendas
-  private stores: Store[] = [
-    {
-      id: 1,
-      nombre: 'Perfumes Premium',
-      propietario: 'Juan Pérez',
-      email: 'juan@example.com',
-      telefono: '+34 666 123 456',
-      descripcion: 'Tienda de perfumes de lujo importados',
-      estado: 'verificada',
-      productosActivos: 45,
-      ventasMes: 15000,
-      calificacion: 4.8,
-      fechaCreacion: '2025-01-15'
-    },
-    {
-      id: 2,
-      nombre: 'Aromas Naturales',
-      propietario: 'Laura Fernández',
-      email: 'laura@example.com',
-      telefono: '+34 666 567 890',
-      descripcion: 'Perfumes y colonias naturales',
-      estado: 'pendiente',
-      productosActivos: 23,
-      ventasMes: 5000,
-      calificacion: 0,
-      fechaCreacion: '2025-02-20'
-    },
-    {
-      id: 3,
-      nombre: 'Fragancias del Mundo',
-      propietario: 'Miguel Sánchez',
-      email: 'miguel@example.com',
-      telefono: '+34 666 678 901',
-      descripcion: 'Colección de fragancias internacionales',
-      estado: 'verificada',
-      productosActivos: 67,
-      ventasMes: 22000,
-      calificacion: 4.9,
-      fechaCreacion: '2025-01-05'
-    }
-  ];
-
-  // Mock data - Pedidos
-  private orders: Order[] = [
-    {
-      id: 1,
-      numero: 'ORD-001',
-      cliente: 'María García',
-      tienda: 'Perfumes Premium',
-      total: 250.50,
-      estado: 'entregado',
-      fecha: '2025-03-01',
-      productos: 2
-    },
-    {
-      id: 2,
-      numero: 'ORD-002',
-      cliente: 'Ana Martínez',
-      tienda: 'Fragancias del Mundo',
-      total: 180.00,
-      estado: 'enviado',
-      fecha: '2025-03-02',
-      productos: 1
-    },
-    {
-      id: 3,
-      numero: 'ORD-003',
-      cliente: 'Carlos López',
-      tienda: 'Aromas Naturales',
-      total: 95.99,
-      estado: 'procesando',
-      fecha: '2025-03-03',
-      productos: 3
-    },
-    {
-      id: 4,
-      numero: 'ORD-004',
-      cliente: 'Juan Pérez',
-      tienda: 'Perfumes Premium',
-      total: 320.00,
-      estado: 'pendiente',
-      fecha: '2025-03-04',
-      productos: 2
-    }
-  ];
-
-  constructor() { }
-
-  // ============= DASHBOARD =============
-  getDashboardStats(): DashboardStats {
-    return {
-      totalUsers: this.users.length,
-      totalStores: this.stores.length,
-      totalOrders: this.orders.length,
-      totalRevenue: 87250.50,
-      monthlyRevenue: 42500.75,
-      activeUsers: this.users.filter(u => u.estado === 'activo').length,
-      pendingStores: this.stores.filter(s => s.estado === 'pendiente').length,
-      pendingOrders: this.orders.filter(o => o.estado === 'pendiente').length
-    };
-  }
-
-  // ============= USERS =============
-  getUsers(): User[] {
-    return this.users;
-  }
-
-  banUser(userId: number): void {
-    const user = this.users.find(u => u.id === userId);
-    if (user) {
-      user.estado = 'bloqueado';
-    }
-  }
-
-  unbanUser(userId: number): void {
-    const user = this.users.find(u => u.id === userId);
-    if (user) {
-      user.estado = 'activo';
-    }
-  }
-
-  // ============= STORES =============
-  getStores(): Store[] {
-    return this.stores;
-  }
-
-  verifyStore(storeId: number): void {
-    const store = this.stores.find(s => s.id === storeId);
-    if (store) {
-      store.estado = 'verificada';
-    }
-  }
-
-  suspendStore(storeId: number): void {
-    const store = this.stores.find(s => s.id === storeId);
-    if (store) {
-      store.estado = 'suspendida';
-    }
-  }
-
-  // ============= ORDERS =============
-  getOrders(): Order[] {
-    return this.orders;
-  }
-
-  updateOrderStatus(orderId: number, newStatus: string): void {
-    const order = this.orders.find(o => o.id === orderId);
-    if (order) {
-      order.estado = newStatus as any;
-    }
-  }
-
-  // ============= PRODUCTS =============
-  deleteProduct(productId: number): void {
-    // Mock implementation
-    console.log(`Producto ${productId} eliminado`);
-  }
-
-}
-=======
   private API_URL = 'http://localhost:8080/api';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -484,9 +268,115 @@ export class AdminService {
   }
 
   // Perfumes
-  getPerfumes(filtro?: string, page: number = 0, size: number = 10): Observable<any> {
-    const params = filtro ? `?filtro=${filtro}&page=${page}&size=${size}` : `?page=${page}&size=${size}`;
-    return this.http.get(`${this.API_URL}/perfumes${params}`);
+  getPerfumes(page: number = 0, size: number = 10): Observable<any> {
+    return this.http.get(`${this.API_URL}/perfumes?page=${page}&size=${size}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading perfumes:', error);
+          return of([]);
+        })
+      );
+  }
+
+  getPerfumesBySearch(filtro: string, page: number = 0, size: number = 10): Observable<any> {
+    return this.http.get(`${this.API_URL}/perfumes/mis-perfumes?filtro=${filtro}&page=${page}&size=${size}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error searching perfumes:', error);
+          return of([]);
+        })
+      );
+  }
+
+  deletePerfume(perfumeId: number): Observable<any> {
+    return this.http.delete(`${this.API_URL}/perfumes/${perfumeId}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting perfume:', error);
+          throw error;
+        })
+      );
+  }
+
+  // Marcas
+  getBrands(): Observable<Brand[]> {
+    return this.http.get<Brand[]>(`${this.API_URL}/brands`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading brands:', error);
+          return of([]);
+        })
+      );
+  }
+
+  createBrand(brand: Partial<Brand>): Observable<Brand> {
+    return this.http.post<Brand>(`${this.API_URL}/brands`, brand)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating brand:', error);
+          throw error;
+        })
+      );
+  }
+
+  updateBrand(id: number, brand: Partial<Brand>): Observable<Brand> {
+    return this.http.put<Brand>(`${this.API_URL}/brands/${id}`, brand)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating brand:', error);
+          throw error;
+        })
+      );
+  }
+
+  deleteBrand(id: number): Observable<any> {
+    return this.http.delete(`${this.API_URL}/brands/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting brand:', error);
+          throw error;
+        })
+      );
+  }
+
+  // Categorías
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.API_URL}/categories`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading categories:', error);
+          return of([]);
+        })
+      );
+  }
+
+  createCategory(category: Partial<Category>): Observable<Category> {
+    return this.http.post<Category>(`${this.API_URL}/categories`, category)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating category:', error);
+          throw error;
+        })
+      );
+  }
+
+  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
+    return this.http.put<Category>(`${this.API_URL}/categories/${id}`, category)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating category:', error);
+          throw error;
+        })
+      );
+  }
+
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${this.API_URL}/categories/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting category:', error);
+          throw error;
+        })
+      );
   }
 }
->>>>>>> seller

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AdminService, DashboardStats, User, Store, Order } from '../../services/admin.service';
+import { AdminService, DashboardStats, User, Store, Order, Brand, Category, Perfume } from '../../services/admin.service';
 
 @Component({
   selector: 'app-admin',
@@ -9,59 +9,61 @@ import { AdminService, DashboardStats, User, Store, Order } from '../../services
 })
 export class AdminPage implements OnInit {
 
-<<<<<<< HEAD
-  // Tab control
-  selectedTab: 'dashboard' | 'users' | 'stores' | 'orders' | 'products' | 'reports' = 'dashboard';
+  selectedTab: 'dashboard' | 'users' | 'stores' | 'brands' | 'categories' | 'perfumes' | 'orders' = 'dashboard';
 
-  // Dashboard data
+  // Dashboard
   dashboardStats: DashboardStats | null = null;
 
-  // Users management
-=======
-  selectedTab: 'dashboard' | 'users' | 'stores' | 'orders' | 'products' | 'reports' = 'dashboard';
-
-  dashboardStats: DashboardStats | null = null;
-
->>>>>>> seller
+  // Users
   users: User[] = [];
   filteredUsers: User[] = [];
   userSearchTerm = '';
   userFilterStatus = 'all';
+  userPage = 1;
 
-<<<<<<< HEAD
-  // Stores management
-=======
->>>>>>> seller
+  // Stores
   stores: Store[] = [];
   filteredStores: Store[] = [];
   storeSearchTerm = '';
   storeFilterStatus = 'all';
+  storePage = 1;
 
-<<<<<<< HEAD
-  // Orders management
-=======
->>>>>>> seller
+  // Brands
+  brands: Brand[] = [];
+  filteredBrands: Brand[] = [];
+  brandSearchTerm = '';
+  brandPage = 1;
+  newBrandName = '';
+  newBrandDescription = '';
+
+  // Categories
+  categories: Category[] = [];
+  filteredCategories: Category[] = [];
+  categorySearchTerm = '';
+  categoryPage = 1;
+  newCategoryName = '';
+  newCategoryDescription = '';
+
+  // Perfumes
+  perfumes: Perfume[] = [];
+  filteredPerfumes: Perfume[] = [];
+  perfumeSearchTerm = '';
+  perfumePage = 1;
+
+  // Orders
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   orderFilterStatus = 'all';
-
-<<<<<<< HEAD
-  // Pagination
-=======
->>>>>>> seller
-  userPage = 1;
-  storePage = 1;
   orderPage = 1;
-  itemsPerPage = 10;
 
-<<<<<<< HEAD
-  // Loading states
-=======
->>>>>>> seller
+  // General
+  itemsPerPage = 10;
   isLoading = false;
   selectedUser: User | null = null;
   selectedStore: Store | null = null;
   selectedOrder: Order | null = null;
+  selectedBrand: Brand | null = null;
+  selectedCategory: Category | null = null;
 
   constructor(private adminService: AdminService) { }
 
@@ -69,21 +71,26 @@ export class AdminPage implements OnInit {
     this.loadDashboard();
   }
 
-<<<<<<< HEAD
-
-  loadDashboard() {
-    this.isLoading = true;
-    this.dashboardStats = this.adminService.getDashboardStats();
-    this.isLoading = false;
+  selectTab(tab: typeof this.selectedTab) {
+    this.selectedTab = tab;
+    
+    // Load data cuando se selecciona tab
+    if (tab === 'users' && this.users.length === 0) {
+      this.loadUsers();
+    } else if (tab === 'stores' && this.stores.length === 0) {
+      this.loadStores();
+    } else if (tab === 'brands' && this.brands.length === 0) {
+      this.loadBrands();
+    } else if (tab === 'categories' && this.categories.length === 0) {
+      this.loadCategories();
+    } else if (tab === 'perfumes' && this.perfumes.length === 0) {
+      this.loadPerfumes();
+    } else if (tab === 'orders' && this.orders.length === 0) {
+      this.loadOrders();
+    }
   }
 
- 
-  loadUsers() {
-    this.isLoading = true;
-    this.users = this.adminService.getUsers();
-    this.applyUserFilters();
-    this.isLoading = false;
-=======
+  // ============= DASHBOARD =============
   loadDashboard() {
     this.isLoading = true;
     this.adminService.getDashboardStats().subscribe({
@@ -98,6 +105,7 @@ export class AdminPage implements OnInit {
     });
   }
 
+  // ============= USUARIOS =============
   loadUsers() {
     this.isLoading = true;
     this.adminService.getUsers().subscribe({
@@ -111,7 +119,6 @@ export class AdminPage implements OnInit {
         this.isLoading = false;
       }
     });
->>>>>>> seller
   }
 
   applyUserFilters() {
@@ -121,6 +128,7 @@ export class AdminPage implements OnInit {
       const matchesStatus = this.userFilterStatus === 'all' || user.estado === this.userFilterStatus;
       return matchesSearch && matchesStatus;
     });
+    this.userPage = 1;
   }
 
   searchUsers(term: string) {
@@ -134,40 +142,20 @@ export class AdminPage implements OnInit {
   }
 
   banUser(userId: number) {
-    if (confirm('¿Estás seguro de que quieres bloquear este usuario?')) {
-<<<<<<< HEAD
-      this.adminService.banUser(userId);
-      this.loadUsers();
-=======
+    if (confirm('¿Bloquear este usuario?')) {
       this.adminService.banUser(userId).subscribe({
-        next: () => {
-          this.loadUsers();
-        },
-        error: (error) => {
-          console.error('Error banning user:', error);
-          alert('Error al bloquear usuario');
-        }
+        next: () => this.loadUsers(),
+        error: (error) => console.error('Error:', error)
       });
->>>>>>> seller
     }
   }
 
   unbanUser(userId: number) {
-    if (confirm('¿Estás seguro de que quieres desbloquear este usuario?')) {
-<<<<<<< HEAD
-      this.adminService.unbanUser(userId);
-      this.loadUsers();
-=======
+    if (confirm('¿Desbloquear este usuario?')) {
       this.adminService.unbanUser(userId).subscribe({
-        next: () => {
-          this.loadUsers();
-        },
-        error: (error) => {
-          console.error('Error unbanning user:', error);
-          alert('Error al desbloquear usuario');
-        }
+        next: () => this.loadUsers(),
+        error: (error) => console.error('Error:', error)
       });
->>>>>>> seller
     }
   }
 
@@ -179,14 +167,7 @@ export class AdminPage implements OnInit {
     this.selectedUser = null;
   }
 
-<<<<<<< HEAD
-  // ============= STORES MANAGEMENT =============
-  loadStores() {
-    this.isLoading = true;
-    this.stores = this.adminService.getStores();
-    this.applyStoreFilters();
-    this.isLoading = false;
-=======
+  // ============= TIENDAS =============
   loadStores() {
     this.isLoading = true;
     this.adminService.getStores().subscribe({
@@ -200,7 +181,6 @@ export class AdminPage implements OnInit {
         this.isLoading = false;
       }
     });
->>>>>>> seller
   }
 
   applyStoreFilters() {
@@ -209,6 +189,7 @@ export class AdminPage implements OnInit {
       const matchesStatus = this.storeFilterStatus === 'all' || store.estado === this.storeFilterStatus;
       return matchesSearch && matchesStatus;
     });
+    this.storePage = 1;
   }
 
   searchStores(term: string) {
@@ -222,40 +203,20 @@ export class AdminPage implements OnInit {
   }
 
   verifyStore(storeId: number) {
-    if (confirm('¿Verificar esta tienda?')) {
-<<<<<<< HEAD
-      this.adminService.verifyStore(storeId);
-      this.loadStores();
-=======
+    if (confirm('¿Verificar tienda?')) {
       this.adminService.verifyStore(storeId).subscribe({
-        next: () => {
-          this.loadStores();
-        },
-        error: (error) => {
-          console.error('Error verifying store:', error);
-          alert('Error al verificar tienda');
-        }
+        next: () => this.loadStores(),
+        error: (error) => console.error('Error:', error)
       });
->>>>>>> seller
     }
   }
 
   suspendStore(storeId: number) {
-    if (confirm('¿Suspender esta tienda?')) {
-<<<<<<< HEAD
-      this.adminService.suspendStore(storeId);
-      this.loadStores();
-=======
+    if (confirm('¿Suspender tienda?')) {
       this.adminService.suspendStore(storeId).subscribe({
-        next: () => {
-          this.loadStores();
-        },
-        error: (error) => {
-          console.error('Error suspending store:', error);
-          alert('Error al suspender tienda');
-        }
+        next: () => this.loadStores(),
+        error: (error) => console.error('Error:', error)
       });
->>>>>>> seller
     }
   }
 
@@ -267,14 +228,152 @@ export class AdminPage implements OnInit {
     this.selectedStore = null;
   }
 
-<<<<<<< HEAD
-  // ============= ORDERS MANAGEMENT =============
-  loadOrders() {
+  // ============= MARCAS =============
+  loadBrands() {
     this.isLoading = true;
-    this.orders = this.adminService.getOrders();
-    this.applyOrderFilters();
-    this.isLoading = false;
-=======
+    this.adminService.getBrands().subscribe({
+      next: (brands) => {
+        this.brands = brands;
+        this.applyBrandFilters();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading brands:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  applyBrandFilters() {
+    this.filteredBrands = this.brands.filter(brand =>
+      brand.nombre.toLowerCase().includes(this.brandSearchTerm.toLowerCase())
+    );
+    this.brandPage = 1;
+  }
+
+  searchBrands(term: string) {
+    this.brandSearchTerm = term;
+    this.applyBrandFilters();
+  }
+
+  createBrand() {
+    if (!this.newBrandName.trim()) return;
+    const brand = {
+      nombre: this.newBrandName,
+      descripcion: this.newBrandDescription,
+      activo: true
+    };
+    this.adminService.createBrand(brand).subscribe({
+      next: () => {
+        this.newBrandName = '';
+        this.newBrandDescription = '';
+        this.loadBrands();
+      },
+      error: (error) => console.error('Error:', error)
+    });
+  }
+
+  deleteBrand(id: number) {
+    if (confirm('¿Eliminar marca?')) {
+      this.adminService.deleteBrand(id).subscribe({
+        next: () => this.loadBrands(),
+        error: (error) => console.error('Error:', error)
+      });
+    }
+  }
+
+  // ============= CATEGORÍAS =============
+  loadCategories() {
+    this.isLoading = true;
+    this.adminService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.applyCategoryFilters();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  applyCategoryFilters() {
+    this.filteredCategories = this.categories.filter(category =>
+      category.nombre.toLowerCase().includes(this.categorySearchTerm.toLowerCase())
+    );
+    this.categoryPage = 1;
+  }
+
+  searchCategories(term: string) {
+    this.categorySearchTerm = term;
+    this.applyCategoryFilters();
+  }
+
+  createCategory() {
+    if (!this.newCategoryName.trim()) return;
+    const category = {
+      nombre: this.newCategoryName,
+      descripcion: this.newCategoryDescription,
+      activo: true
+    };
+    this.adminService.createCategory(category).subscribe({
+      next: () => {
+        this.newCategoryName = '';
+        this.newCategoryDescription = '';
+        this.loadCategories();
+      },
+      error: (error) => console.error('Error:', error)
+    });
+  }
+
+  deleteCategory(id: number) {
+    if (confirm('¿Eliminar categoría?')) {
+      this.adminService.deleteCategory(id).subscribe({
+        next: () => this.loadCategories(),
+        error: (error) => console.error('Error:', error)
+      });
+    }
+  }
+
+  // ============= PERFUMES =============
+  loadPerfumes() {
+    this.isLoading = true;
+    this.adminService.getPerfumes(0, 50).subscribe({
+      next: (data) => {
+        this.perfumes = data.content || data;
+        this.applyPerfumeFilters();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading perfumes:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  applyPerfumeFilters() {
+    this.filteredPerfumes = this.perfumes.filter(perfume =>
+      perfume.nombre.toLowerCase().includes(this.perfumeSearchTerm.toLowerCase())
+    );
+    this.perfumePage = 1;
+  }
+
+  searchPerfumes(term: string) {
+    this.perfumeSearchTerm = term;
+    this.applyPerfumeFilters();
+  }
+
+  deletePerfume(id: number) {
+    if (confirm('¿Eliminar perfume?')) {
+      this.adminService.deletePerfume(id).subscribe({
+        next: () => this.loadPerfumes(),
+        error: (error) => console.error('Error:', error)
+      });
+    }
+  }
+
+  // ============= PEDIDOS =============
   loadOrders() {
     this.isLoading = true;
     this.adminService.getOrders().subscribe({
@@ -288,14 +387,13 @@ export class AdminPage implements OnInit {
         this.isLoading = false;
       }
     });
->>>>>>> seller
   }
 
   applyOrderFilters() {
-    this.filteredOrders = this.orders.filter(order => {
-      const matchesStatus = this.orderFilterStatus === 'all' || order.estado === this.orderFilterStatus;
-      return matchesStatus;
-    });
+    this.filteredOrders = this.orders.filter(order =>
+      this.orderFilterStatus === 'all' || order.estado === this.orderFilterStatus
+    );
+    this.orderPage = 1;
   }
 
   filterOrdersByStatus(status: string) {
@@ -304,20 +402,10 @@ export class AdminPage implements OnInit {
   }
 
   updateOrderStatus(orderId: number, newStatus: string) {
-<<<<<<< HEAD
-    this.adminService.updateOrderStatus(orderId, newStatus);
-    this.loadOrders();
-=======
     this.adminService.updateOrderStatus(orderId, newStatus).subscribe({
-      next: () => {
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Error updating order status:', error);
-        alert('Error al actualizar estado del pedido');
-      }
+      next: () => this.loadOrders(),
+      error: (error) => console.error('Error:', error)
     });
->>>>>>> seller
   }
 
   viewOrderDetails(order: Order) {
@@ -326,45 +414,6 @@ export class AdminPage implements OnInit {
 
   closeOrderDetails() {
     this.selectedOrder = null;
-  }
-
-<<<<<<< HEAD
-  // ============= PRODUCTS MANAGEMENT =============
-  deleteProduct(productId: number) {
-    if (confirm('¿Eliminar este producto?')) {
-      this.adminService.deleteProduct(productId);
-      alert('Producto eliminado');
-    }
-  }
-
-  // ============= TAB NAVIGATION =============
-=======
-  deleteProduct(productId: number) {
-    if (confirm('¿Eliminar este producto?')) {
-      this.adminService.deleteProduct(productId).subscribe({
-        next: () => {
-          alert('Producto eliminado');
-        },
-        error: (error) => {
-          console.error('Error deleting product:', error);
-          alert('Error al eliminar producto');
-        }
-      });
-    }
-  }
-
->>>>>>> seller
-  selectTab(tab: 'dashboard' | 'users' | 'stores' | 'orders' | 'products' | 'reports') {
-    this.selectedTab = tab;
-    
-    // Load data when switching tabs
-    if (tab === 'users' && this.users.length === 0) {
-      this.loadUsers();
-    } else if (tab === 'stores' && this.stores.length === 0) {
-      this.loadStores();
-    } else if (tab === 'orders' && this.orders.length === 0) {
-      this.loadOrders();
-    }
   }
 
   // ============= PAGINATION =============
@@ -376,6 +425,21 @@ export class AdminPage implements OnInit {
   get paginatedStores(): Store[] {
     const start = (this.storePage - 1) * this.itemsPerPage;
     return this.filteredStores.slice(start, start + this.itemsPerPage);
+  }
+
+  get paginatedBrands(): Brand[] {
+    const start = (this.brandPage - 1) * this.itemsPerPage;
+    return this.filteredBrands.slice(start, start + this.itemsPerPage);
+  }
+
+  get paginatedCategories(): Category[] {
+    const start = (this.categoryPage - 1) * this.itemsPerPage;
+    return this.filteredCategories.slice(start, start + this.itemsPerPage);
+  }
+
+  get paginatedPerfumes(): Perfume[] {
+    const start = (this.perfumePage - 1) * this.itemsPerPage;
+    return this.filteredPerfumes.slice(start, start + this.itemsPerPage);
   }
 
   get paginatedOrders(): Order[] {
@@ -391,12 +455,19 @@ export class AdminPage implements OnInit {
     return Math.ceil(this.filteredStores.length / this.itemsPerPage);
   }
 
+  get totalBrandPages(): number {
+    return Math.ceil(this.filteredBrands.length / this.itemsPerPage);
+  }
+
+  get totalCategoryPages(): number {
+    return Math.ceil(this.filteredCategories.length / this.itemsPerPage);
+  }
+
+  get totalPerfumePages(): number {
+    return Math.ceil(this.filteredPerfumes.length / this.itemsPerPage);
+  }
+
   get totalOrderPages(): number {
     return Math.ceil(this.filteredOrders.length / this.itemsPerPage);
   }
-<<<<<<< HEAD
-
 }
-=======
-}
->>>>>>> seller
