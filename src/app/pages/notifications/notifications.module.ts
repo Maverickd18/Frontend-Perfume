@@ -1,22 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
 
-import { ProfileSellerPageRoutingModule } from './profile-seller-routing.module';
+import { NotificationsPageRoutingModule } from './notifications-routing.module';
+import { NotificationsPage } from './notifications.page';
 import { SharedModule } from '../../shared/shared-module';
-
-import { ProfileSellerPage } from './profile-seller.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ProfileSellerPageRoutingModule,
+    NotificationsPageRoutingModule,
     SharedModule
   ],
-  declarations: [ProfileSellerPage]
+  declarations: [NotificationsPage]
 })
-export class ProfileSellerPageModule {}
+export class NotificationsPageModule { }

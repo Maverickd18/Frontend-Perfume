@@ -1,22 +1,11 @@
-<ion-button
+<ion-button 
+  [color]="type === 'secondary' ? 'success' : type === 'outline' ? 'medium' : type === 'clear' ? 'light' : 'primary'"
+  [size]="size"
   [expand]="expand"
-  [disabled]="disabled || loading"
-  [class]="'custom-button custom-button-' + type + ' custom-button-' + size"
+  [disabled]="disabled"
   (click)="onClick()">
-  
-  <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
-  
-  <ion-icon 
-    *ngIf="icon && !loading && iconPosition === 'start'" 
-    [name]="icon" 
-    slot="start">
-  </ion-icon>
-  
-  {{ text }}
-  
-  <ion-icon 
-    *ngIf="icon && !loading && iconPosition === 'end'" 
-    [name]="icon" 
-    slot="end">
-  </ion-icon>
+  <ion-icon *ngIf="icon && iconPosition === 'start'" slot="start" [name]="icon"></ion-icon>
+  <span>{{ text }}</span>
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+  <ion-icon *ngIf="icon && iconPosition === 'end'" slot="end" [name]="icon"></ion-icon>
 </ion-button>

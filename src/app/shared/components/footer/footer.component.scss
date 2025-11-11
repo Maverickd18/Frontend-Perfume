@@ -1,0 +1,18 @@
+.app-footer {
+  --background: linear-gradient(90deg, #c4356a 0%, #7b68ee 100%);
+  border-top: 2px solid #c4356a;
+
+  ion-toolbar {
+    --background: transparent;
+    --border-color: transparent;
+    padding: 1rem;
+  }
+
+  .footer-text {
+    color: white;
+    text-align: center;
+    font-size: 0.875rem;
+    margin: 0;
+    font-weight: 500;
+  }
+}
