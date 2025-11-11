@@ -1,49 +1,43 @@
 <ion-content class="auth-content">
   <div class="auth-container">
-    <!-- Brand Section -->
     <div class="brand-section">
-      <div class="logo-container">
-        <ion-icon name="storefront" class="brand-logo"></ion-icon>
-      </div>
+      <ion-icon name="storefront" class="brand-logo"></ion-icon>
       <h1 class="brand-name">MarketPlace</h1>
       <p class="brand-tagline">Tu tienda en línea favorita</p>
     </div>
 
-    <!-- Login Form Card -->
     <div class="form-card">
       <h2 class="form-title">Log In</h2>
 
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-        <!-- Email Input -->
         <app-input
           label="Email"
+<<<<<<< HEAD
           placeholder="Correo electrónico"
+=======
+>>>>>>> a9afdbc3660898d22baaed6bb0de8a0caae1cba2
           type="email"
           icon="mail-outline"
           [error]="getEmailError()"
           formControlName="email">
         </app-input>
 
-        <!-- Password Input -->
         <app-input
           label="Contraseña"
-          placeholder="••••••••"
           type="password"
           icon="lock-closed-outline"
           [error]="getPasswordError()"
           formControlName="password">
         </app-input>
 
-        <!-- Remember Me & Forgot Password -->
         <div class="form-options">
           <ion-item lines="none" class="remember-item">
             <ion-checkbox [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}"></ion-checkbox>
-            <ion-label>Remember me</ion-label>
+            <ion-label>Recordarme</ion-label>
           </ion-item>
           <a class="forgot-link" (click)="onForgotPassword()">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <!-- Login Button -->
         <app-button
           text="Log in"
           type="primary"
@@ -53,30 +47,25 @@
         </app-button>
       </form>
 
-      <!-- Divider -->
       <div class="divider">
+<<<<<<< HEAD
         <span>O continuar con</span>
+=======
+        <span>O continúa con</span>
+>>>>>>> a9afdbc3660898d22baaed6bb0de8a0caae1cba2
       </div>
 
-      <!-- Social Login Buttons -->
       <div class="social-buttons">
-        <app-button
-          text="Google"
-          type="outline"
-          icon="logo-google"
-          (clicked)="onGoogleLogin()">
-        </app-button>
-        <app-button
-          text="Facebook"
-          type="outline"
-          icon="logo-facebook"
-          (clicked)="onFacebookLogin()">
-        </app-button>
+        <app-button text="Google" type="outline" icon="logo-google" (clicked)="onGoogleLogin()"></app-button>
+        <app-button text="Facebook" type="outline" icon="logo-facebook" (clicked)="onFacebookLogin()"></app-button>
       </div>
 
-      <!-- Switch to Register -->
       <div class="switch-auth">
+<<<<<<< HEAD
         <p>¿No tienes cuenta? <a (click)="goToRegister()">Regístrate</a></p>
+=======
+        <p>¿No tienes una cuenta? <a (click)="goToRegister()">Regístrate</a></p>
+>>>>>>> a9afdbc3660898d22baaed6bb0de8a0caae1cba2
       </div>
     </div>
   </div>
