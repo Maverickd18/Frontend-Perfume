@@ -26,6 +26,25 @@ ion-card-title {
   color: #333;
 }
 
+.card-title .title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-title .brand {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff6f00;
+  text-transform: uppercase;
+}
+
+.card-title .title-text {
+  font-size: 16px;
+  color: #222;
+  font-weight: 600;
+}
+
 .description {
   color: #666;
   margin: 0 0 16px 0;

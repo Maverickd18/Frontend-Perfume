@@ -1,6 +1,5 @@
 <ion-content class="auth-content">
   <div class="auth-container">
-    <!-- Brand Section -->
     <div class="brand-section">
       <div class="logo-container">
         <ion-icon name="storefront" class="brand-logo"></ion-icon>
@@ -9,12 +8,10 @@
       <p class="brand-tagline">Tu tienda en línea favorita</p>
     </div>
 
-    <!-- Login Form Card -->
     <div class="form-card">
       <h2 class="form-title">Iniciar Sesión</h2>
 
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-        <!-- Email Input -->
         <app-input
           label="Correo Electrónico"
           placeholder="ejemplo@correo.com"
@@ -24,7 +21,6 @@
           formControlName="email">
         </app-input>
 
-        <!-- Password Input -->
         <app-input
           label="Contraseña"
           placeholder="••••••••"
@@ -34,7 +30,6 @@
           formControlName="password">
         </app-input>
 
-        <!-- Remember Me & Forgot Password -->
         <div class="form-options">
           <ion-item lines="none" class="remember-item">
             <ion-checkbox [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}"></ion-checkbox>
@@ -45,7 +40,6 @@
           </a>
         </div>
 
-        <!-- Login Button -->
         <app-button
           text="Iniciar Sesión"
           type="primary"
@@ -55,12 +49,10 @@
         </app-button>
       </form>
 
-      <!-- Divider -->
       <div class="divider">
         <span>O continúa con</span>
       </div>
 
-      <!-- Social Login Buttons -->
       <div class="social-buttons">
         <app-button
           text="Google"
@@ -76,7 +68,6 @@
         </app-button>
       </div>
 
-      <!-- Switch to Register -->
       <div class="switch-auth">
         <p>¿No tienes una cuenta? <a (click)="goToRegister()">Regístrate</a></p>
       </div>

@@ -1,52 +1,88 @@
-ion-searchbar {
-	--background: rgba(255,255,255,0.12);
-	--border-radius: 12px;
-	--placeholder-color: rgba(255,255,255,0.85);
-	--icon-color: #fff;
-	width: 320px;
-	max-width: 45vw;
+// Contenedor de search bar con acciones a la derecha
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-.searchbar-filters {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
+// Searchbar minimalista - sin botón de filtro
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-family: "Inter", "Poppins", "Helvetica Neue", sans-serif;
+  height: 40px;
+  flex: 1;
+  min-width: 0;
 }
 
-.filters-row {
-	display: flex;
-	flex-direction: row;
-	gap: 12px;
-	margin-top: 8px;
-	width: 100%;
-	justify-content: center;
+.search-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
 }
 
-.filters-row ion-select,
-.filters-row ion-range {
-	min-width: 100px;
-	max-width: 140px;
-	flex: 1 1 120px;
+.search-icon {
+  width: 18px;
+  height: 18px;
+  color: #000000;
+  flex-shrink: 0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-@media (max-width: 576px) {
-	.filters-row {
-		flex-direction: column;
-		gap: 8px;
-		align-items: stretch;
-	}
-	.filters-row ion-select,
-	.filters-row ion-range {
-		max-width: 100%;
-		min-width: 0;
-	}
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-family: "Inter", "Poppins", "Helvetica Neue", sans-serif;
+  color: #000000;
+  outline: none;
+  padding: 0;
+
+  &::placeholder {
+    color: #999999;
+  }
+
+  &:focus {
+    outline: none;
+  }
 }
 
-@media (max-width: 576px) {
-	ion-searchbar {
-		width: 180px;
-		max-width: 60vw;
-	}
+// Acciones a la derecha (usuario, logout)
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .search-bar-container {
+    gap: 0.5rem;
+  }
+
+  .search-bar {
+    padding: 0.4rem 0.5rem;
+    height: 36px;
+  }
+
+  .search-input {
+    font-size: 13px;
+  }
+
+  .search-actions {
+    gap: 0.3rem;
+  }
 }
 

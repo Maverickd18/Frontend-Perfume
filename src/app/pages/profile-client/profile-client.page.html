@@ -1,41 +1,56 @@
 <app-header
-  [showBackButton]="true"
-  (backClicked)="goBack()"
-  (logoutClicked)="logout()"
-  (homeClicked)="goHome()">
+  title="Mi Perfil"
+  (profileClicked)="goProfile()"
+  (logoutClicked)="logout()">
 </app-header>
 
 <ion-content [fullscreen]="true" class="profile-content">
   <div class="profile-container">
-    <div class="profile-card">
-      <div class="profile-title">Mi perfil</div>
-
-      <div class="profile-actions">
-        <app-button *ngIf="!editing" text="Editar" type="secondary" (clicked)="startEdit()"></app-button>
-        <app-button *ngIf="editing" text="Guardar" type="primary" (clicked)="save()"></app-button>
-        <app-button *ngIf="editing" text="Cancelar" type="outline" (clicked)="cancel()"></app-button>
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
       </div>
-
-      <form #profileForm="ngForm" (ngSubmit)="save()" class="profile-form">
-        <div class="profile-field">
-          <label for="firstName">Nombre</label>
-          <app-input [disabled]="!editing" name="firstName" placeholder="" [(ngModel)]="profile.firstName"></app-input>
-        </div>
-        <div class="profile-field">
-          <label for="lastName">Apellido</label>
-          <app-input [disabled]="!editing" name="lastName" placeholder="" [(ngModel)]="profile.lastName"></app-input>
-        </div>
-        <div class="profile-field">
-          <label for="phone">Teléfono</label>
-          <app-input [disabled]="!editing" name="phone" placeholder="" type="tel" [(ngModel)]="profile.phone"></app-input>
-        </div>
-        <div class="profile-field">
-          <label for="cedula">Cédula</label>
-          <app-input [disabled]="!editing" name="cedula" placeholder="" [(ngModel)]="profile.cedula"></app-input>
-        </div>
-      </form>
+      <div class="profile-name">
+        <h2>{{ profile.firstName }} {{ profile.lastName }}</h2>
+        <p class="profile-type">Cliente</p>
+      </div>
     </div>
 
-    <app-footer></app-footer>
+    <form #profileForm="ngForm" (ngSubmit)="save()" class="profile-form">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="firstName">Nombre</label>
+          <app-input [disabled]="!editing" name="firstName" placeholder="Ingresa tu nombre" [(ngModel)]="profile.firstName"></app-input>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Apellido</label>
+          <app-input [disabled]="!editing" name="lastName" placeholder="Ingresa tu apellido" [(ngModel)]="profile.lastName"></app-input>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <app-input [disabled]="!editing" name="phone" placeholder="+1 (555) 000-0000" type="tel" [(ngModel)]="profile.phone"></app-input>
+        </div>
+        <div class="form-group">
+          <label for="cedula">Cédula</label>
+          <app-input [disabled]="!editing" name="cedula" placeholder="12345678" [(ngModel)]="profile.cedula"></app-input>
+        </div>
+      </div>
+    </form>
+
+    <div class="profile-actions">
+      <app-button *ngIf="!editing" text="Editar Perfil" type="primary" (clicked)="startEdit()"></app-button>
+      <div *ngIf="editing" class="action-buttons">
+        <app-button text="Guardar" type="primary" (clicked)="save()"></app-button>
+        <app-button text="Cancelar" type="outline" (clicked)="cancel()"></app-button>
+      </div>
+    </div>
   </div>
+
+  <app-footer></app-footer>
 </ion-content>

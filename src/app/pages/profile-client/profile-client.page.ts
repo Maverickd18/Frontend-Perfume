@@ -27,23 +27,15 @@ export class ProfileClientPage implements OnInit {
   editing: boolean = false;
   private originalProfile: any = null;
 
-  // 🟣 --- Métodos del header ---
-  goBack() {
-    this.location.back();
-  }
-
-  goHome() {
-    this.router.navigate(['/home']);
+  goProfile() {
+    console.log('Ya estás en tu perfil');
   }
 
   logout() {
-    // Aquí podrías limpiar el token o llamar al backend más adelante
     console.log('Sesión cerrada (frontend)');
     this.router.navigate(['/login']);
   }
-  // 🟣 --- Fin métodos del header ---
 
-  // ✏️ --- Métodos de edición del perfil ---
   save() {
     console.log('Perfil guardado (frontend):', this.profile);
     alert('Perfil guardado localmente.');

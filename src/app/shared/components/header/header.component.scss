@@ -1,36 +1,92 @@
 .custom-header {
-  --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
-  color: white;
+  --background: #ffffff;
+  --border-bottom: 1px solid #e0e0e0;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
 
-  .header-container {
+  ion-toolbar {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 0 12px;
-    width: 100%;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+.header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
+  font-family: "Poppins", "Inter", sans-serif;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: #000000;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    background: #000000;
+
+    svg {
+      color: #ffffff;
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+@media (max-width: 600px) {
+  .custom-header {
+    ion-toolbar {
+      padding: 0.5rem 0.75rem;
+    }
   }
 
   .header-title {
-    margin: 0 auto; /* centra el titulo */
-    font-size: 20px;
-    font-weight: 600;
-    color: white;
-    text-align: center;
-    flex: 1 1 auto;
+    font-size: 18px;
   }
 
-  .header-search {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-  }
+  .icon-button {
+    width: 36px;
+    height: 36px;
 
-  app-button {
-    --color: white;
-
-    ion-icon {
-      font-size: 22px;
+    svg {
+      width: 16px;
+      height: 16px;
     }
   }
 }

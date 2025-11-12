@@ -163,7 +163,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 576px) {
   .auth-container {
     padding: 16px;
@@ -190,7 +189,6 @@
   }
 }
 
-// Dark mode
 @media (prefers-color-scheme: dark) {
   .auth-content {
     --background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);

@@ -19,6 +19,7 @@ export class CardComponent  implements OnInit {
   @Input() size: string = '';
   @Input() stock: number = 0;
   @Input() category: string = '';
+  @Input() brand: string = '';
 
   @Output() viewProduct = new EventEmitter<void>();
   @Output() buyProduct = new EventEmitter<void>();

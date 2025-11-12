@@ -2,26 +2,121 @@
   <ion-toolbar>
     <ion-title>Perfumes</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="openFilter()">
-        <ion-icon name="filter" slot="icon-only"></ion-icon>
-      </ion-button>
+      <app-searchbar (filtersChange)="onFiltersChange($event)">
+        <button slot="actions" class="icon-button" (click)="goProfile()" title="Profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </button>
+        <button slot="actions" class="icon-button" (click)="logout()" title="Logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </app-searchbar>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Modal con el componente Searchbar -->
-  <ion-modal [isOpen]="filterOpen" (didDismiss)="closeFilter()" cssClass="filter-modal">
-    <ng-template>
-      <div class="filter-panel">
-        <app-searchbar></app-searchbar>
-        <ion-button expand="block" (click)="closeFilter()">Cerrar</ion-button>
-      </div>
-    </ng-template>
-  </ion-modal>
+  <div class="filter-overlay" *ngIf="showFilters" (click)="showFilters = false"></div>
 
-  <!-- Lista de productos -->
+  <div class="filter-sidebar" [class.open]="showFilters">
+    <div class="filter-header">
+      <h2>Filtros</h2>
+      <button class="close-button" (click)="showFilters = false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="filter-content">
+      <div class="filter-section">
+        <h3 class="filter-title">Categoría</h3>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" [checked]="filterCategory.includes('floral')" (change)="toggleFilterCategory('floral')">
+            <span>Floral</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" [checked]="filterCategory.includes('citrus')" (change)="toggleFilterCategory('citrus')">
+            <span>Citrus</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" [checked]="filterCategory.includes('oriental')" (change)="toggleFilterCategory('oriental')">
+            <span>Oriental</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3 class="filter-title">Marca</h3>
+        <div class="filter-options">
+          <label class="filter-option" *ngFor="let brand of brands">
+            <input type="checkbox" [checked]="filterBrand.includes(brand)" (change)="toggleFilterBrand(brand)">
+            <span>{{ brand }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3 class="filter-title">Tamaño</h3>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" [checked]="filterSize.includes('50ml')" (change)="toggleFilterSize('50ml')">
+            <span>50ml</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" [checked]="filterSize.includes('75ml')" (change)="toggleFilterSize('75ml')">
+            <span>75ml</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" [checked]="filterSize.includes('100ml')" (change)="toggleFilterSize('100ml')">
+            <span>100ml</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3 class="filter-title">Precio</h3>
+        <div class="price-range">
+          <div class="price-display">${{ filterPriceRange[0] }} - ${{ filterPriceRange[1] }}</div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            [(ngModel)]="filterPriceRange[0]"
+            (change)="onFilterChange()"
+            class="range-input">
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            [(ngModel)]="filterPriceRange[1]"
+            (change)="onFilterChange()"
+            class="range-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-primary" (click)="applyFilters()">Mostrar resultados</button>
+      <button class="btn-secondary" (click)="clearFilters()">Borrar todo</button>
+    </div>
+  </div>
+
   <div class="products-list">
+    <button class="floating-filter-button" (click)="toggleFilters()" title="Toggle filters">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+
     <div class="grid">
       <div class="col" *ngFor="let p of products">
         <app-card
@@ -31,6 +126,8 @@
           [price]="p.price"
           [size]="p.size"
           [stock]="p.stock"
+          [brand]="p.brand"
+          [category]="p.category"
           (viewProduct)="onView(p)"
           (buyProduct)="onBuy(p)"
         ></app-card>
