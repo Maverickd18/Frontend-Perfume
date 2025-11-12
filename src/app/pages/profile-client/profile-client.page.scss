@@ -12,15 +12,15 @@
 
 .profile-header {
   background: linear-gradient(135deg, #000000 0%, #333333 100%);
-  padding: 2rem;
+  padding: 1rem 1.5rem;
   color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 
   .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     background: #ffffff;
     border-radius: 50%;
     display: flex;
@@ -29,8 +29,8 @@
     flex-shrink: 0;
 
     svg {
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       stroke: #000000;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -41,15 +41,15 @@
     flex: 1;
 
     h2 {
-      margin: 0 0 0.25rem 0;
-      font-size: 24px;
+      margin: 0 0 0.1rem 0;
+      font-size: 18px;
       font-weight: 700;
       color: #ffffff;
     }
 
     .profile-type {
       margin: 0;
-      font-size: 14px;
+      font-size: 12px;
       color: #cccccc;
       font-weight: 500;
     }
@@ -99,6 +99,27 @@
 
   app-button {
     flex: 1;
+  }
+}
+
+.favorites-section {
+  padding: 2rem;
+
+  h3 {
+    margin: 0 0 1.5rem 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .col {
+    width: 100%;
   }
 }
 

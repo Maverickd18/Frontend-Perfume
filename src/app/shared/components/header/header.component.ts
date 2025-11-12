@@ -11,14 +11,24 @@ export class HeaderComponent {
   @Input() showSearchbar: boolean = true;
   @Input() brands: string[] = [];
 
+  @Output() homeClicked = new EventEmitter<void>();
+  @Output() cartClicked = new EventEmitter<void>();
   @Output() profileClicked = new EventEmitter<void>();
   @Output() logoutClicked = new EventEmitter<void>();
 
-  onProfileClick() { 
-    this.profileClicked.emit(); 
+  onHomeClick() {
+    this.homeClicked.emit();
   }
 
-  onLogoutClick() { 
-    this.logoutClicked.emit(); 
+  onCartClick() {
+    this.cartClicked.emit();
+  }
+
+  onProfileClick() {
+    this.profileClicked.emit();
+  }
+
+  onLogoutClick() {
+    this.logoutClicked.emit();
   }
 }

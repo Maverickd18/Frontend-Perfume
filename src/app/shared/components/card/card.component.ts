@@ -6,7 +6,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
 })
-export class CardComponent  implements OnInit {
+export class CardComponent implements OnInit {
 
   constructor() { }
 
@@ -24,12 +24,8 @@ export class CardComponent  implements OnInit {
   @Output() viewProduct = new EventEmitter<void>();
   @Output() buyProduct = new EventEmitter<void>();
 
-  view() {
+  onCardClick() {
     this.viewProduct.emit();
-  }
-
-  buy() {
-    this.buyProduct.emit();
   }
 
 }

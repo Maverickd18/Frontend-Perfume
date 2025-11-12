@@ -1,5 +1,7 @@
 <app-header
   title="Mi Perfil"
+  (homeClicked)="goHome()"
+  (cartClicked)="onCartClick()"
   (profileClicked)="goProfile()"
   (logoutClicked)="logout()">
 </app-header>
@@ -48,6 +50,25 @@
       <div *ngIf="editing" class="action-buttons">
         <app-button text="Guardar" type="primary" (clicked)="save()"></app-button>
         <app-button text="Cancelar" type="outline" (clicked)="cancel()"></app-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="favorites-section">
+    <h3>Mis Productos Favoritos</h3>
+    <div class="grid">
+      <div class="col" *ngFor="let p of favoriteProducts">
+        <app-card
+          [title]="p.title"
+          [description]="p.description"
+          [image]="p.image"
+          [price]="p.price"
+          [size]="p.size"
+          [stock]="p.stock"
+          [brand]="p.brand"
+          [category]="p.category"
+          (viewProduct)="onViewProduct(p)"
+        ></app-card>
       </div>
     </div>
   </div>

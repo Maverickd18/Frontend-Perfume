@@ -208,6 +208,10 @@ export class HomePage {
     this.navCtrl.navigateForward('/profile-client');
   }
 
+  onCartClick() {
+    alert('Carrito de compras');
+  }
+
   logout() {
     alert('Sesión cerrada');
     this.navCtrl.navigateRoot('/login');
@@ -218,11 +222,9 @@ export class HomePage {
   }
 
   onView(p: any) {
-    alert('Ver producto: ' + p.title);
-  }
-
-  onBuy(p: any) {
-    alert('Comprar producto: ' + p.title + '\nPrecio: $' + p.price);
+    this.navCtrl.navigateForward('/product-detail', {
+      state: { product: p }
+    });
   }
 
   onFiltersChange(filters: any) {

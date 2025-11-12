@@ -1,4 +1,4 @@
-<ion-card class="product-card">
+<ion-card class="product-card" (click)="onCardClick()">
   <img *ngIf="image" [src]="image" [alt]="title" class="product-image"/>
   <ion-card-header>
     <ion-card-title class="card-title">
@@ -17,10 +17,6 @@
         <span class="stock">Stock: {{ stock }}</span>
       </div>
       <div class="price" *ngIf="price">{{ price | currency:'USD' }}</div>
-    </div>
-    <div class="actions">
-      <app-button text="View" type="outline" size="small" (clicked)="view()"></app-button>
-      <app-button text="Buy" type="primary" size="small" (clicked)="buy()"></app-button>
     </div>
   </ion-card-content>
 </ion-card>

@@ -2,10 +2,12 @@
   border-radius: 16px;
   overflow: hidden;
   background: white;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
   }
 }
 
