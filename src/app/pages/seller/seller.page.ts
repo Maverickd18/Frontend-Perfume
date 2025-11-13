@@ -158,4 +158,15 @@ export class SellerPage implements OnInit {
     }
     return 'assets/images/default-brand.jpg';
   }
+
+  // Método para manejar error de imagen
+  onImageError(perfume: Perfume) {
+    perfume.imageUrl = undefined;
+  }
+
+  // Método para ver detalles del perfume
+  viewPerfumeDetails(perfume: Perfume) {
+    console.log('Ver detalles:', perfume);
+    // Aquí puedes abrir un modal o navegar a una página de detalles
+  }
 }

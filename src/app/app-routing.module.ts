@@ -26,7 +26,7 @@ const routes: Routes = [
   {
     path: 'seller',
     loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule),
-    canActivate: [AuthGuard, RoleGuard],
+    //canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['VENDEDOR'] }
   },
   {
