@@ -49,6 +49,7 @@ export class HomePage implements OnInit {
   }
 
   onFilterChange() {
+    // Empty for now
   }
 
   toggleFilterCategory(value: string) {

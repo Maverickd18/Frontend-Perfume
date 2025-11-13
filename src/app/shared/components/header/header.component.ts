@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -8,16 +10,26 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 })
 export class HeaderComponent {
   @Input() title: string = '';
-  @Input() showSearchbar: boolean = true;
-  @Input() brands: string[] = [];
-
-  @Output() homeClicked = new EventEmitter<void>();
+  @Input() showBackButton: boolean = false;
+  @Input() backIcon: string = 'arrow-back';
+  @Input() unreadNotifications: number = 0;
+  
+  @Output() backClicked = new EventEmitter<void>();
+  @Output() notificationClicked = new EventEmitter<void>();
   @Output() cartClicked = new EventEmitter<void>();
   @Output() profileClicked = new EventEmitter<void>();
   @Output() logoutClicked = new EventEmitter<void>();
 
-  onHomeClick() {
-    this.homeClicked.emit();
+  constructor(private location: Location, private router: Router) {}
+
+  onBackClick() {
+    this.backClicked.emit();
+    this.location.back();
+  }
+
+  onNotificationClick() {
+    this.notificationClicked.emit();
+    this.router.navigate(['/notifications']);
   }
 
   onCartClick() {

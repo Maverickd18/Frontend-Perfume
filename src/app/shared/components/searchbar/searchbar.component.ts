@@ -4,8 +4,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-searchbar',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
+  standalone: false,
   templateUrl: './searchbar.component.html',
   styleUrls: ['./searchbar.component.scss'],
 })

@@ -1,16 +1,18 @@
 <ion-header>
-  <ion-toolbar class="custom-header">
-    <div class="header-left">
-      <h1 class="header-title">{{ title || 'Perfume Shop' }}</h1>
-    </div>
-
+  <ion-toolbar>
+    <ion-buttons slot="start" *ngIf="showBackButton">
+      <ion-back-button [icon]="backIcon" (click)="onBackClick()"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ title }}</ion-title>
     <ion-buttons slot="end">
-      <app-header-buttons
-        (homeClicked)="homeClicked.emit()"
-        (cartClicked)="cartClicked.emit()"
-        (profileClicked)="profileClicked.emit()"
-        (logoutClicked)="logoutClicked.emit()">
-      </app-header-buttons>
+      <ion-button (click)="onNotificationClick()" *ngIf="unreadNotifications > 0">
+        <ion-icon name="notifications"></ion-icon>
+        <ion-badge color="danger">{{ unreadNotifications }}</ion-badge>
+      </ion-button>
+      <ion-button (click)="onNotificationClick()" *ngIf="unreadNotifications === 0">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ng-content select="[slot='end']"></ng-content>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

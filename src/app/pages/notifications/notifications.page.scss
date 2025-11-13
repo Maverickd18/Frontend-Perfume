@@ -1,0 +1,471 @@
+/* Notifications page styles */
+:host {
+  --ion-background-color: #f5f1ef;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
+    box-shadow: 0 4px 15px rgba(196, 53, 106, 0.2);
+  }
+
+  ion-title {
+    color: white;
+    font-weight: 700;
+    font-size: 24px;
+  }
+}
+
+ion-content {
+  --background: #f5f1ef;
+
+  @media (min-width: 769px) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+}
+
+/* ===================== FILTROS ===================== */
+.filter-card {
+  border-radius: 16px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(196, 53, 106, 0.1);
+  --background: white;
+  animation: slideInDown 0.5s ease-out;
+
+  ion-card-content {
+    padding: 12px;
+  }
+}
+
+.filter-segment {
+  --background: #f5f1ef;
+  border-radius: 8px;
+
+  ion-segment-button {
+    --color: #999;
+    --color-checked: white;
+    --background-checked: linear-gradient(135deg, #c4356a 0%, #e85d8a 100%);
+    --border-radius: 6px;
+    margin: 4px;
+    font-weight: 600;
+    font-size: 12px;
+
+    ion-badge {
+      margin-left: 4px;
+    }
+  }
+}
+
+/* ===================== ANIMACIONES ===================== */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ===================== NOTIFICATION CARDS ===================== */
+.notification-card {
+  border-radius: 12px;
+  margin: 12px 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(196, 53, 106, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  --background: white;
+  animation: slideInUp 0.5s ease-out;
+  position: relative;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(196, 53, 106, 0.15);
+    transform: translateX(4px);
+  }
+
+  &.unread {
+    border-left: 4px solid #c4356a;
+    background: linear-gradient(135deg, rgba(196, 53, 106, 0.02) 0%, rgba(232, 93, 138, 0.02) 100%);
+    box-shadow: 0 4px 12px rgba(196, 53, 106, 0.15);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  ion-card-header {
+    background: linear-gradient(135deg, #f5f1ef 0%, #faf7f5 100%);
+    border-bottom: 2px solid #e0e0e0;
+    padding: 16px;
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .notification-icon {
+        font-size: 32px;
+        flex-shrink: 0;
+      }
+
+      .notification-title {
+        flex: 1;
+        min-width: 0;
+
+        ion-card-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #333;
+          margin: 0;
+          line-height: 1.2;
+        }
+
+        .notification-date {
+          font-size: 12px;
+          color: #999;
+          margin: 4px 0 0 0;
+        }
+      }
+
+      ion-button {
+        margin: 0;
+        --padding-start: 4px;
+        --padding-end: 4px;
+
+        ion-icon {
+          color: #c4356a;
+        }
+      }
+    }
+  }
+
+  ion-card-content {
+    padding: 16px;
+
+    .notification-product {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+
+      strong {
+        color: #c4356a;
+      }
+    }
+
+    .notification-message {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+      margin: 0 0 12px 0;
+      line-height: 1.4;
+    }
+
+    .notification-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .notification-details {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e0e0e0;
+
+      p {
+        font-size: 13px;
+        color: #666;
+        margin: 4px 0;
+
+        strong {
+          color: #333;
+        }
+      }
+    }
+  }
+
+  .unread-indicator {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 12px;
+    height: 12px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+/* ===================== EMPTY STATE ===================== */
+.empty-state {
+  border-radius: 16px;
+  margin-top: 40px;
+  box-shadow: 0 4px 12px rgba(196, 53, 106, 0.08);
+  --background: white;
+  animation: slideInUp 0.5s ease-out;
+
+  ion-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+
+    ion-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    h2 {
+      color: #c4356a;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      color: #999;
+      font-size: 14px;
+      text-align: center;
+      margin: 0;
+    }
+  }
+}
+
+/* ===================== ION BADGE ===================== */
+ion-badge {
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+
+  &[color="danger"] {
+    --background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+  }
+
+  &[color="success"] {
+    --background: linear-gradient(135deg, #50c878 0%, #6fdd99 100%);
+  }
+
+  &[color="warning"] {
+    --background: linear-gradient(135deg, #ffa500 0%, #ffb84d 100%);
+  }
+
+  &[color="primary"] {
+    --background: linear-gradient(135deg, #7b68ee 0%, #9f7aea 100%);
+  }
+}
+
+/* ===================== ION BUTTONS ===================== */
+ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+
+  &[slot="end"] {
+    ion-icon {
+      transition: all 0.3s ease;
+    }
+
+    &:hover ion-icon {
+      transform: rotate(90deg) scale(1.1);
+    }
+  }
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+/* MOBILE: max 768px */
+@media (max-width: 768px) {
+  .notification-card {
+    margin: 8px 0;
+
+    ion-card-header {
+      padding: 12px;
+
+      .notification-header {
+        gap: 8px;
+
+        .notification-icon {
+          font-size: 28px;
+        }
+
+        ion-card-title {
+          font-size: 14px;
+        }
+      }
+    }
+
+    ion-card-content {
+      padding: 12px;
+    }
+  }
+
+  .empty-state {
+    margin-top: 20px;
+
+    ion-card-content {
+      padding: 30px 16px;
+
+      ion-icon {
+        font-size: 48px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+/* DESKTOP: 769px and up */
+@media (min-width: 769px) {
+  ion-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    --padding-top: 20px;
+    --padding-bottom: 20px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+
+    .filter-card,
+    .notification-card,
+    .empty-state,
+    .action-buttons {
+      width: 100%;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .filter-card {
+    margin-top: 0;
+    margin-bottom: 24px;
+
+    .filter-segment {
+      display: flex;
+      justify-content: space-between;
+
+      ion-segment-button {
+        flex: 1;
+      }
+    }
+  }
+
+  .notification-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 12px auto;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 12px 32px rgba(196, 53, 106, 0.2);
+      transform: translateY(-2px);
+    }
+
+    ion-card-header {
+      padding: 20px;
+
+      .notification-header {
+        gap: 16px;
+        display: flex;
+        align-items: flex-start;
+
+        .notification-icon {
+          font-size: 40px;
+          flex-shrink: 0;
+        }
+
+        .notification-title {
+          flex: 1;
+
+          ion-card-title {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    ion-card-content {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+
+      .notification-product,
+      .notification-message,
+      .notification-details {
+        grid-column: 1;
+      }
+
+      .notification-badge {
+        grid-column: 2;
+        justify-self: end;
+        align-self: start;
+      }
+    }
+  }
+
+  .empty-state {
+    ion-card-content {
+      padding: 60px 40px;
+
+      ion-icon {
+        font-size: 80px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .action-buttons {
+    margin-top: 24px;
+    margin-bottom: 0;
+
+    ion-card-content {
+      padding: 20px;
+
+      div {
+        display: flex;
+        gap: 12px;
+        max-width: 400px;
+        margin: 0 auto;
+
+        app-button {
+          flex: 1;
+        }
+      }
+    }
+  }
+}
