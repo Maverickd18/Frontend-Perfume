@@ -12,6 +12,25 @@ export interface DashboardStats {
   pendingOrders: number;
   monthlyRevenue: number;
   totalRevenue: number;
+  // Nuevos campos para vendedores
+  totalSellers: number;
+  activeSellers: number;
+  conversionRate: number;
+  avgRating: number;
+  productsPerSeller: number;
+  // Nuevos campos para clientes
+  totalCustomers: number;
+  activeCustomers: number;
+  monthlyPurchases: number;
+  avgOrderValue: number;
+  repeatCustomers: number;
+  // Perfumes
+  totalPerfumes: number;
+  // Vendedores - Detalles
+  sellerRevenue: number;
+  sellerProductCount: number;
+  // Clientes - Detalles
+  customerSpending: number;
 }
 
 export interface User {
@@ -52,28 +71,41 @@ export interface Order {
 
 export interface Brand {
   id: number;
-  nombre: string;
-  descripcion?: string;
-  activo?: boolean;
+  name: string;
+  description: string;
+  countryOrigin: string;
 }
 
 export interface Category {
   id: number;
-  nombre: string;
-  descripcion?: string;
-  activo?: boolean;
+  name: string;
+  description: string;
 }
 
 export interface Perfume {
   id: number;
-  nombre: string;
-  descripcion?: string;
-  precio: number;
+  name: string;
+  description: string;
+  price: number;
   stock: number;
-  marca?: string;
-  categoria?: string;
-  activo?: boolean;
-  fechaCreacion?: string;
+  sizeMl: number;
+  genre: string;
+  releaseDate?: string;
+  brand: { id: number; name: string };
+  category: { id: number; name: string };
+  creador?: string;
+}
+
+export interface PerfumeDTO {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  sizeMl: number;
+  genre: string;
+  releaseDate?: string;
+  brandId: number;
+  categoryId: number;
 }
 
 export interface LoginResponse {
@@ -167,7 +199,21 @@ export class AdminService {
             totalOrders: 0,
             pendingOrders: 0,
             monthlyRevenue: 0,
-            totalRevenue: 0
+            totalRevenue: 0,
+            totalSellers: 0,
+            activeSellers: 0,
+            conversionRate: 0,
+            avgRating: 0,
+            productsPerSeller: 0,
+            totalCustomers: 0,
+            activeCustomers: 0,
+            monthlyPurchases: 0,
+            avgOrderValue: 0,
+            repeatCustomers: 0,
+            totalPerfumes: 0,
+            sellerRevenue: 0,
+            sellerProductCount: 0,
+            customerSpending: 0
           });
         })
       );
@@ -269,8 +315,9 @@ export class AdminService {
 
   // Perfumes
   getPerfumes(page: number = 0, size: number = 10): Observable<any> {
-    return this.http.get(`${this.API_URL}/perfumes?page=${page}&size=${size}`)
+    return this.http.get<any>(`${this.API_URL}/perfumes?page=${page}&size=${size}`)
       .pipe(
+        map(response => response?.data || []),
         catchError(error => {
           console.error('Error loading perfumes:', error);
           return of([]);
@@ -278,18 +325,18 @@ export class AdminService {
       );
   }
 
-  getPerfumesBySearch(filtro: string, page: number = 0, size: number = 10): Observable<any> {
-    return this.http.get(`${this.API_URL}/perfumes/mis-perfumes?filtro=${filtro}&page=${page}&size=${size}`)
+  createPerfume(perfumeDto: PerfumeDTO): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/perfumes/nuevo`, perfumeDto)
       .pipe(
         catchError(error => {
-          console.error('Error searching perfumes:', error);
-          return of([]);
+          console.error('Error creating perfume:', error);
+          throw error;
         })
       );
   }
 
   deletePerfume(perfumeId: number): Observable<any> {
-    return this.http.delete(`${this.API_URL}/perfumes/${perfumeId}`)
+    return this.http.delete<any>(`${this.API_URL}/perfumes/${perfumeId}`)
       .pipe(
         catchError(error => {
           console.error('Error deleting perfume:', error);
@@ -309,8 +356,8 @@ export class AdminService {
       );
   }
 
-  createBrand(brand: Partial<Brand>): Observable<Brand> {
-    return this.http.post<Brand>(`${this.API_URL}/brands`, brand)
+  createBrand(brand: Partial<Brand>): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/brands`, brand)
       .pipe(
         catchError(error => {
           console.error('Error creating brand:', error);
@@ -319,8 +366,8 @@ export class AdminService {
       );
   }
 
-  updateBrand(id: number, brand: Partial<Brand>): Observable<Brand> {
-    return this.http.put<Brand>(`${this.API_URL}/brands/${id}`, brand)
+  updateBrand(id: number, brand: Partial<Brand>): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/brands/${id}`, brand)
       .pipe(
         catchError(error => {
           console.error('Error updating brand:', error);
@@ -330,7 +377,7 @@ export class AdminService {
   }
 
   deleteBrand(id: number): Observable<any> {
-    return this.http.delete(`${this.API_URL}/brands/${id}`)
+    return this.http.delete<any>(`${this.API_URL}/brands/${id}`)
       .pipe(
         catchError(error => {
           console.error('Error deleting brand:', error);
@@ -350,8 +397,8 @@ export class AdminService {
       );
   }
 
-  createCategory(category: Partial<Category>): Observable<Category> {
-    return this.http.post<Category>(`${this.API_URL}/categories`, category)
+  createCategory(category: Partial<Category>): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/categories`, category)
       .pipe(
         catchError(error => {
           console.error('Error creating category:', error);
@@ -360,8 +407,8 @@ export class AdminService {
       );
   }
 
-  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
-    return this.http.put<Category>(`${this.API_URL}/categories/${id}`, category)
+  updateCategory(id: number, category: Partial<Category>): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/categories/${id}`, category)
       .pipe(
         catchError(error => {
           console.error('Error updating category:', error);
@@ -371,7 +418,7 @@ export class AdminService {
   }
 
   deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.API_URL}/categories/${id}`)
+    return this.http.delete<any>(`${this.API_URL}/categories/${id}`)
       .pipe(
         catchError(error => {
           console.error('Error deleting category:', error);

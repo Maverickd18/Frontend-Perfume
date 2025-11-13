@@ -37,6 +37,15 @@ export class StepperComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.state = state;
+        // Ocultar footer cuando stepper está abierto
+        const footer = document.querySelector('app-footer');
+        if (footer) {
+          if (state.isOpen) {
+            (footer as HTMLElement).style.display = 'none';
+          } else {
+            (footer as HTMLElement).style.display = 'block';
+          }
+        }
       });
 
     // Verificar permisos antes de cargar datos
@@ -53,6 +62,11 @@ export class StepperComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Mostrar footer nuevamente
+    const footer = document.querySelector('app-footer');
+    if (footer) {
+      (footer as HTMLElement).style.display = 'block';
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }
