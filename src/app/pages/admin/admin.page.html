@@ -290,7 +290,7 @@
                 </ion-badge>
               </td>
               <td>
-                <ion-button size="small" color="primary" (click)="viewUserDetails(user)">
+                <ion-button size="small" class="btn-primary" (click)="viewUserDetails(user)">
                   <ion-icon name="eye"></ion-icon>
                 </ion-button>
                 <ion-button 
@@ -355,7 +355,7 @@
               [(ngModel)]="brandSearchTerm"
               (ionChange)="searchBrands(brandSearchTerm)">
             </ion-searchbar>
-            <ion-button color="success" (click)="openCreateBrandStepper()">
+            <ion-button class="btn-primary" (click)="openCreateBrandStepper()">
               <ion-icon name="add" slot="start"></ion-icon>
               Crear
             </ion-button>
@@ -375,7 +375,7 @@
               <p><strong>Descripción:</strong> {{ brand.description || 'Sin descripción' }}</p>
               <p><strong>País:</strong> {{ brand.countryOrigin || '-' }}</p>
               <div class="actions">
-                <ion-button size="small" color="danger" (click)="deleteBrand(brand.id)">
+                <ion-button size="small" class="btn-danger" (click)="deleteBrand(brand.id)">
                   <ion-icon name="trash"></ion-icon> Eliminar
                 </ion-button>
               </div>
@@ -431,7 +431,7 @@
               <td>{{ perfume.brand?.name || '-' }}</td>
               <td>{{ perfume.category?.name || '-' }}</td>
               <td>
-                <ion-button size="small" color="danger" (click)="deletePerfume(perfume.id)">
+                <ion-button size="small" class="btn-danger" (click)="deletePerfume(perfume.id)">
                   <ion-icon name="trash"></ion-icon>
                 </ion-button>
               </td>
@@ -499,7 +499,7 @@
               </td>
               <td>{{ order.fecha }}</td>
               <td>
-                <ion-button size="small" color="primary" (click)="viewOrderDetails(order)">
+                <ion-button size="small" class="btn-primary" (click)="viewOrderDetails(order)">
                   <ion-icon name="eye"></ion-icon>
                 </ion-button>
               </td>
