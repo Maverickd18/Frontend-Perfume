@@ -9,6 +9,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { CardComponent } from './components/card/card.component';
 import { SearchbarComponent } from './components/searchbar/searchbar.component';
+import { HeaderButtonsComponent } from './components/header-buttons/header-buttons.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { SearchbarComponent } from './components/searchbar/searchbar.component';
     InputComponent,
     HeaderComponent,
     FooterComponent,
+    HeaderButtonsComponent,
   ],
   imports: [
     CommonModule,
@@ -36,7 +38,8 @@ import { SearchbarComponent } from './components/searchbar/searchbar.component';
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
-    CardComponent
+    CardComponent,
+    HeaderButtonsComponent
   ]
 })
 export class SharedModule { }

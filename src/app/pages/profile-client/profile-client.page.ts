@@ -99,6 +99,10 @@ export class ProfileClientPage implements OnInit {
     });
   }
 
+  removeFavorite(productId: number) {
+    this.favoriteProducts = this.favoriteProducts.filter(p => p.id !== productId);
+  }
+
   onCartClick() {
     alert('Carrito de compras');
   }
