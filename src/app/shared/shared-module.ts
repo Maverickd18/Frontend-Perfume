@@ -8,6 +8,7 @@ import { InputComponent } from './components/input/input.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { StepperComponent } from './components/stepper/stepper.component';
+import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { StepperComponent } from './components/stepper/stepper.component';
     InputComponent,
     HeaderComponent,
     FooterComponent,
-    StepperComponent
+    StepperComponent,
+    ImageUploadComponent
   ],
   imports: [
     CommonModule,
@@ -32,7 +34,8 @@ import { StepperComponent } from './components/stepper/stepper.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    IonicModule
+    IonicModule,
+    ImageUploadComponent
   ]
 })
 export class SharedModule { }

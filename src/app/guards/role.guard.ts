@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
@@ -7,33 +7,30 @@ import { AuthService } from '../services/auth.service';
 })
 export class RoleGuard implements CanActivate {
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    const user = this.authService.getUserData();
     const expectedRoles = route.data['roles'] as Array<string>;
+    const user = this.authService.getCurrentUser();
 
-    console.log('RoleGuard - Usuario:', user);
-    console.log('RoleGuard - Roles esperados:', expectedRoles);
+    console.log('RoleGuard - User:', user);
+    console.log('RoleGuard - Expected roles:', expectedRoles);
 
-    if (user && user.rol && expectedRoles.includes(user.rol)) {
+    // Cambiar user.rol por user.role
+    if (user && user.role && expectedRoles.includes(user.role)) {
       return true;
-    } else {
-      this.redirectByRole(user?.rol);
-      return false;
     }
+
+    // Redirigir según el rol actual del usuario
+    this.redirectByRole(user?.role);
+    return false;
   }
 
-  private redirectByRole(rol: string | undefined) {
-    console.log('RoleGuard - Redirigiendo por rol:', rol);
-    
-    // Si no hay rol definido, redirigir al home
-    if (!rol) {
-      this.router.navigate(['/home']);
-      return;
-    }
-    
-    switch (rol.toUpperCase()) {
+  private redirectByRole(role?: string): void {
+    switch (role) {
       case 'ADMIN':
         this.router.navigate(['/admin']);
         break;
@@ -44,7 +41,7 @@ export class RoleGuard implements CanActivate {
         this.router.navigate(['/home']);
         break;
       default:
-        this.router.navigate(['/home']);
+        this.router.navigate(['/login']);
         break;
     }
   }

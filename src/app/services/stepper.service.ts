@@ -12,11 +12,15 @@ export interface StepperState {
     sizeMl: number;
     genre: string;
     releaseDate: string;
+    imageUrl?: string;
   };
   selectedBrand?: number;
   selectedCategory?: number;
   brands: any[];
   categories: any[];
+  brandImage?: File | null;
+  categoryImage?: File | null;
+  perfumeImage?: File | null;
 }
 
 @Injectable({
@@ -33,36 +37,49 @@ export class StepperService {
       stock: 0,
       sizeMl: 100,
       genre: 'Masculino',
-      releaseDate: new Date().toISOString().split('T')[0]
+      releaseDate: new Date().toISOString().split('T')[0],
+      imageUrl: ''
     },
     brands: [],
-    categories: []
+    categories: [],
+    brandImage: null,
+    categoryImage: null,
+    perfumeImage: null
   };
 
   private stateSubject = new BehaviorSubject<StepperState>(this.initialState);
   public state$ = this.stateSubject.asObservable();
 
-  constructor() {}
-
-  getState() {
-    return this.state$;
+  constructor() {
+    console.log('StepperService initialized');
   }
 
   openStepper(): void {
+    console.log('🔄 StepperService: Abriendo stepper...');
     const currentState = this.stateSubject.value;
-    this.stateSubject.next({
-      ...currentState,
+    
+    const newState: StepperState = {
+      ...this.initialState,
       isOpen: true,
-      currentStep: 1
-    });
+      currentStep: 1,
+      brands: Array.isArray(currentState.brands) ? currentState.brands : [],
+      categories: Array.isArray(currentState.categories) ? currentState.categories : [],
+      brandImage: null,
+      categoryImage: null,
+      perfumeImage: null
+    };
+    
+    console.log('🔄 StepperService: Nuevo estado:', newState);
+    this.stateSubject.next(newState);
   }
 
   closeStepper(): void {
+    console.log('🔄 StepperService: Cerrando stepper...');
     const currentState = this.stateSubject.value;
     this.stateSubject.next({
       ...this.initialState,
-      brands: currentState.brands,
-      categories: currentState.categories
+      brands: Array.isArray(currentState.brands) ? currentState.brands : [],
+      categories: Array.isArray(currentState.categories) ? currentState.categories : []
     });
   }
 
@@ -127,7 +144,7 @@ export class StepperService {
     const currentState = this.stateSubject.value;
     this.stateSubject.next({
       ...currentState,
-      brands
+      brands: Array.isArray(brands) ? brands : []
     });
   }
 
@@ -135,11 +152,31 @@ export class StepperService {
     const currentState = this.stateSubject.value;
     this.stateSubject.next({
       ...currentState,
-      categories
+      categories: Array.isArray(categories) ? categories : []
     });
   }
 
-  setStoreCreated(created: boolean): void {
-    // Puedes implementar lógica adicional si es necesario
+  setBrandImage(image: File | null): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      brandImage: image
+    });
+  }
+
+  setCategoryImage(image: File | null): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      categoryImage: image
+    });
+  }
+
+  setPerfumeImage(image: File | null): void {
+    const currentState = this.stateSubject.value;
+    this.stateSubject.next({
+      ...currentState,
+      perfumeImage: image
+    });
   }
 }

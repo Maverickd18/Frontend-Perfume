@@ -2,7 +2,7 @@
   <div class="stepper-modal">
     <!-- Header -->
     <div class="stepper-header">
-      <h2>Create Product</h2>
+      <h2>Crear Nuevo Perfume</h2>
       <button class="close-btn" (click)="closeStepper()">
         <ion-icon name="close"></ion-icon>
       </button>
@@ -18,31 +18,41 @@
       <div class="step-indicator" 
            [class.active]="state.currentStep === 1"
            [class.completed]="state.currentStep > 1"
+           [class.error]="stepErrors[1]"
            (click)="goToStep(1)">
         <span>1</span>
-        <p>Product</p>
+        <p>Producto</p>
       </div>
       <div class="step-indicator" 
            [class.active]="state.currentStep === 2"
            [class.completed]="state.currentStep > 2"
+           [class.error]="stepErrors[2]"
            (click)="state.currentStep >= 2 && goToStep(2)">
         <span>2</span>
-        <p>Details</p>
+        <p>Detalles</p>
       </div>
       <div class="step-indicator" 
            [class.active]="state.currentStep === 3"
            [class.completed]="state.currentStep > 3"
+           [class.error]="stepErrors[3]"
            (click)="state.currentStep >= 3 && goToStep(3)">
         <span>3</span>
-        <p>Category</p>
+        <p>Categoría</p>
       </div>
       <div class="step-indicator" 
            [class.active]="state.currentStep === 4"
            [class.completed]="state.currentStep > 4"
+           [class.error]="stepErrors[4]"
            (click)="state.currentStep >= 4 && goToStep(4)">
         <span>4</span>
-        <p>Brand</p>
+        <p>Marca</p>
       </div>
+    </div>
+
+    <!-- Mensajes de error -->
+    <div *ngIf="stepErrors[state.currentStep]" class="error-message">
+      <ion-icon name="warning-outline"></ion-icon>
+      {{ stepErrors[state.currentStep] }}
     </div>
 
     <!-- Content Container -->
@@ -50,33 +60,44 @@
       
       <!-- STEP 1: Product Name and Basic Info -->
       <div class="step-content" *ngIf="state.currentStep === 1">
-        <h3>Let's start with the basics</h3>
-        <p class="step-description">Enter your product name and initial details</p>
-        
-        <ion-item>
-          <ion-label position="stacked">Product Name *</ion-label>
+        <h3>Información Básica del Producto</h3>
+        <p class="step-description">Todos los campos son obligatorios</p>
+
+        <!-- Imagen del Perfume (OPCIONAL) -->
+        <div class="image-upload-section">
+          <label class="section-label">Imagen del Perfume (Opcional)</label>
+          <app-image-upload
+            (imageUploaded)="onPerfumeImageUploaded($event)">
+          </app-image-upload>
+        </div>
+
+        <ion-item [class.error]="!state.perfumeData.name.trim() && state.perfumeData.name !== ''">
+          <ion-label position="stacked">Nombre del Producto *</ion-label>
           <ion-input 
             [(ngModel)]="state.perfumeData.name"
             (ionInput)="updatePerfumeData('name', $event.detail.value!)"
-            placeholder="e.g., Rose Perfume Premium">
+            placeholder="Ej: Perfume de Rosas Premium"
+            required>
           </ion-input>
         </ion-item>
 
-        <ion-item>
-          <ion-label position="stacked">Description *</ion-label>
+        <ion-item [class.error]="!state.perfumeData.description.trim() && state.perfumeData.description !== ''">
+          <ion-label position="stacked">Descripción *</ion-label>
           <ion-textarea 
             [(ngModel)]="state.perfumeData.description"
             (ionInput)="updatePerfumeData('description', $event.detail.value!)"
-            placeholder="Describe the scent..."
-            rows="3">
+            placeholder="Describe el aroma, notas olfativas, etc..."
+            rows="3"
+            required>
           </ion-textarea>
         </ion-item>
 
-        <ion-item>
-          <ion-label position="stacked">Gender</ion-label>
+        <ion-item [class.error]="!state.perfumeData.genre">
+          <ion-label position="stacked">Género *</ion-label>
           <ion-select 
             [(ngModel)]="state.perfumeData.genre"
-            (ionChange)="updatePerfumeData('genre', $event.detail.value)">
+            (ionChange)="updatePerfumeData('genre', $event.detail.value)"
+            placeholder="Selecciona un género">
             <ion-select-option value="Masculino">Masculino</ion-select-option>
             <ion-select-option value="Femenino">Femenino</ion-select-option>
             <ion-select-option value="Unisex">Unisex</ion-select-option>
@@ -86,58 +107,88 @@
 
       <!-- STEP 2: Price, Stock, Size -->
       <div class="step-content" *ngIf="state.currentStep === 2">
-        <h3>Product Details</h3>
-        <p class="step-description">Enter pricing and inventory information</p>
+        <h3>Detalles del Producto</h3>
+        <p class="step-description">Información de precio e inventario</p>
 
-        <ion-item>
-          <ion-label position="stacked">Price ($) *</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="state.perfumeData.price"
-            (ionInput)="updatePerfumeData('price', +$event.detail.value!)"
-            placeholder="150">
-          </ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Stock (Units) *</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="state.perfumeData.stock"
-            (ionInput)="updatePerfumeData('stock', +$event.detail.value!)"
-            placeholder="10">
-          </ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Size (ml) *</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="state.perfumeData.sizeMl"
-            (ionInput)="updatePerfumeData('sizeMl', +$event.detail.value!)"
-            placeholder="100">
-          </ion-input>
-        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item [class.error]="(!state.perfumeData.price || state.perfumeData.price <= 0) && state.perfumeData.price !== 0">
+                <ion-label position="stacked">Precio ($) *</ion-label>
+                <ion-input 
+                  type="number"
+                  [(ngModel)]="state.perfumeData.price"
+                  (ionInput)="updatePerfumeData('price', +$event.detail.value!)"
+                  placeholder="150.00"
+                  min="0"
+                  step="0.01"
+                  required>
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-md="6">
+              <ion-item [class.error]="(state.perfumeData.stock < 0) && state.perfumeData.stock !== 0">
+                <ion-label position="stacked">Stock (Unidades) *</ion-label>
+                <ion-input 
+                  type="number"
+                  [(ngModel)]="state.perfumeData.stock"
+                  (ionInput)="updatePerfumeData('stock', +$event.detail.value!)"
+                  placeholder="10"
+                  min="0"
+                  required>
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item [class.error]="(!state.perfumeData.sizeMl || state.perfumeData.sizeMl <= 0) && state.perfumeData.sizeMl !== 0">
+                <ion-label position="stacked">Tamaño (ml) *</ion-label>
+                <ion-input 
+                  type="number"
+                  [(ngModel)]="state.perfumeData.sizeMl"
+                  (ionInput)="updatePerfumeData('sizeMl', +$event.detail.value!)"
+                  placeholder="100"
+                  min="1"
+                  required>
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-md="6">
+              <ion-item [class.error]="!state.perfumeData.releaseDate">
+                <ion-label position="stacked">Fecha de Lanzamiento *</ion-label>
+                <ion-input 
+                  type="date"
+                  [(ngModel)]="state.perfumeData.releaseDate"
+                  (ionInput)="updatePerfumeData('releaseDate', $event.detail.value!)"
+                  required>
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </div>
 
       <!-- STEP 3: Category Selection -->
       <div class="step-content" *ngIf="state.currentStep === 3">
-        <h3>Select Category</h3>
-        <p class="step-description">Choose the fragrance category that best describes your product</p>
+        <h3>Selección de Categoría</h3>
+        <p class="step-description">Elige una categoría existente o crea una nueva</p>
 
         <!-- Option to use existing category -->
         <ion-item class="ion-margin-bottom">
           <ion-checkbox slot="start" [(ngModel)]="useExistingCategory"></ion-checkbox>
-          <ion-label>Use existing category</ion-label>
+          <ion-label>Usar categoría existente</ion-label>
         </ion-item>
 
         <!-- Existing categories dropdown -->
         <div *ngIf="useExistingCategory" class="ion-margin-bottom">
-          <ion-item>
-            <ion-label position="stacked">Select Category</ion-label>
+          <ion-item [class.error]="!state.selectedCategory && useExistingCategory">
+            <ion-label position="stacked">Seleccionar Categoría *</ion-label>
             <ion-select 
               [(ngModel)]="state.selectedCategory"
-              (ionChange)="selectCategory($event.detail.value)">
+              (ionChange)="selectCategory($event.detail.value)"
+              placeholder="Selecciona una categoría">
               <ion-select-option *ngFor="let category of state.categories" [value]="category.id">
                 {{ category.name }}
               </ion-select-option>
@@ -147,20 +198,22 @@
 
         <!-- New category form -->
         <div *ngIf="!useExistingCategory">
-          <ion-item class="ion-margin-bottom">
-            <ion-label position="stacked">Category Name *</ion-label>
+          <ion-item class="ion-margin-bottom" [class.error]="!newCategoryName.trim() && newCategoryName !== ''">
+            <ion-label position="stacked">Nombre de Categoría *</ion-label>
             <ion-input 
               [(ngModel)]="newCategoryName"
-              placeholder="e.g., Premium Fragrances">
+              placeholder="Ej: Fragancias Premium"
+              required>
             </ion-input>
           </ion-item>
 
-          <ion-item class="ion-margin-bottom">
-            <ion-label position="stacked">Description *</ion-label>
+          <ion-item class="ion-margin-bottom" [class.error]="!newCategoryDescription.trim() && newCategoryDescription !== ''">
+            <ion-label position="stacked">Descripción *</ion-label>
             <ion-textarea 
               [(ngModel)]="newCategoryDescription"
-              placeholder="e.g., Luxury perfume collection"
-              rows="3">
+              placeholder="Ej: Colección de perfumes de lujo"
+              rows="3"
+              required>
             </ion-textarea>
           </ion-item>
         </div>
@@ -168,22 +221,23 @@
 
       <!-- STEP 4: Brand Selection/Creation -->
       <div class="step-content" *ngIf="state.currentStep === 4">
-        <h3>Select or Create Brand</h3>
-        <p class="step-description">Choose an existing brand or create a new one</p>
+        <h3>Selección de Marca</h3>
+        <p class="step-description">Elige una marca existente o crea una nueva</p>
 
         <!-- Option to use existing brand -->
         <ion-item class="ion-margin-bottom">
           <ion-checkbox slot="start" [(ngModel)]="useExistingBrand"></ion-checkbox>
-          <ion-label>Use existing brand</ion-label>
+          <ion-label>Usar marca existente</ion-label>
         </ion-item>
 
         <!-- Existing brands dropdown -->
         <div *ngIf="useExistingBrand" class="ion-margin-bottom">
-          <ion-item>
-            <ion-label position="stacked">Select Brand</ion-label>
+          <ion-item [class.error]="!state.selectedBrand && useExistingBrand">
+            <ion-label position="stacked">Seleccionar Marca *</ion-label>
             <ion-select 
               [(ngModel)]="state.selectedBrand"
-              (ionChange)="selectBrand($event.detail.value)">
+              (ionChange)="selectBrand($event.detail.value)"
+              placeholder="Selecciona una marca">
               <ion-select-option *ngFor="let brand of state.brands" [value]="brand.id">
                 {{ brand.name }}
               </ion-select-option>
@@ -193,28 +247,30 @@
 
         <!-- New brand form -->
         <div *ngIf="!useExistingBrand">
-          <ion-item class="ion-margin-bottom">
-            <ion-label position="stacked">Brand Name *</ion-label>
+          <ion-item class="ion-margin-bottom" [class.error]="!newBrandName.trim() && newBrandName !== ''">
+            <ion-label position="stacked">Nombre de Marca *</ion-label>
             <ion-input 
               [(ngModel)]="newBrandName"
-              placeholder="e.g., Luxury Scents">
+              placeholder="Ej: Luxury Scents"
+              required>
             </ion-input>
           </ion-item>
 
-          <ion-item class="ion-margin-bottom">
-            <ion-label position="stacked">Description *</ion-label>
+          <ion-item class="ion-margin-bottom" [class.error]="!newBrandDescription.trim() && newBrandDescription !== ''">
+            <ion-label position="stacked">Descripción *</ion-label>
             <ion-textarea 
               [(ngModel)]="newBrandDescription"
-              placeholder="e.g., Premium fragrance brand from France"
-              rows="3">
+              placeholder="Ej: Marca de fragancias premium de Francia"
+              rows="3"
+              required>
             </ion-textarea>
           </ion-item>
 
           <ion-item class="ion-margin-bottom">
-            <ion-label position="stacked">Country of Origin</ion-label>
+            <ion-label position="stacked">País de Origen</ion-label>
             <ion-input 
               [(ngModel)]="newBrandCountry"
-              placeholder="e.g., France">
+              placeholder="Ej: Francia">
             </ion-input>
           </ion-item>
         </div>
@@ -229,22 +285,23 @@
         fill="outline"
         (click)="previousStep()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
-        Back
+        Anterior
       </ion-button>
 
       <div class="flex-spacer"></div>
 
       <ion-button 
         fill="outline"
+        color="medium"
         (click)="closeStepper()">
-        Cancel
+        Cancelar
       </ion-button>
 
       <ion-button 
         *ngIf="state.currentStep < 4"
         [disabled]="!validateCurrentStep()"
         (click)="nextStep()">
-        Next
+        Siguiente
         <ion-icon slot="end" name="chevron-forward"></ion-icon>
       </ion-button>
 
@@ -254,7 +311,7 @@
         (click)="savePerfume()">
         <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
         <ion-icon *ngIf="!isLoading" slot="start" name="checkmark"></ion-icon>
-        {{ isLoading ? 'Creating...' : 'Save Product' }}
+        {{ isLoading ? 'Creando...' : 'Crear Producto' }}
       </ion-button>
     </div>
   </div>

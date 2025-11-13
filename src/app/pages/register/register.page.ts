@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService, RegisterRequest } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -11,16 +12,17 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class RegisterPage implements OnInit {
   registerForm: FormGroup;
   acceptTerms: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private authService: AuthService
   ) {
     this.registerForm = this.formBuilder.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
-      userType: ['client', [Validators.required]],
+      userType: ['CLIENTE', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
@@ -30,13 +32,12 @@ export class RegisterPage implements OnInit {
     this.resetForm();
   }
 
- resetForm() {
-  this.registerForm.reset({
-    userType: 'client'
-  });
-  this.acceptTerms = false;
-}
-  
+  resetForm() {
+    this.registerForm.reset({
+      userType: 'CLIENTE'
+    });
+    this.acceptTerms = false;
+  }
 
   passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password')?.value;
@@ -58,11 +59,46 @@ export class RegisterPage implements OnInit {
 
   onRegister() {
     if (this.registerForm.valid && this.acceptTerms) {
-      console.log('Register attempt:', this.registerForm.value);
-      this.router.navigate(['/login']);
+      this.isLoading = true;
+      
+      const formData = this.registerForm.value;
+      
+      // Separar nombre y apellido del fullName
+      const nameParts = formData.fullName.split(' ');
+      const name = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+      
+      const registerData: RegisterRequest = {
+        name: name,
+        lastName: lastName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.userType // CLIENTE o VENDEDOR
+      };
+
+      console.log('Datos de registro enviados:', registerData);
+
+      this.authService.register(registerData).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          console.log('Registro exitoso:', response);
+          
+          // Redirigir según el tipo de usuario
+          if (formData.userType === 'VENDEDOR') {
+            this.router.navigate(['/seller']);
+          } else {
+            this.router.navigate(['/home']);
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          console.error('Error en registro:', error);
+          alert('Error en el registro: ' + (error.error?.message || error.message));
+        }
+      });
     } else {
       if (!this.acceptTerms) {
-        console.log('Debe aceptar los términos y condiciones');
+        alert('Debe aceptar los términos y condiciones');
       }
       this.markFormGroupTouched(this.registerForm);
     }
@@ -70,10 +106,12 @@ export class RegisterPage implements OnInit {
 
   onGoogleRegister() {
     console.log('Google register');
+    // Implementar lógica de Google OAuth
   }
 
   onFacebookRegister() {
     console.log('Facebook register');
+    // Implementar lógica de Facebook OAuth
   }
 
   goToLogin() {
@@ -105,17 +143,6 @@ export class RegisterPage implements OnInit {
     }
     if (control?.hasError('email') && control?.touched) {
       return 'Ingrese un correo electrónico válido';
-    }
-    return '';
-  }
-
-  getPhoneError(): string {
-    const control = this.registerForm.get('phone');
-    if (control?.hasError('required') && control?.touched) {
-      return 'El teléfono es requerido';
-    }
-    if (control?.hasError('pattern') && control?.touched) {
-      return 'Ingrese un número de teléfono válido (10 dígitos)';
     }
     return '';
   }

@@ -19,10 +19,11 @@
   </ion-card>
 
   <!-- Add Products Button -->
-  <div class="ion-padding">
+   <div class="ion-padding">
     <ion-button 
       expand="block" 
-      (click)="openAddProductStepper()">
+      (click)="openAddProductStepper()"
+      class="add-product-btn">
       <ion-icon slot="start" name="add-circle"></ion-icon>
       Agregar Nuevo Perfume
     </ion-button>
@@ -38,6 +39,7 @@
       <div *ngIf="perfumes && perfumes.length > 0" class="ion-margin-bottom">
         <ion-button 
           fill="outline"
+          color="danger"
           [disabled]="selectedPerfumes.size === 0"
           (click)="deleteSelectedPerfumes()">
           <ion-icon slot="start" name="trash"></ion-icon>
@@ -55,15 +57,31 @@
                 [checked]="isSelected(perfume.id!)"
                 (ionChange)="toggleSelectPerfume(perfume.id!)">
               </ion-checkbox>
+              
+              <!-- Imagen del perfume -->
+              <ion-avatar slot="start" class="perfume-avatar">
+                <img [src]="getPerfumeImage(perfume)" [alt]="perfume.name" (error)="perfume.imageUrl = null">
+              </ion-avatar>
+              
               <ion-label>
                 <h2>{{ perfume.name }}</h2>
                 <p>{{ perfume.description }}</p>
-                <p *ngIf="perfume.brand"><strong>Marca:</strong> {{ perfume.brand.name }}</p>
-                <p *ngIf="perfume.category"><strong>Categoría:</strong> {{ perfume.category.name }}</p>
+                <p *ngIf="perfume.brand">
+                  <ion-icon name="business-outline"></ion-icon>
+                  <strong>Marca:</strong> {{ perfume.brand.name }}
+                </p>
+                <p *ngIf="perfume.category">
+                  <ion-icon name="pricetags-outline"></ion-icon>
+                  <strong>Categoría:</strong> {{ perfume.category.name }}
+                </p>
                 <p>
+                  <ion-icon name="cash-outline"></ion-icon>
                   <strong>Precio:</strong> ${{ perfume.price }} | 
+                  <ion-icon name="cube-outline"></ion-icon>
                   <strong>Stock:</strong> {{ perfume.stock }} | 
+                  <ion-icon name="resize-outline"></ion-icon>
                   <strong>Tamaño:</strong> {{ perfume.sizeMl }}ml | 
+                  <ion-icon name="person-outline"></ion-icon>
                   <strong>Género:</strong> {{ perfume.genre }}
                 </p>
               </ion-label>
@@ -71,15 +89,17 @@
             <ion-item-options side="end">
               <ion-item-option color="primary" (click)="startEditPerfume(perfume)">
                 <ion-icon slot="icon-only" name="pencil"></ion-icon>
+                Editar
               </ion-item-option>
               <ion-item-option color="danger" (click)="deletePerfume(perfume.id!)">
                 <ion-icon slot="icon-only" name="trash"></ion-icon>
+                Eliminar
               </ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
 
           <!-- Edit Form inside Product Card -->
-          <ion-card *ngIf="editingPerfume?.id === perfume.id" class="ion-margin-top ion-margin-bottom">
+          <ion-card *ngIf="editingPerfume?.id === perfume.id" class="ion-margin-top ion-margin-bottom edit-card">
             <ion-card-header>
               <ion-card-title>Editar: {{ perfume.name }}</ion-card-title>
             </ion-card-header>
@@ -144,9 +164,15 @@
                 </ion-select>
               </ion-item>
               
-              <div class="ion-margin-top">
-                <ion-button (click)="saveEditPerfume()">Guardar Cambios</ion-button>
-                <ion-button fill="outline" (click)="cancelEditPerfume()">Cancelar</ion-button>
+              <div class="ion-margin-top action-buttons">
+                <ion-button (click)="saveEditPerfume()" color="primary">
+                  <ion-icon slot="start" name="save"></ion-icon>
+                  Guardar Cambios
+                </ion-button>
+                <ion-button fill="outline" (click)="cancelEditPerfume()">
+                  <ion-icon slot="start" name="close"></ion-icon>
+                  Cancelar
+                </ion-button>
               </div>
             </ion-card-content>
           </ion-card>
@@ -154,9 +180,17 @@
       </ion-list>
 
       <!-- Message if no products -->
-      <ion-text *ngIf="!perfumes || perfumes.length === 0" color="medium">
-        <p class="ion-text-center ion-margin-top">No hay perfumes aún. ¡Crea tu primer perfume!</p>
-      </ion-text>
+      <div *ngIf="!perfumes || perfumes.length === 0" class="empty-state">
+        <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
+        <h3>No hay perfumes aún</h3>
+        <p>¡Crea tu primer perfume usando el botón de arriba!</p>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando perfumes...</p>
+      </div>
     </ion-card-content>
   </ion-card>
 

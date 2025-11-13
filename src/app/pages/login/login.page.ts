@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LoadingController, AlertController } from '@ionic/angular';
 import { AuthService, LoginRequest } from '../../services/auth.service';
 
 @Component({
@@ -10,17 +9,15 @@ import { AuthService, LoginRequest } from '../../services/auth.service';
   styleUrls: ['./login.page.scss'],
   standalone: false
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   loginForm: FormGroup;
-  rememberMe: boolean = false;
   isLoading: boolean = false;
+  errorMessage: string = '';
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private loadingCtrl: LoadingController,
-    private alertCtrl: AlertController
+    private authService: AuthService
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -28,112 +25,71 @@ export class LoginPage implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.resetForm();
-  }
-
-  resetForm() {
-    this.loginForm.reset();
-    this.rememberMe = false;
-  }
-
-  async onLogin() {
+  onLogin() {
+    this.errorMessage = '';
+    
     if (this.loginForm.valid) {
       this.isLoading = true;
       
-      const loading = await this.loadingCtrl.create({
-        message: 'Iniciando sesión...'
-      });
-      await loading.present();
-
-      const loginData: LoginRequest = this.loginForm.value;
+      const loginData: LoginRequest = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password
+      };
 
       console.log('Datos de login enviados:', loginData);
 
       this.authService.login(loginData).subscribe({
         next: (response) => {
-          loading.dismiss();
           this.isLoading = false;
           console.log('Login exitoso - Respuesta completa:', response);
           
-          if (response.usuario && response.usuario.rol) {
-            console.log('Redirigiendo con rol:', response.usuario.rol);
-            this.redirectByRole(response.usuario.rol);
+          // Verificar que tenemos token y usuario en la respuesta
+          if (!response.token || !response.usuario) {
+            this.errorMessage = 'Error: Respuesta del servidor incompleta';
+            return;
+          }
+          
+          // Obtener el usuario mapeado del servicio
+          const user = this.authService.getCurrentUser();
+          console.log('Usuario mapeado después del login:', user);
+          
+          if (user && user.role) {
+            console.log('Redirigiendo según rol:', user.role);
+            
+            if (user.role === 'VENDEDOR' || user.role === 'ADMIN') {
+              this.router.navigate(['/seller']);
+            } else {
+              this.router.navigate(['/home']);
+            }
           } else {
-            console.error('Estructura de usuario no válida:', response);
-            this.showErrorAlert('Error en la estructura de datos del usuario');
+            this.errorMessage = 'Error: No se pudo obtener información del usuario';
+            console.error('Usuario no tiene rol definido:', user);
           }
         },
         error: (error) => {
-          loading.dismiss();
           this.isLoading = false;
           console.error('Error completo en login:', error);
-          console.error('Error status:', error.status);
-          console.error('Error message:', error.message);
-          console.error('Error response:', error.error);
           
-          let errorMessage = 'Error al iniciar sesión';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          } else if (error.status === 401) {
-            errorMessage = 'Credenciales incorrectas';
+          // Manejar diferentes tipos de errores
+          if (error.status === 401) {
+            this.errorMessage = 'Credenciales incorrectas. Verifique su email y contraseña.';
           } else if (error.status === 0) {
-            errorMessage = 'No se puede conectar con el servidor. Verifica que el backend esté ejecutándose.';
-          } else if (error.status === 404) {
-            errorMessage = 'Endpoint no encontrado. Verifica la URL del servidor.';
+            this.errorMessage = 'Error de conexión. Verifique su internet.';
+          } else if (error.error?.message) {
+            this.errorMessage = error.error.message;
+          } else {
+            this.errorMessage = 'Error en el servidor. Intente nuevamente.';
           }
-          
-          this.showErrorAlert(errorMessage);
         }
       });
     } else {
       this.markFormGroupTouched(this.loginForm);
+      this.errorMessage = 'Por favor complete todos los campos correctamente';
     }
-  }
-
-  private redirectByRole(rol: string) {
-    console.log('Redirigiendo con rol:', rol);
-    
-    switch (rol.toUpperCase()) {
-      case 'ADMIN':
-        this.router.navigate(['/admin']);
-        break;
-      case 'VENDEDOR':
-        this.router.navigate(['/seller']);
-        break;
-      case 'CLIENTE':
-        this.router.navigate(['/home']);
-        break;
-      default:
-        console.warn('Rol no reconocido:', rol, 'redirigiendo a home');
-        this.router.navigate(['/home']);
-        break;
-    }
-  }
-
-  async showErrorAlert(message: string) {
-    const alert = await this.alertCtrl.create({
-      header: 'Error',
-      message: message,
-      buttons: ['OK']
-    });
-    await alert.present();
-  }
-
-  onGoogleLogin() {
-    console.log('Google login');
-  }
-
-  onFacebookLogin() {
-    console.log('Facebook login');
   }
 
   goToRegister() {
     this.router.navigate(['/register']);
-  }
-
-  onForgotPassword() {
-    this.router.navigate(['/forgot-password']);
   }
 
   private markFormGroupTouched(formGroup: FormGroup) {
@@ -144,22 +100,22 @@ export class LoginPage implements OnInit {
   }
 
   getEmailError(): string {
-    const emailControl = this.loginForm.get('email');
-    if (emailControl?.hasError('required') && emailControl?.touched) {
+    const control = this.loginForm.get('email');
+    if (control?.hasError('required') && control?.touched) {
       return 'El correo electrónico es requerido';
     }
-    if (emailControl?.hasError('email') && emailControl?.touched) {
+    if (control?.hasError('email') && control?.touched) {
       return 'Ingrese un correo electrónico válido';
     }
     return '';
   }
 
   getPasswordError(): string {
-    const passwordControl = this.loginForm.get('password');
-    if (passwordControl?.hasError('required') && passwordControl?.touched) {
+    const control = this.loginForm.get('password');
+    if (control?.hasError('required') && control?.touched) {
       return 'La contraseña es requerida';
     }
-    if (passwordControl?.hasError('minlength') && passwordControl?.touched) {
+    if (control?.hasError('minlength') && control?.touched) {
       return 'La contraseña debe tener al menos 6 caracteres';
     }
     return '';
