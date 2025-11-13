@@ -371,9 +371,4 @@ export class AdminPage implements OnInit {
     // Abre el stepper para crear marca (usa el mismo componente)
     this.stepperService.openStepper();
   }
-
-  openCreatePerfumeStepper() {
-    // Abre el stepper para crear perfume
-    this.stepperService.openStepper();
-  }
 }

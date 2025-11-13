@@ -401,17 +401,11 @@
       
       <ion-card class="filters-card">
         <ion-card-content>
-          <div class="search-with-action">
-            <ion-searchbar 
-              placeholder="Buscar perfumes..." 
-              [(ngModel)]="perfumeSearchTerm"
-              (ionChange)="searchPerfumes(perfumeSearchTerm)">
-            </ion-searchbar>
-            <ion-button color="success" (click)="openCreatePerfumeStepper()">
-              <ion-icon name="add" slot="start"></ion-icon>
-              Crear
-            </ion-button>
-          </div>
+          <ion-searchbar 
+            placeholder="Buscar perfumes..." 
+            [(ngModel)]="perfumeSearchTerm"
+            (ionChange)="searchPerfumes(perfumeSearchTerm)">
+          </ion-searchbar>
         </ion-card-content>
       </ion-card>
 
