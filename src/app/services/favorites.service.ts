@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FavoritesService {
+  private baseUrl = environment.apiUrl;
   private favorites$ = new BehaviorSubject<any[]>([]);
   private favoriteCount$ = new BehaviorSubject<number>(0);
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class AuthService {
   private currentUser$ = new BehaviorSubject<any>(null);
   private isAuthenticated$ = new BehaviorSubject<boolean>(false);
-  private baseUrl = 'http://localhost:3001/api';
+  private baseUrl = environment.apiUrl;
 
   constructor() {
     this.checkAuthStatus();

@@ -1,43 +1,53 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private baseUrl = 'http://localhost:3001/api';
+  private baseUrl = `${environment.apiUrl}/api/products`;
   private products$ = new BehaviorSubject<any[]>([]);
 
-  constructor() {
-    this.initializeProducts();
+  constructor(private http: HttpClient) {
+    this.loadProductsFromServer();
+  }
+
+  private loadProductsFromServer() {
+    this.http.get<any[]>(this.baseUrl).pipe(
+      catchError(() => {
+        return of(this.getMockProducts());
+      }),
+      tap(products => this.products$.next(products))
+    ).subscribe();
   }
 
   getProducts(): Observable<any[]> {
-    return new Observable(observer => {
-      observer.next(this.products$.value);
-      observer.complete();
-    });
+    return this.products$.asObservable();
   }
 
   getProductById(id: number): Observable<any> {
-    return new Observable(observer => {
-      const product = this.products$.value.find(p => p.id === id);
-      observer.next(product);
-      observer.complete();
-    });
+    return this.http.get<any>(`${this.baseUrl}/${id}`).pipe(
+      catchError(() => {
+        const product = this.products$.value.find(p => p.id === id);
+        return of(product);
+      })
+    );
   }
 
   searchProducts(query: string): Observable<any[]> {
-    return new Observable(observer => {
-      const lowerQuery = query.toLowerCase();
-      const filtered = this.products$.value.filter(p =>
-        p.title.toLowerCase().includes(lowerQuery) ||
-        p.description.toLowerCase().includes(lowerQuery)
-      );
-      observer.next(filtered);
-      observer.complete();
-    });
+    return this.http.get<any[]>(`${this.baseUrl}/search?q=${query}`).pipe(
+      catchError(() => {
+        const lowerQuery = query.toLowerCase();
+        const filtered = this.products$.value.filter(p =>
+          p.title.toLowerCase().includes(lowerQuery) ||
+          p.description.toLowerCase().includes(lowerQuery)
+        );
+        return of(filtered);
+      })
+    );
   }
 
   filterProducts(filters: any): Observable<any[]> {
@@ -67,28 +77,25 @@ export class ProductService {
   }
 
   createProduct(product: any): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true, id: Math.random() });
-      observer.complete();
-    });
+    return this.http.post<any>(this.baseUrl, product).pipe(
+      catchError(() => of({ success: true, id: Math.random() }))
+    );
   }
 
   updateProduct(id: number, product: any): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true, id: id });
-      observer.complete();
-    });
+    return this.http.put<any>(`${this.baseUrl}/${id}`, product).pipe(
+      catchError(() => of({ success: true, id: id }))
+    );
   }
 
   deleteProduct(id: number): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true });
-      observer.complete();
-    });
+    return this.http.delete<any>(`${this.baseUrl}/${id}`).pipe(
+      catchError(() => of({ success: true }))
+    );
   }
 
-  private initializeProducts(): void {
-    const products = [
+  private getMockProducts(): any[] {
+    return [
       {
         id: 1,
         title: 'Soft Rose',
@@ -211,7 +218,5 @@ export class ProductService {
         stock: 22
       }
     ];
-
-    this.products$.next(products);
   }
 }

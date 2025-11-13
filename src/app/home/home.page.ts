@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-home',
@@ -7,140 +8,35 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage {
-  constructor(private navCtrl: NavController) {}
-
-  allProducts = [
-    {
-      id: 1,
-      title: 'Soft Rose',
-      description: 'Aromatic floral with soft musk notes.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 29.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 15
-    },
-    {
-      id: 2,
-      title: 'Amber Night',
-      description: 'Warm, amber and vanilla tones for evening wear.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 39.99,
-      size: '50ml',
-      brand: 'NoirScent',
-      category: 'oriental',
-      stock: 8
-    },
-    {
-      id: 3,
-      title: 'Citrus Fresh',
-      description: 'Bright citrus with green top notes, perfect for daytime.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 24.99,
-      size: '75ml',
-      brand: 'FreshAura',
-      category: 'citrus',
-      stock: 20
-    },
-    {
-      id: 4,
-      title: 'Midnight Bloom',
-      description: 'Deep floral essence with exotic undertones.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 44.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 12
-    },
-    {
-      id: 5,
-      title: 'Ocean Breeze',
-      description: 'Fresh and aquatic notes perfect for summer.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 32.99,
-      size: '75ml',
-      brand: 'FreshAura',
-      category: 'citrus',
-      stock: 18
-    },
-    {
-      id: 6,
-      title: 'Velvet Spice',
-      description: 'Luxurious warm spices with woody base.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 49.99,
-      size: '50ml',
-      brand: 'NoirScent',
-      category: 'oriental',
-      stock: 10
-    },
-    {
-      id: 7,
-      title: 'Garden Petals',
-      description: 'Soft blend of iris and peony flowers.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 27.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 25
-    },
-    {
-      id: 8,
-      title: 'Lemon Zest',
-      description: 'Energetic citrus burst with bergamot.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 21.99,
-      size: '75ml',
-      brand: 'FreshAura',
-      category: 'citrus',
-      stock: 30
-    },
-    {
-      id: 9,
-      title: 'Oud Heritage',
-      description: 'Premium oud blended with rose and sandalwood.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 64.99,
-      size: '50ml',
-      brand: 'NoirScent',
-      category: 'oriental',
-      stock: 6
-    },
-    {
-      id: 10,
-      title: 'Cherry Blossom',
-      description: 'Sweet floral with light fruity notes.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 31.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 16
-    },
-    {
-      id: 11,
-      title: 'Tropical Storm',
-      description: 'Exotic mix of mango, pineapple and coconut.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 28.99,
-      size: '75ml',
-      brand: 'FreshAura',
-      category: 'citrus',
-      stock: 22
-    }
-  ];
-
-  products = [...this.allProducts];
-
+export class HomePage implements OnInit {
+  allProducts: any[] = [];
+  products: any[] = [];
   showFilters: boolean = false;
   filterCategory: string[] = [];
   filterBrand: string[] = [];
   filterSize: string[] = [];
   filterPriceRange: number[] = [0, 100];
+
+  constructor(
+    private navCtrl: NavController,
+    private productService: ProductService
+  ) {}
+
+  ngOnInit() {
+    this.loadProducts();
+  }
+
+  private loadProducts() {
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        this.allProducts = products;
+        this.products = [...this.allProducts];
+      },
+      error: (err) => {
+        console.error('Error loading products:', err);
+      }
+    });
+  }
 
   get brands(): string[] {
     const set = new Set<string>();
@@ -209,7 +105,7 @@ export class HomePage {
   }
 
   onCartClick() {
-    alert('Carrito de compras');
+    this.navCtrl.navigateForward('/cart');
   }
 
   logout() {
