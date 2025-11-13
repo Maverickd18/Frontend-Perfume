@@ -16,23 +16,28 @@ export interface RegisterRequest {
   role?: string;
 }
 
+// Interface CORREGIDA basada en la respuesta REAL de tu backend
 export interface AuthResponse {
   token: string;
-  usuario: {
+  usuario: {  // ← Cambiado de 'user' a 'usuario'
     id: number;
-    name: string;
-    apellido: string;
+    nombre: string;      // ← Cambiado de 'name' a 'nombre'
+    apellido: string;    // ← Cambiado de 'lastName' a 'apellido'
     email: string;
-    rol: string;
+    rol: string;         // ← Cambiado de 'role' a 'rol'
+    username: string;
+    active: boolean;
   };
 }
 
 export interface User {
   id: number;
   name: string;
-  apellido: string;
+  lastName: string;
   email: string;
-  rol: string;
+  role: string;
+  username: string;
+  active: boolean;
 }
 
 @Injectable({
@@ -47,19 +52,59 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, loginData)
       .pipe(
         tap(response => {
-          console.log('Respuesta del servidor en AuthService:', response);
-          localStorage.setItem('authToken', response.token);
-          localStorage.setItem('userData', JSON.stringify(response.usuario));
+          console.log('Respuesta REAL del login:', response);
+          
+          // Mapear la respuesta del backend (español) a nuestra interfaz (inglés)
+          if (response.token && response.usuario) {
+            const userData: User = {
+              id: response.usuario.id,
+              name: response.usuario.nombre,
+              lastName: response.usuario.apellido,
+              email: response.usuario.email,
+              role: response.usuario.rol,
+              username: response.usuario.username,
+              active: response.usuario.active
+            };
+            
+            localStorage.setItem('authToken', response.token);
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            console.log('Token guardado:', response.token);
+            console.log('User data mapeado y guardado:', userData);
+          }
         })
       );
   }
 
   register(registerData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, registerData)
+    // Asegurar que el role esté en mayúsculas como espera el backend
+    const dataToSend = {
+      ...registerData,
+      role: registerData.role?.toUpperCase() || 'CLIENTE'
+    };
+    
+    console.log('Enviando datos de registro:', dataToSend);
+    
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, dataToSend)
       .pipe(
         tap(response => {
-          localStorage.setItem('authToken', response.token);
-          localStorage.setItem('userData', JSON.stringify(response.usuario));
+          console.log('Respuesta REAL del registro:', response);
+          
+          // Mapear la respuesta del backend (español) a nuestra interfaz (inglés)
+          if (response.token && response.usuario) {
+            const userData: User = {
+              id: response.usuario.id,
+              name: response.usuario.nombre,
+              lastName: response.usuario.apellido,
+              email: response.usuario.email,
+              role: response.usuario.rol,
+              username: response.usuario.username,
+              active: response.usuario.active
+            };
+            
+            localStorage.setItem('authToken', response.token);
+            localStorage.setItem('userData', JSON.stringify(userData));
+          }
         })
       );
   }
@@ -84,12 +129,17 @@ export class AuthService {
 
   isSeller(): boolean {
     const user = this.getUserData();
-    return user ? user.rol === 'VENDEDOR' || user.rol === 'vendedor' : false;
+    return user ? user.role === 'VENDEDOR' : false;
   }
 
   isAdmin(): boolean {
     const user = this.getUserData();
-    return user ? user.rol === 'ADMIN' || user.rol === 'admin' : false;
+    return user ? user.role === 'ADMIN' : false;
+  }
+
+  isClient(): boolean {
+    const user = this.getUserData();
+    return user ? user.role === 'CLIENTE' : false;
   }
 
   getCurrentUser(): User | null {
