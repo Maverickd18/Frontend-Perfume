@@ -1,3 +1,4 @@
+/* Custom Button Component - Dark/Gold Theme */
 .custom-button {
   --border-radius: 14px;
   --padding-top: 14px;
@@ -13,47 +14,49 @@
   transition: all 0.3s ease;
 
   &.custom-button-primary {
-    --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
-    --background-hover: linear-gradient(135deg, #7b1fa2 0%, #c2185b 100%);
-    --background-activated: linear-gradient(135deg, #6a1b9a 0%, #ad1457 100%);
-    --color: white;
-    --box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+    --background: linear-gradient(135deg, #d4af37 0%, #c9a935 50%, #b8860b 100%);
+    --background-hover: linear-gradient(135deg, #dab863 0%, #d4af37 50%, #c9a935 100%);
+    --background-activated: linear-gradient(135deg, #c9a935 0%, #b8860b 100%);
+    --color: #0a0a0a;
+    --box-shadow: 0 6px 20px rgba(218, 165, 32, 0.4);
 
     &:hover {
-      --box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+      --box-shadow: 0 8px 24px rgba(218, 165, 32, 0.5);
       transform: translateY(-2px);
     }
   }
 
   &.custom-button-secondary {
-    --background: #f5f5f5;
-    --background-hover: #e0e0e0;
-    --background-activated: #d0d0d0;
-    --color: #333;
-    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    --background-hover: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+    --background-activated: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    --color: #d4af37;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(218, 165, 32, 0.3);
   }
 
   &.custom-button-outline {
     --border-width: 2px;
-    --border-color: #9c27b0;
+    --border-color: #d4af37;
     --border-style: solid;
     --background: transparent;
-    --background-hover: rgba(156, 39, 176, 0.05);
-    --background-activated: rgba(156, 39, 176, 0.1);
-    --color: #9c27b0;
+    --background-hover: rgba(218, 165, 32, 0.1);
+    --background-activated: rgba(218, 165, 32, 0.2);
+    --color: #d4af37;
     --box-shadow: none;
 
     &:hover {
-      --border-color: #7b1fa2;
-      --color: #7b1fa2;
+      --border-color: #dab863;
+      --color: #dab863;
+      box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
     }
   }
 
   &.custom-button-clear {
     --background: transparent;
-    --background-hover: rgba(156, 39, 176, 0.05);
-    --background-activated: rgba(156, 39, 176, 0.1);
-    --color: #9c27b0;
+    --background-hover: rgba(218, 165, 32, 0.1);
+    --background-activated: rgba(218, 165, 32, 0.15);
+    --color: #d4af37;
     --box-shadow: none;
   }
 
@@ -89,13 +92,16 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .custom-button {
-    &.custom-button-secondary {
-      --background: #3a3a3a;
-      --background-hover: #444;
-      --background-activated: #4a4a4a;
-      --color: #f0f0f0;
-    }
+/* Gold glow animation for primary buttons */
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(218, 165, 32, 0.4);
   }
+  50% {
+    box-shadow: 0 8px 28px rgba(218, 165, 32, 0.6);
+  }
+}
+
+.custom-button-primary:hover {
+  animation: goldPulse 2s ease-in-out infinite;
 }

@@ -1,5 +1,5 @@
 <ion-button 
-  [color]="type === 'secondary' ? 'success' : type === 'outline' ? 'medium' : type === 'clear' ? 'light' : 'primary'"
+  [class]="'custom-button custom-button-' + type + (size ? ' custom-button-' + size : '')"
   [size]="size"
   [expand]="expand"
   [disabled]="disabled"

@@ -87,7 +87,7 @@ export class RegisterPage implements OnInit {
           if (formData.userType === 'VENDEDOR') {
             this.router.navigate(['/seller']);
           } else {
-            this.router.navigate(['/home']);
+            this.router.navigate(['/login']);
           }
         },
         error: (error) => {

@@ -283,6 +283,7 @@
       <ion-button 
         *ngIf="state.currentStep > 1"
         fill="outline"
+        class="btn-previous"
         (click)="previousStep()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         Anterior
@@ -292,7 +293,7 @@
 
       <ion-button 
         fill="outline"
-        color="medium"
+        class="btn-cancel"
         (click)="closeStepper()">
         Cancelar
       </ion-button>
@@ -300,6 +301,7 @@
       <ion-button 
         *ngIf="state.currentStep < 4"
         [disabled]="!validateCurrentStep()"
+        class="btn-next"
         (click)="nextStep()">
         Siguiente
         <ion-icon slot="end" name="chevron-forward"></ion-icon>
@@ -308,6 +310,7 @@
       <ion-button 
         *ngIf="state.currentStep === 4"
         [disabled]="!validateCurrentStep() || isLoading"
+        class="btn-create"
         (click)="savePerfume()">
         <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
         <ion-icon *ngIf="!isLoading" slot="start" name="checkmark"></ion-icon>

@@ -42,6 +42,42 @@ export class SellerPage implements OnInit {
     });
 
     this.sellerService.initializeData();
+    
+    // Agregar producto de muestra para visualización
+    this.addSampleProduct();
+  }
+
+  addSampleProduct() {
+    const samplePerfume: Perfume = {
+      id: 999,
+      name: 'Sauvage Eau de Parfum',
+      description: 'Una fragancia icónica que combina notas frescas de bergamota con toques especiados de pimienta Sichuan y un fondo amaderado de ámbar gris. Perfecta para el hombre moderno y sofisticado.',
+      price: 125.99,
+      stock: 45,
+      sizeMl: 100,
+      genre: 'Masculino',
+      releaseDate: '2023-06-15',
+      brandId: 1,
+      categoryId: 2,
+      imageUrl: 'https://fimgs.net/mdimg/perfume/375x500.68668.jpg',
+      brand: {
+        id: 1,
+        name: 'Dior',
+        description: 'Casa de moda francesa de lujo',
+        countryOrigin: 'Francia',
+        imageUrl: 'https://example.com/dior-logo.jpg'
+      },
+      category: {
+        id: 2,
+        name: 'Eau de Parfum',
+        description: 'Concentración de fragancia alta'
+      }
+    };
+    
+    // Agregar el producto de muestra al array si no existe
+    if (!this.perfumes.find(p => p.id === 999)) {
+      this.perfumes = [samplePerfume, ...this.perfumes];
+    }
   }
 
   loadPerfumes() {
