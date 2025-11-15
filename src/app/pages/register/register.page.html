@@ -5,7 +5,7 @@
       <div class="logo-container">
         <ion-icon name="storefront" class="brand-logo"></ion-icon>
       </div>
-      <h1 class="brand-name">MarketPlace</h1>
+      <h1 class="brand-name">LUMIERESHOP</h1>
       <p class="brand-tagline">Crea tu cuenta y comienza a comprar</p>
     </div>
 
@@ -100,32 +100,6 @@
           {{ isLoading ? 'Creating Account...' : 'Create Account' }}
         </ion-button>
       </form>
-
-      <!-- Divider -->
-      <div class="divider">
-        <span>Or register with</span>
-      </div>
-
-      <!-- Social Register Buttons -->
-      <div class="social-buttons">
-        <ion-button 
-          expand="block"
-          fill="outline"
-          (click)="onGoogleRegister()"
-          [disabled]="isLoading">
-          <ion-icon slot="start" name="logo-google"></ion-icon>
-          Google
-        </ion-button>
-        
-        <ion-button 
-          expand="block"
-          fill="outline"
-          (click)="onFacebookRegister()"
-          [disabled]="isLoading">
-          <ion-icon slot="start" name="logo-facebook"></ion-icon>
-          Facebook
-        </ion-button>
-      </div>
 
       <!-- Switch to Login -->
       <div class="switch-auth">

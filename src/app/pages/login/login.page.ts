@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService, LoginRequest } from '../../services/auth.service';
@@ -9,7 +9,7 @@ import { AuthService, LoginRequest } from '../../services/auth.service';
   styleUrls: ['./login.page.scss'],
   standalone: false
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   loginForm: FormGroup;
   isLoading: boolean = false;
   errorMessage: string = '';
@@ -23,6 +23,24 @@ export class LoginPage {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ngOnInit() {
+    // Inicialización básica
+  }
+
+  // ✨ RESETEO AUTOMÁTICO cada vez que entras a la página
+  ionViewWillEnter() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.loginForm.reset({
+      email: '',
+      password: ''
+    });
+    this.isLoading = false;
+    this.errorMessage = '';
   }
 
   onLogin() {
@@ -48,6 +66,9 @@ export class LoginPage {
             this.errorMessage = 'Error: Respuesta del servidor incompleta';
             return;
           }
+          
+          // Limpiar formulario después del login exitoso
+          this.resetForm();
           
           // Obtener el usuario mapeado del servicio
           const user = this.authService.getCurrentUser();
