@@ -29,14 +29,24 @@ export class RegisterPage implements OnInit {
   }
 
   ngOnInit() {
+    // Inicialización básica
+  }
+
+  // ✨ Se ejecuta cada vez que entras a la página
+  ionViewWillEnter() {
     this.resetForm();
   }
 
   resetForm() {
     this.registerForm.reset({
-      userType: 'CLIENTE'
+      fullName: '',
+      userType: 'CLIENTE',
+      email: '',
+      password: '',
+      confirmPassword: ''
     });
     this.acceptTerms = false;
+    this.isLoading = false;
   }
 
   passwordMatchValidator(formGroup: FormGroup) {
@@ -83,12 +93,12 @@ export class RegisterPage implements OnInit {
           this.isLoading = false;
           console.log('Registro exitoso:', response);
           
-          // Redirigir según el tipo de usuario
-          if (formData.userType === 'VENDEDOR') {
-            this.router.navigate(['/seller']);
-          } else {
-            this.router.navigate(['/login']);
-          }
+          // Limpiar formulario después del registro exitoso
+          this.resetForm();
+          
+          // 🔥 CAMBIO: Ambos tipos de usuario van al LOGIN
+          // Ya sea CLIENTE o VENDEDOR, deben hacer login después de registrarse
+          this.router.navigate(['/login']);
         },
         error: (error) => {
           this.isLoading = false;
