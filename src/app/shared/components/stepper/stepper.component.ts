@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { StepperService, StepperState } from '../../../services/stepper.service';
 import { SellerService, Brand, Category } from '../../../services/seller.service';
 import { FileUploadService } from '../../../services/file-upload.service';
@@ -37,7 +37,8 @@ export class StepperComponent implements OnInit, OnDestroy {
     private stepperService: StepperService, 
     private sellerService: SellerService,
     private fileUploadService: FileUploadService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -314,7 +315,10 @@ export class StepperComponent implements OnInit, OnDestroy {
   validateCurrentStep(): boolean {
     if (!this.state) return false;
 
-    this.stepErrors[this.state.currentStep] = '';
+    setTimeout(() => {
+      this.stepErrors[this.state!.currentStep] = '';
+      this.cdr.detectChanges();
+    });
 
     switch (this.state.currentStep) {
       case 1:
@@ -351,7 +355,10 @@ export class StepperComponent implements OnInit, OnDestroy {
       errors.push('Género es obligatorio');
     }
 
-    this.stepErrors[1] = errors.join(', ');
+    setTimeout(() => {
+      this.stepErrors[1] = errors.join(', ');
+      this.cdr.detectChanges();
+    });
     return errors.length === 0;
   }
 
@@ -384,7 +391,10 @@ export class StepperComponent implements OnInit, OnDestroy {
       errors.push('Fecha de lanzamiento es obligatoria');
     }
 
-    this.stepErrors[2] = errors.join(', ');
+    setTimeout(() => {
+      this.stepErrors[2] = errors.join(', ');
+      this.cdr.detectChanges();
+    });
     return errors.length === 0;
   }
 
@@ -407,7 +417,10 @@ export class StepperComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.stepErrors[3] = errors.join(', ');
+    setTimeout(() => {
+      this.stepErrors[3] = errors.join(', ');
+      this.cdr.detectChanges();
+    });
     return errors.length === 0;
   }
 
@@ -430,7 +443,10 @@ export class StepperComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.stepErrors[4] = errors.join(', ');
+    setTimeout(() => {
+      this.stepErrors[4] = errors.join(', ');
+      this.cdr.detectChanges();
+    });
     return errors.length === 0;
   }
 
