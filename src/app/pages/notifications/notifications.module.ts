@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { NotificationsPageRoutingModule } from './notifications-routing.module';
 import { NotificationsPage } from './notifications.page';
+import { OrderDetailModalComponent } from './order-detail-modal/order-detail-modal.component';
 import { SharedModule } from '../../shared/shared-module';
 
 @NgModule({
@@ -15,6 +16,6 @@ import { SharedModule } from '../../shared/shared-module';
     NotificationsPageRoutingModule,
     SharedModule
   ],
-  declarations: [NotificationsPage]
+  declarations: [NotificationsPage, OrderDetailModalComponent]
 })
 export class NotificationsPageModule { }

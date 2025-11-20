@@ -1,6 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { NotificationService, Notification } from '../../services/notification.service';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
+import { OrderDetailModalComponent } from './order-detail-modal/order-detail-modal.component';
+
+// Order interface
+interface Order {
+  id: number;
+  orderNumber: string;
+  cliente: string;
+  producto: string;
+  cantidad: number;
+  total: number;
+  estado: 'pendiente' | 'procesando' | 'enviado' | 'entregado' | 'cancelado';
+  fecha: Date;
+  direccion?: string;
+  telefono?: string;
+}
 
 @Component({
   selector: 'app-notifications',
@@ -22,7 +38,11 @@ export class NotificationsPage implements OnInit {
     { value: 'stock_bajo', label: 'Stock bajo' }
   ];
 
-  constructor(private notificationService: NotificationService, private router: Router) {}
+  constructor(
+    private notificationService: NotificationService, 
+    private router: Router,
+    private modalController: ModalController
+  ) {}
 
   ngOnInit() {
     this.loadNotifications();
@@ -66,6 +86,41 @@ export class NotificationsPage implements OnInit {
     if (!notification.leida) {
       this.notificationService.markAsRead(notification.id!);
     }
+    
+    // Si es una notificación de compra, abrir modal de pedido
+    if (notification.tipo === 'compra') {
+      this.openOrderDetail(notification);
+    }
+  }
+
+  async openOrderDetail(notification: Notification) {
+    console.log('Opening order detail for:', notification);
+    
+    // Crear orden a partir de la notificación
+    const order: Order = {
+      id: notification.id || 0,
+      orderNumber: `ORD-${String(notification.id).padStart(5, '0')}`,
+      cliente: notification.cliente,
+      producto: notification.producto,
+      cantidad: notification.detalles?.stock || 1,
+      total: notification.detalles?.amount || 0,
+      estado: 'pendiente',
+      fecha: notification.fecha,
+      direccion: 'Av. Principal #123, Ciudad',
+      telefono: '+1 234 567 890'
+    };
+    
+    console.log('Selected order:', order);
+    
+    const modal = await this.modalController.create({
+      component: OrderDetailModalComponent,
+      componentProps: {
+        order: order
+      },
+      cssClass: 'order-modal'
+    });
+
+    await modal.present();
   }
 
   markAllAsRead(): void {

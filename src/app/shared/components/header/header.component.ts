@@ -13,9 +13,11 @@ export class HeaderComponent {
   @Input() showBackButton: boolean = false;
   @Input() backIcon: string = 'arrow-back';
   @Input() unreadNotifications: number = 0;
+  @Input() showProfileButton: boolean = true;
   
   @Output() backClicked = new EventEmitter<void>();
   @Output() notificationClicked = new EventEmitter<void>();
+  @Output() profileClicked = new EventEmitter<void>();
 
   constructor(private location: Location, private router: Router) {}
 
@@ -27,5 +29,10 @@ export class HeaderComponent {
   onNotificationClick() {
     this.notificationClicked.emit();
     this.router.navigate(['/notifications']);
+  }
+
+  onProfileClick() {
+    this.profileClicked.emit();
+    this.router.navigate(['/seller-profile']);
   }
 }

@@ -35,6 +35,12 @@ const routes: Routes = [
     //canActivate: [AuthGuard]
   },
   {
+    path: 'seller-profile',
+    loadChildren: () => import('./pages/seller-profile/seller-profile.module').then(m => m.SellerProfilePageModule),
+    //canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['VENDEDOR'] }
+  },
+  {
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule),
     //canActivate: [AuthGuard, RoleGuard],
