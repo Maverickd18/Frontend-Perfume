@@ -48,6 +48,21 @@ const routes: Routes = [
     path: 'profile-seller',
     loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile-client',
+    loadChildren: () => import('./pages/profile-client/profile-client.module').then(m => m.ProfileClientPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'cart',
+    loadChildren: () => import('./pages/cart/cart.module').then(m => m.CartPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'product-detail',
+    loadChildren: () => import('./pages/product-detail/product-detail.module').then(m => m.ProductDetailPageModule),
+    canActivate: [AuthGuard]
   }
 ];
 

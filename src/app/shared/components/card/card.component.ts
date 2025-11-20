@@ -22,10 +22,13 @@ export class CardComponent implements OnInit {
   @Input() brand: string = '';
 
   @Output() viewProduct = new EventEmitter<void>();
-  @Output() buyProduct = new EventEmitter<void>();
+  @Output() addToCart = new EventEmitter<void>();
 
   onCardClick() {
     this.viewProduct.emit();
   }
 
+  onAddToCart() {
+    this.addToCart.emit();
+  }
 }

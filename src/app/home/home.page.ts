@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { NavController, AlertController } from '@ionic/angular';
 import { ProductService } from '../services/product.service';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-home',
@@ -19,11 +20,14 @@ export class HomePage implements OnInit {
 
   constructor(
     private navCtrl: NavController,
-    private productService: ProductService
+    private productService: ProductService,
+    private cartService: CartService,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
     this.loadProducts();
+    this.addTestProduct();
   }
 
   private loadProducts() {
@@ -36,6 +40,22 @@ export class HomePage implements OnInit {
         console.error('Error loading products:', err);
       }
     });
+  }
+
+  private addTestProduct() {
+    const testProduct = {
+      id: 999,
+      title: 'Eau de Parfum Floral',
+      description: 'Perfume floral con notas de rosa y jazmín',
+      image: 'https://via.placeholder.com/200x200?text=Perfume',
+      price: 59.99,
+      size: '100ml',
+      stock: 15,
+      brand: 'Chanel',
+      category: 'floral'
+    };
+    this.allProducts.unshift(testProduct);
+    this.products.unshift(testProduct);
   }
 
   get brands(): string[] {
@@ -141,5 +161,32 @@ export class HomePage implements OnInit {
       const matchesPrice = (p.price ?? 0) >= min && (p.price ?? 0) <= max;
       return matchesText && matchesCategory && matchesSize && matchesBrand && matchesPrice;
     });
+  }
+
+  addToCart(product: any) {
+    this.cartService.addToCart(product, 1);
+    this.showAddToCartAlert(product.title);
+  }
+
+  private async showAddToCartAlert(productName: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Producto Agregado',
+      message: `${productName} ha sido agregado a tu carrito`,
+      buttons: [
+        {
+          text: 'Continuar Comprando',
+          handler: () => {
+            // Close alert and stay on page
+          }
+        },
+        {
+          text: 'Ir al Carrito',
+          handler: () => {
+            this.navCtrl.navigateForward('/cart');
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 }

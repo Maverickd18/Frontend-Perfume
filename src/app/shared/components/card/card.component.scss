@@ -81,6 +81,51 @@ ion-card-title {
   font-size: 18px;
 }
 
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+
+  .btn-view, .btn-cart {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .btn-view {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+
+    &:hover {
+      background-color: #e8e8e8;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .btn-cart {
+    background-color: #ff6f00;
+    color: white;
+
+    &:hover {
+      background-color: #e65100;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
 .actions {
   display: flex;
   gap: 8px;

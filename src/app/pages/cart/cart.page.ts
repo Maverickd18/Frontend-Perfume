@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { CartService } from '../../services/cart.service';
+import { CartService, CartItem } from '../../services/cart.service';
 
 @Component({
   selector: 'app-cart',
@@ -9,10 +9,11 @@ import { CartService } from '../../services/cart.service';
   standalone: false
 })
 export class CartPage implements OnInit {
-  cartItems: any[] = [];
+  cartItems: CartItem[] = [];
   subtotal: number = 0;
   tax: number = 0;
   total: number = 0;
+  TAX_RATE = 0.19;
 
   constructor(
     private navCtrl: NavController,
@@ -34,30 +35,36 @@ export class CartPage implements OnInit {
 
   calculateTotals() {
     this.subtotal = this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    this.tax = this.subtotal * 0.19;
+    this.tax = this.subtotal * this.TAX_RATE;
     this.total = this.subtotal + this.tax;
   }
 
-  updateQuantity(item: any, newQuantity: number) {
-    if (newQuantity <= 0) {
-      this.removeItem(item.id);
-    } else {
-      item.quantity = newQuantity;
-      this.cartService.updateCart(this.cartItems).subscribe(
-        () => this.calculateTotals()
-      );
-    }
+  updateQuantity(item: CartItem, newQuantity: number) {
+    this.cartService.updateQuantity(item.id, newQuantity);
+    this.calculateTotals();
   }
 
   removeItem(productId: number) {
-    this.cartItems = this.cartItems.filter(item => item.id !== productId);
-    this.cartService.updateCart(this.cartItems).subscribe(
-      () => this.calculateTotals()
-    );
+    this.cartService.removeFromCart(productId);
+    this.calculateTotals();
+  }
+
+  continueShopping() {
+    this.navCtrl.navigateBack('/home');
+  }
+
+  checkout() {
+    if (this.total > 0) {
+      this.navCtrl.navigateForward('/checkout');
+    }
   }
 
   goHome() {
     this.navCtrl.navigateRoot('/home');
+  }
+
+  onCartClick() {
+    // Already on cart page
   }
 
   goProfile() {
@@ -65,19 +72,8 @@ export class CartPage implements OnInit {
   }
 
   logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
     this.navCtrl.navigateRoot('/login');
-  }
-
-  onCartClick() {
-    // Ya estamos en el carrito
-  }
-
-  checkout() {
-    alert('Proceeding to checkout with total: $' + this.total.toFixed(2));
-    // TODO: Implementar pago
-  }
-
-  continueShopping() {
-    this.navCtrl.navigateRoot('/home');
   }
 }
