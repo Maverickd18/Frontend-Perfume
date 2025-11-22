@@ -8,17 +8,38 @@
 <ion-content>
   
   <!-- Welcome Section -->
-  <div class="welcome-section ion-padding">
-    <div class="welcome-card-modern">
-      <div class="welcome-icon">
-        <ion-icon name="storefront"></ion-icon>
+  <ion-card class="welcome-card">
+    <ion-card-header>
+      <ion-card-title>Gestión de Productos</ion-card-title>
+      <ion-card-subtitle>Administra tus perfumes y marcas</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Desde aquí puedes agregar nuevos perfumes, editar existentes y gestionar tus marcas y categorías.</p>
+      
+      <!-- Estadísticas de Moderación -->
+      <div class="moderation-stats" *ngIf="moderationStats">
+        <h4>Estadísticas de Moderación</h4>
+        <div class="stats-grid">
+          <div class="stat-item approved">
+            <span class="stat-number">{{ moderationStats.approved }}</span>
+            <span class="stat-label">Aprobados</span>
+          </div>
+          <div class="stat-item pending">
+            <span class="stat-number">{{ moderationStats.pending }}</span>
+            <span class="stat-label">En Revisión</span>
+          </div>
+          <div class="stat-item rejected">
+            <span class="stat-number">{{ moderationStats.rejected }}</span>
+            <span class="stat-label">Rechazados</span>
+          </div>
+          <div class="stat-item draft">
+            <span class="stat-number">{{ moderationStats.draft || 0 }}</span>
+            <span class="stat-label">Borradores</span>
+          </div>
+        </div>
       </div>
-      <div class="welcome-content">
-        <h1>Gestión de Productos</h1>
-        <p>Administra tus perfumes y marcas de forma eficiente</p>
-      </div>
-    </div>
-  </div>
+    </ion-card-content>
+  </ion-card>
 
   <!-- Action Buttons -->
   <div class="action-buttons ion-padding">
@@ -36,14 +57,60 @@
         <ion-col size="12" size-md="6">
           <ion-button 
             expand="block" 
+            fill="outline"
             (click)="showBrandsSection = !showBrandsSection"
-            class="add-product-btn">
+            class="brands-btn">
             <ion-icon slot="start" name="business"></ion-icon>
             {{ showBrandsSection ? 'Ocultar Marcas' : 'Ver Mis Marcas' }}
           </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
+  </div>
+
+  <!-- Filtros de Moderación -->
+  <div class="filters-section ion-padding">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Filtros de Moderación</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label>Estado de Perfumes</ion-label>
+                <ion-select 
+                  [value]="moderationFilter" 
+                  (ionChange)="onModerationFilterChange($event)"
+                  placeholder="Todos los estados">
+                  <ion-select-option value="ALL">Todos</ion-select-option>
+                  <ion-select-option value="APPROVED">Aprobados</ion-select-option>
+                  <ion-select-option value="PENDING_REVIEW">En Revisión</ion-select-option>
+                  <ion-select-option value="REJECTED">Rechazados</ion-select-option>
+                  <ion-select-option value="DRAFT">Borradores</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label>Estado de Marcas</ion-label>
+                <ion-select 
+                  [value]="brandModerationFilter" 
+                  (ionChange)="onBrandModerationFilterChange($event)"
+                  placeholder="Todos los estados">
+                  <ion-select-option value="ALL">Todos</ion-select-option>
+                  <ion-select-option value="APPROVED">Aprobadas</ion-select-option>
+                  <ion-select-option value="PENDING_REVIEW">En Revisión</ion-select-option>
+                  <ion-select-option value="REJECTED">Rechazadas</ion-select-option>
+                  <ion-select-option value="DRAFT">Borradores</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
   </div>
 
   <!-- Stats Cards -->
@@ -53,7 +120,7 @@
         <ion-col size="6" size-md="3">
           <ion-card class="stat-card">
             <ion-card-content>
-              <div class="stat-number">{{ perfumes.length }}</div>
+              <div class="stat-number">{{ getFilteredPerfumes().length }}</div>
               <div class="stat-label">Total Perfumes</div>
             </ion-card-content>
           </ion-card>
@@ -91,11 +158,12 @@
     <div class="section-header">
       <h2>Mis Marcas</h2>
       <div class="header-actions">
-        <span class="brands-count">{{ brands.length || 0 }} marcas</span>
+        <span class="brands-count">{{ getFilteredBrands().length || 0 }} marcas</span>
         <ion-button 
           size="small" 
-          (click)="openCreateBrand()"
-          class="add-product-btn">
+          fill="solid"
+          color="primary"
+          (click)="openCreateBrand()">
           <ion-icon slot="start" name="add"></ion-icon>
           Nueva Marca
         </ion-button>
@@ -103,8 +171,8 @@
     </div>
 
     <!-- Brands Grid View -->
-    <div *ngIf="brands && brands.length > 0" class="brands-grid">
-      <ion-card *ngFor="let brand of brands" class="brand-card">
+    <div *ngIf="getFilteredBrands().length > 0" class="brands-grid">
+      <ion-card *ngFor="let brand of getFilteredBrands()" class="brand-card">
         
         <!-- Brand Image -->
         <div class="brand-image-container">
@@ -119,6 +187,14 @@
             <span>Sin imagen</span>
           </div>
           
+          <!-- Estado de Moderación -->
+          <div class="moderation-status-overlay" *ngIf="brand.moderationStatus">
+            <app-moderation-badge 
+              [status]="brand.moderationStatus" 
+              [rejectionReason]="brand.rejectionReason">
+            </app-moderation-badge>
+          </div>
+
           <!-- Perfumes Count Badge -->
           <div class="perfumes-badge">
             <ion-icon name="flask-outline"></ion-icon>
@@ -189,10 +265,15 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!brands || brands.length === 0" class="empty-state">
+    <div *ngIf="getFilteredBrands().length === 0" class="empty-state">
       <ion-icon name="business-outline"></ion-icon>
-      <h3>No hay marcas aún</h3>
-      <p>¡Crea tu primera marca usando el botón de arriba!</p>
+      <h3>No hay marcas</h3>
+      <p *ngIf="brandModerationFilter !== 'ALL'">
+        No se encontraron marcas con el estado "{{ brandModerationFilter }}"
+      </p>
+      <p *ngIf="brandModerationFilter === 'ALL'">
+        ¡Crea tu primera marca usando el botón de arriba!
+      </p>
     </div>
 
     <!-- Loading State -->
@@ -206,15 +287,13 @@
   <div class="products-section ion-padding">
     <div class="section-header">
       <h2>Mis Perfumes</h2>
-      <span class="products-count">{{ perfumes.length || 0 }} productos</span>
+      <span class="products-count">{{ getFilteredPerfumes().length || 0 }} productos</span>
     </div>
 
-
-
     <!-- Products Grid View -->
-    <div *ngIf="perfumes && perfumes.length > 0" class="products-grid">
-      <ion-card *ngFor="let perfume of perfumes" class="product-card">
-        
+    <div *ngIf="getFilteredPerfumes().length > 0" class="products-grid">
+      <ion-card *ngFor="let perfume of getFilteredPerfumes()" class="product-card">
+
         <!-- Product Image -->
         <div class="product-image-container">
           <img 
@@ -228,6 +307,14 @@
             <span>Sin imagen</span>
           </div>
           
+          <!-- Estado de Moderación -->
+          <div class="moderation-status-overlay" *ngIf="perfume.moderationStatus">
+            <app-moderation-badge 
+              [status]="perfume.moderationStatus" 
+              [rejectionReason]="perfume.rejectionReason">
+            </app-moderation-badge>
+          </div>
+
           <!-- Stock Badge -->
           <div class="stock-badge" [class.low-stock]="perfume.stock! < 10">
             <ion-icon name="cube-outline"></ion-icon>
@@ -314,10 +401,15 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!perfumes || perfumes.length === 0" class="empty-state">
+    <div *ngIf="getFilteredPerfumes().length === 0" class="empty-state">
       <ion-icon name="cube-outline"></ion-icon>
-      <h3>No hay perfumes aún</h3>
-      <p>¡Crea tu primer perfume usando el botón de arriba!</p>
+      <h3>No hay perfumes</h3>
+      <p *ngIf="moderationFilter !== 'ALL'">
+        No se encontraron perfumes con el estado "{{ moderationFilter }}"
+      </p>
+      <p *ngIf="moderationFilter === 'ALL'">
+        ¡Crea tu primer perfume usando el botón de arriba!
+      </p>
     </div>
 
     <!-- Loading State -->
@@ -333,65 +425,55 @@
 <app-stepper></app-stepper>
 
 <!-- Create Brand Modal -->
-<ion-modal [isOpen]="isCreateModalOpen" (didDismiss)="closeCreateModal()" trigger="create-brand-modal">
+<ion-modal [isOpen]="isCreateModalOpen" (didDismiss)="closeCreateModal()">
   <ng-template>
     <ion-header>
-      <ion-toolbar class="brand-modal-toolbar">
-        <ion-title class="brand-modal-title">Crear Nueva Marca</ion-title>
+      <ion-toolbar>
+        <ion-title>Crear Nueva Marca</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="closeCreateModal()" class="close-modal-btn">
-            <ion-icon name="close" slot="icon-only"></ion-icon>
-          </ion-button>
+          <ion-button (click)="closeCreateModal()">Cerrar</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="brand-modal-content">
-      <ion-item class="brand-input-item">
+    <ion-content class="ion-padding">
+      <ion-item>
         <ion-label position="stacked">Nombre de la Marca *</ion-label>
         <ion-input 
           type="text" 
           [(ngModel)]="newBrand.name"
-          placeholder="Ej: Chanel"
-          class="brand-input">
+          placeholder="Ej: Chanel">
         </ion-input>
       </ion-item>
 
-      <ion-item class="brand-input-item">
+      <ion-item>
         <ion-label position="stacked">Descripción *</ion-label>
         <ion-textarea 
           [(ngModel)]="newBrand.description"
           placeholder="Descripción de la marca"
-          rows="4"
-          class="brand-textarea">
+          rows="4">
         </ion-textarea>
       </ion-item>
 
-      <ion-item class="brand-input-item">
+      <ion-item>
         <ion-label position="stacked">País de Origen</ion-label>
         <ion-input 
           type="text" 
           [(ngModel)]="newBrand.countryOrigin"
-          placeholder="Ej: Francia"
-          class="brand-input">
+          placeholder="Ej: Francia">
         </ion-input>
       </ion-item>
 
-      <ion-item class="brand-input-item">
+      <ion-item>
         <ion-label position="stacked">Imagen de la Marca (URL)</ion-label>
         <ion-input 
           type="text" 
           [(ngModel)]="newBrand.imageUrl"
-          placeholder="https://ejemplo.com/imagen.jpg"
-          class="brand-input">
+          placeholder="https://ejemplo.com/imagen.jpg">
         </ion-input>
       </ion-item>
 
       <div class="modal-actions">
-        <ion-button 
-          expand="block" 
-          (click)="createBrand()" 
-          [disabled]="!isValidBrand()"
-          class="create-brand-btn">
+        <ion-button expand="block" (click)="createBrand()" [disabled]="!isValidBrand()">
           <ion-icon slot="start" name="save"></ion-icon>
           Crear Marca
         </ion-button>

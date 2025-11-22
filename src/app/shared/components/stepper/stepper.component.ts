@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { StepperService, StepperState } from '../../../services/stepper.service';
 import { SellerService, Brand, Category } from '../../../services/seller.service';
 import { FileUploadService } from '../../../services/file-upload.service';
@@ -22,7 +22,7 @@ export class StepperComponent implements OnInit, OnDestroy {
   newCategoryDescription = '';
   
   useExistingBrand = false;
-  useExistingCategory = false;
+  useExistingCategory = true; // Por defecto usar categoría existente
   
   brandImagePreview: string | null = null;
   categoryImagePreview: string | null = null;
@@ -37,7 +37,8 @@ export class StepperComponent implements OnInit, OnDestroy {
     private stepperService: StepperService, 
     private sellerService: SellerService,
     private fileUploadService: FileUploadService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdRef: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -48,6 +49,7 @@ export class StepperComponent implements OnInit, OnDestroy {
       .subscribe(state => {
         console.log('StepperComponent: State received', state);
         this.state = state;
+        this.cdRef.detectChanges();
       });
 
     if (!this.sellerService.canCreatePerfume()) {
@@ -70,6 +72,7 @@ export class StepperComponent implements OnInit, OnDestroy {
     this.sellerService.getMyBrands().subscribe({
       next: (brands) => {
         this.stepperService.setBrands(brands || []);
+        this.cdRef.detectChanges();
       },
       error: (error) => {
         console.error('Error loading my brands:', error);
@@ -79,6 +82,7 @@ export class StepperComponent implements OnInit, OnDestroy {
     this.sellerService.getCategories().subscribe({
       next: (categories) => {
         this.stepperService.setCategories(categories || []);
+        this.cdRef.detectChanges();
       },
       error: (error) => {
         console.error('Error loading categories:', error);
@@ -118,10 +122,12 @@ export class StepperComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.brandImagePreview = e.target.result;
+        this.cdRef.detectChanges();
       };
       reader.readAsDataURL(file);
     } else {
       this.brandImagePreview = null;
+      this.cdRef.detectChanges();
     }
   }
 
@@ -131,10 +137,12 @@ export class StepperComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.categoryImagePreview = e.target.result;
+        this.cdRef.detectChanges();
       };
       reader.readAsDataURL(file);
     } else {
       this.categoryImagePreview = null;
+      this.cdRef.detectChanges();
     }
   }
 
@@ -144,14 +152,16 @@ export class StepperComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.perfumeImagePreview = e.target.result;
+        this.cdRef.detectChanges();
       };
       reader.readAsDataURL(file);
     } else {
       this.perfumeImagePreview = null;
+      this.cdRef.detectChanges();
     }
   }
 
- async savePerfume() {
+  async savePerfume() {
   this.stepErrors = {};
 
   if (!this.state) {
@@ -170,6 +180,7 @@ export class StepperComponent implements OnInit, OnDestroy {
   }
 
   this.isLoading = true;
+  this.cdRef.detectChanges();
 
   try {
     let brandId: number;
@@ -181,24 +192,19 @@ export class StepperComponent implements OnInit, OnDestroy {
     // ========== SUBIR IMAGEN DEL PERFUME ==========
     if (this.state.perfumeImage) {
       console.log('📤 Uploading perfume image...');
-      
       try {
         const uploadResponse = await lastValueFrom(this.sellerService.uploadPerfumeImage(this.state.perfumeImage));
         console.log('📨 Upload response:', uploadResponse);
 
-        // OBTENER LA URL DE LA IMAGEN
         perfumeImageUrl = uploadResponse.fileUrl || 
-                         uploadResponse.url || 
-                         uploadResponse.imageUrl;
+                        uploadResponse.url || 
+                        uploadResponse.imageUrl;
 
-        // Si no tenemos URL completa, construirla
         if (!perfumeImageUrl && uploadResponse.filePath) {
           perfumeImageUrl = `http://localhost:8080${uploadResponse.filePath}`;
           console.log('🔨 Built image URL from filePath:', perfumeImageUrl);
         }
-
         console.log('🖼️ Final image URL for perfume:', perfumeImageUrl);
-
       } catch (error) {
         console.error('❌ Error uploading perfume image:', error);
         // Continuar sin imagen si hay error
@@ -218,11 +224,13 @@ export class StepperComponent implements OnInit, OnDestroy {
         throw new Error('Nombre y descripción de marca son obligatorios');
       }
 
-      const brandData = {
-        name: this.newBrandName.trim(),
-        description: this.newBrandDescription.trim(),
-        countryOrigin: this.newBrandCountry.trim() || undefined
-      };
+      // En el método savePerfume(), en la sección de creación de marca:
+const brandData = {
+  name: this.newBrandName.trim(),
+  description: this.newBrandDescription.trim(),
+  countryOrigin: this.newBrandCountry.trim() || 'No especificado', // ← OBLIGATORIO
+  imageUrl: this.brandImagePreview || undefined
+};
 
       const brandResponse = await lastValueFrom(this.sellerService.createMyBrand(brandData));
       
@@ -250,14 +258,24 @@ export class StepperComponent implements OnInit, OnDestroy {
         description: this.newCategoryDescription.trim()
       };
 
-      const categoryResponse = await lastValueFrom(this.sellerService.createCategory(categoryData));
-
-      if (!categoryResponse || !categoryResponse.id) {
-        throw new Error('Failed to create category - no ID returned from API');
-      }
+      console.log('📤 Creating category with data:', categoryData);
       
-      categoryId = categoryResponse.id;
-      console.log('🆔 New category created with ID:', categoryId);
+      // En el método savePerfume(), en la sección de creación de categorías:
+try {
+  const categoryResponse = await lastValueFrom(this.sellerService.createCategory(categoryData));
+  console.log('✅ Category creation response:', categoryResponse);
+
+  // Asegurarse de que tenemos un ID
+  if (!categoryResponse || !categoryResponse.id) {
+    throw new Error('No se pudo crear la categoría - el servidor no respondió con un ID');
+  }
+  
+  categoryId = categoryResponse.id;
+  console.log('🆔 New category created with ID:', categoryId);
+} catch (error: any) {
+  console.error('❌ Error creating category:', error);
+  throw new Error('Error creando categoría: ' + (error.message || 'Verifica los datos'));
+}
     }
 
     // ========== CREAR PERFUME ==========
@@ -271,7 +289,7 @@ export class StepperComponent implements OnInit, OnDestroy {
       releaseDate: this.state.perfumeData.releaseDate,
       brandId: brandId,
       categoryId: categoryId,
-      imageUrl: perfumeImageUrl // Puede ser null si no hay imagen
+      imageUrl: perfumeImageUrl
     };
 
     console.log('🎯 Final perfume data to send:', perfumeData);
@@ -287,14 +305,28 @@ export class StepperComponent implements OnInit, OnDestroy {
     const createdPerfume = await lastValueFrom(this.sellerService.createPerfume(perfumeData));
     console.log('✅ Perfume created successfully:', createdPerfume);
 
-    alert('¡Producto creado exitosamente!');
+    alert('¡Producto creado exitosamente! 🎉');
     this.closeStepper();
 
   } catch (error: any) {
     console.error('❌ Error creating product:', error);
-    alert('Error creando el producto: ' + (error.message || 'Verifica todos los campos'));
+    
+    let errorMessage = 'Error creando el producto: ';
+    
+    if (error.message.includes('categoría') || error.message.includes('categoria')) {
+      errorMessage += 'Problema con la categoría. ' + error.message;
+    } else if (error.message.includes('marca')) {
+      errorMessage += 'Problema con la marca. ' + error.message;
+    } else if (error.message.includes('permisos')) {
+      errorMessage += 'No tienes permisos para realizar esta acción.';
+    } else {
+      errorMessage += error.message || 'Verifica todos los campos';
+    }
+    
+    alert(errorMessage);
   } finally {
     this.isLoading = false;
+    this.cdRef.detectChanges();
   }
 }
   private showStepErrors() {
@@ -314,18 +346,27 @@ export class StepperComponent implements OnInit, OnDestroy {
 
     this.stepErrors[this.state.currentStep] = '';
 
+    let isValid = false;
     switch (this.state.currentStep) {
       case 1:
-        return this.isStep1Valid();
+        isValid = this.isStep1Valid();
+        break;
       case 2:
-        return this.isStep2Valid();
+        isValid = this.isStep2Valid();
+        break;
       case 3:
-        return this.isStep3Valid();
+        isValid = this.isStep3Valid();
+        break;
       case 4:
-        return this.isStep4Valid();
+        isValid = this.isStep4Valid();
+        break;
       default:
-        return false;
+        isValid = false;
     }
+
+    setTimeout(() => this.cdRef.detectChanges(), 0);
+    
+    return isValid;
   }
 
   validateAllSteps(): boolean {
@@ -357,14 +398,6 @@ export class StepperComponent implements OnInit, OnDestroy {
     if (!this.state) return false;
 
     const errors: string[] = [];
-    
-    if (!this.state.perfumeData.name.trim()) {
-      errors.push('Nombre del producto es obligatorio');
-    }
-    
-    if (!this.state.perfumeData.description.trim()) {
-      errors.push('Descripción del producto es obligatoria');
-    }
     
     if (!this.state.perfumeData.price || this.state.perfumeData.price <= 0) {
       errors.push('Precio debe ser mayor a 0');
@@ -444,10 +477,11 @@ export class StepperComponent implements OnInit, OnDestroy {
     this.newCategoryName = '';
     this.newCategoryDescription = '';
     this.useExistingBrand = false;
-    this.useExistingCategory = false;
+    this.useExistingCategory = true;
     this.brandImagePreview = null;
     this.categoryImagePreview = null;
     this.perfumeImagePreview = null;
     this.stepErrors = {};
+    this.cdRef.detectChanges();
   }
 }

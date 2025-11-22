@@ -29,12 +29,12 @@ export class RegisterPage implements OnInit {
   }
 
   ngOnInit() {
-    // Inicialización básica
+    console.log('RegisterPage inicializado');
   }
 
-  // ✨ Se ejecuta cada vez que entras a la página
   ionViewWillEnter() {
     this.resetForm();
+    console.log('RegisterPage - ionViewWillEnter');
   }
 
   resetForm() {
@@ -47,6 +47,7 @@ export class RegisterPage implements OnInit {
     });
     this.acceptTerms = false;
     this.isLoading = false;
+    console.log('Formulario reiniciado');
   }
 
   passwordMatchValidator(formGroup: FormGroup) {
@@ -68,25 +69,31 @@ export class RegisterPage implements OnInit {
   }
 
   onRegister() {
+    console.log('onRegister llamado');
+    console.log('Form válido:', this.registerForm.valid);
+    console.log('Términos aceptados:', this.acceptTerms);
+    
     if (this.registerForm.valid && this.acceptTerms) {
       this.isLoading = true;
       
       const formData = this.registerForm.value;
+      console.log('Datos del formulario:', formData);
       
       // Separar nombre y apellido del fullName
-      const nameParts = formData.fullName.split(' ');
+      const nameParts = formData.fullName.trim().split(' ');
       const name = nameParts[0];
       const lastName = nameParts.slice(1).join(' ') || nameParts[0];
       
+      // Datos SIN username - el backend lo generará automáticamente
       const registerData: RegisterRequest = {
-        name: name,
-        lastName: lastName,
-        email: formData.email,
+        name: name.trim(),
+        lastName: lastName.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
         role: formData.userType // CLIENTE o VENDEDOR
       };
 
-      console.log('Datos de registro enviados:', registerData);
+      console.log('Datos de registro enviados (SIN username):', registerData);
 
       this.authService.register(registerData).subscribe({
         next: (response) => {
@@ -96,35 +103,51 @@ export class RegisterPage implements OnInit {
           // Limpiar formulario después del registro exitoso
           this.resetForm();
           
-          // 🔥 CAMBIO: Ambos tipos de usuario van al LOGIN
-          // Ya sea CLIENTE o VENDEDOR, deben hacer login después de registrarse
+          // Mostrar mensaje de éxito
+          this.showAlert('Éxito', 'Registro completado! Por favor verifica tu email antes de iniciar sesión.');
+          
+          // Redirigir al login
           this.router.navigate(['/login']);
         },
         error: (error) => {
           this.isLoading = false;
           console.error('Error en registro:', error);
-          alert('Error en el registro: ' + (error.error?.message || error.message));
+          
+          let errorMessage = 'Error en el registro';
+          if (error.message) {
+            errorMessage = error.message;
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          }
+          
+          this.showAlert('Error', errorMessage);
         }
       });
     } else {
+      console.log('Formulario inválido o términos no aceptados');
       if (!this.acceptTerms) {
-        alert('Debe aceptar los términos y condiciones');
+        this.showAlert('Términos requeridos', 'Debe aceptar los términos y condiciones para registrarse');
       }
       this.markFormGroupTouched(this.registerForm);
     }
   }
 
+  private showAlert(header: string, message: string) {
+    alert(`${header}: ${message}`);
+  }
+
   onGoogleRegister() {
-    console.log('Google register');
-    // Implementar lógica de Google OAuth
+    console.log('Google register - No implementado');
+    this.showAlert('No disponible', 'Registro con Google no disponible actualmente');
   }
 
   onFacebookRegister() {
-    console.log('Facebook register');
-    // Implementar lógica de Facebook OAuth
+    console.log('Facebook register - No implementado');
+    this.showAlert('No disponible', 'Registro con Facebook no disponible actualmente');
   }
 
   goToLogin() {
+    console.log('Navegando a login');
     this.router.navigate(['/login']);
   }
 
@@ -177,5 +200,14 @@ export class RegisterPage implements OnInit {
       return 'Las contraseñas no coinciden';
     }
     return '';
+  }
+
+  // Método para debug
+  logFormStatus() {
+    console.log('Form Status:', {
+      valid: this.registerForm.valid,
+      values: this.registerForm.value,
+      errors: this.registerForm.errors
+    });
   }
 }

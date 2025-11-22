@@ -96,33 +96,12 @@ ion-header {
 ion-content {
   --background: #0a0a0a;
   position: relative;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-
-  /* Custom scrollbar */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(218, 165, 32, 0.05);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-    border-radius: 4px;
-    
-    &:hover {
-      background: linear-gradient(135deg, #dab863 0%, #c9a935 100%);
-    }
-  }
+  overflow: hidden;
 
   /* Gold shimmer effect */
   &::before {
     content: '';
-    position: fixed;
+    position: absolute;
     top: -50%;
     right: -10%;
     width: 80%;
@@ -134,12 +113,11 @@ ion-content {
     filter: blur(100px);
     animation: shimmer 10s ease-in-out infinite;
     z-index: 0;
-    pointer-events: none;
   }
 
   &::after {
     content: '';
-    position: fixed;
+    position: absolute;
     bottom: -30%;
     left: -10%;
     width: 70%;
@@ -151,7 +129,6 @@ ion-content {
     filter: blur(80px);
     animation: shimmer 12s ease-in-out infinite reverse;
     z-index: 0;
-    pointer-events: none;
   }
 
   @media (min-width: 769px) {
@@ -242,39 +219,7 @@ ion-button {
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  z-index: 10;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-  overflow: visible;
-
-  &::part(native) {
-    cursor: pointer !important;
-    pointer-events: auto !important;
-    touch-action: manipulation;
-  }
-
-  // Shine effect on all buttons
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-    pointer-events: none;
-  }
-
-  &:hover::before {
-    left: 100%;
-  }
+  transition: all 0.3s ease;
 
   &[color="primary"] {
     --background: linear-gradient(135deg, #d4af37 0%, #c9a935 50%, #b8860b 100%);
@@ -282,13 +227,9 @@ ion-button {
     --color: #0a0a0a;
     animation: scaleIn 0.4s ease-out;
 
-    &:hover:not(:disabled) {
+    &:hover {
       box-shadow: 0 8px 24px rgba(218, 165, 32, 0.5);
-      transform: translateY(-2px) scale(1.02);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
+      transform: scale(1.02);
     }
   }
 
@@ -298,13 +239,9 @@ ion-button {
     --color: #0a0a0a;
     animation: scaleIn 0.4s ease-out;
 
-    &:hover:not(:disabled) {
+    &:hover {
       box-shadow: 0 8px 24px rgba(218, 165, 32, 0.4);
-      transform: translateY(-2px) scale(1.02);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
+      transform: scale(1.02);
     }
   }
 
@@ -313,18 +250,14 @@ ion-button {
     --background-activated: linear-gradient(135deg, #780000 0%, #8b0000 100%);
     --color: #ffffff;
 
-    &:hover:not(:disabled) {
+    &:hover {
       box-shadow: 0 6px 20px rgba(139, 0, 0, 0.4);
-      transform: translateY(-2px) scale(1.02);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
+      transform: scale(1.02);
     }
 
     &:disabled {
       opacity: 0.5;
-      cursor: not-allowed !important;
+      cursor: not-allowed;
     }
   }
 
@@ -334,14 +267,9 @@ ion-button {
     --color: #d4af37;
     border: 1px solid rgba(218, 165, 32, 0.3);
 
-    &:hover:not(:disabled) {
+    &:hover {
       box-shadow: 0 6px 20px rgba(218, 165, 32, 0.2);
-      transform: translateY(-2px) scale(1.02);
-      border-color: rgba(218, 165, 32, 0.5);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
+      transform: scale(1.02);
     }
   }
 
@@ -350,44 +278,6 @@ ion-button {
     --color: #999;
     --background-activated: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
     border: 1px solid rgba(255, 255, 255, 0.1);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-1px);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
-    }
-  }
-
-  &[fill="clear"] {
-    cursor: pointer !important;
-    pointer-events: auto !important;
-    
-    &:hover:not(:disabled) {
-      --background: rgba(218, 165, 32, 0.1);
-      transform: scale(1.05);
-    }
-
-    &:active:not(:disabled) {
-      --background: rgba(218, 165, 32, 0.2);
-      transform: scale(0.95);
-    }
-  }
-
-  &[expand="block"] {
-    width: 100%;
-    margin: 8px 0;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-
-    &::before {
-      display: none;
-    }
   }
 }
 
@@ -1540,307 +1430,6 @@ ion-text {
   .brands-section {
     .brands-grid {
       grid-template-columns: 1fr;
-    }
-  }
-}
-
-/* ===================== WELCOME CARD MODERNA ===================== */
-.welcome-section {
-  position: relative;
-  z-index: 1;
-  animation: fadeIn 0.6s ease-out;
-}
-
-.welcome-card-modern {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border: 2px solid rgba(218, 165, 32, 0.3);
-  border-radius: 20px;
-  padding: 32px 24px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.4),
-    0 0 80px rgba(218, 165, 32, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  position: relative;
-  overflow: hidden;
-  animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-      transparent 0%, 
-      rgba(218, 165, 32, 0.05) 50%, 
-      transparent 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover {
-    border-color: rgba(218, 165, 32, 0.5);
-    transform: translateY(-4px);
-    box-shadow: 
-      0 15px 50px rgba(0, 0, 0, 0.5),
-      0 0 100px rgba(218, 165, 32, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-
-    &::before {
-      opacity: 1;
-    }
-
-    .welcome-icon {
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 0 40px rgba(218, 165, 32, 0.6);
-    }
-  }
-
-  .welcome-icon {
-    flex-shrink: 0;
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #d4af37 0%, #c9a935 50%, #b8860b 100%);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 
-      0 8px 24px rgba(218, 165, 32, 0.4),
-      inset 0 2px 4px rgba(255, 255, 255, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    ion-icon {
-      font-size: 42px;
-      color: #0a0a0a;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    }
-  }
-
-  .welcome-content {
-    flex: 1;
-
-    h1 {
-      margin: 0 0 8px 0;
-      font-size: 28px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #d4af37 0%, #dab863 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.5px;
-      animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    p {
-      margin: 0;
-      color: #b0b0b0;
-      font-size: 15px;
-      line-height: 1.5;
-      font-weight: 400;
-      animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
-    }
-  }
-}
-
-/* ===================== MODAL STYLES (STEPPER-LIKE) ===================== */
-
-// Modal for brand creation with stepper-like styling
-ion-modal[trigger="create-brand-modal"] {
-  --background: transparent;
-  --box-shadow: none;
-
-  .modal-wrapper {
-    background: #0a0a0a;
-    border-radius: 24px;
-    overflow: hidden;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 
-      0 20px 60px rgba(0, 0, 0, 0.5),
-      0 0 100px rgba(212, 175, 55, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(212, 175, 55, 0.3);
-    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  ion-backdrop {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-  }
-
-  .brand-modal-toolbar {
-    --background: linear-gradient(135deg, #d4af37 0%, #c9a935 100%);
-    --border-width: 0;
-    padding: 16px 0;
-    border-bottom: none;
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-  }
-
-  .brand-modal-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #0a0a0a;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .close-modal-btn {
-    --color: #0a0a0a;
-    font-size: 32px;
-    transition: all 0.3s ease;
-    font-weight: bold;
-
-    &:hover {
-      --color: #1a1a1a;
-      transform: rotate(90deg) scale(1.1);
-    }
-  }
-
-  .brand-modal-content {
-    --background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-    --padding-top: 24px;
-    --padding-bottom: 24px;
-    --padding-start: 24px;
-    --padding-end: 24px;
-  }
-
-  .brand-input-item {
-    --background: rgba(26, 26, 26, 0.6);
-    --border-color: rgba(212, 175, 55, 0.2);
-    --border-radius: 12px;
-    --padding-start: 16px;
-    --padding-end: 16px;
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    &:hover,
-    &:focus-within {
-      --background: rgba(26, 26, 26, 0.8);
-      border-color: rgba(212, 175, 55, 0.5);
-      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
-      transform: translateY(-2px);
-    }
-
-    ion-label {
-      color: #d4af37 !important;
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    ion-input,
-    ion-textarea {
-      --color: #e0e0e0;
-      --placeholder-color: #666;
-      font-size: 15px;
-      margin-top: 8px;
-    }
-  }
-
-  .modal-actions {
-    margin-top: 32px;
-  }
-
-  .create-brand-btn {
-    --background: linear-gradient(135deg, #d4af37 0%, #c9a935 50%, #b8860b 100%);
-    --color: #0a0a0a;
-    --border-radius: 12px;
-    --box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
-    font-weight: 700;
-    font-size: 16px;
-    height: 56px;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    pointer-events: auto;
-    touch-action: manipulation;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s;
-    }
-
-    &:hover {
-      --background: linear-gradient(135deg, #f4d03f 0%, #d4af37 50%, #c9a935 100%);
-      transform: translateY(-2px);
-      --box-shadow: 0 12px 32px rgba(212, 175, 55, 0.6);
-
-      &::before {
-        left: 100%;
-      }
-    }
-
-    &:active {
-      transform: translateY(0);
-      --box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
-    }
-
-    &:disabled {
-      --background: #333;
-      --color: #666;
-      opacity: 0.5;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    ion-icon {
-      margin-right: 8px;
-      font-size: 20px;
-    }
-  }
-}
-
-/* Remove card checkbox styles */
-.card-checkbox {
-  display: none !important;
-}
-
-/* ===================== RESPONSIVE MOBILE ===================== */
-@media (max-width: 768px) {
-  .welcome-card-modern {
-    flex-direction: column;
-    text-align: center;
-    padding: 24px 20px;
-
-    .welcome-icon {
-      width: 70px;
-      height: 70px;
-
-      ion-icon {
-        font-size: 36px;
-      }
-    }
-
-    .welcome-content {
-      h1 {
-        font-size: 24px;
-      }
-
-      p {
-        font-size: 14px;
-      }
     }
   }
 }
