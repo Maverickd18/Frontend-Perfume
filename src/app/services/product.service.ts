@@ -55,10 +55,11 @@ export class ProductService {
     return this.http.get<any>(`${API_URL}/perfumes`, { params })
       .pipe(
         map(response => {
-          console.log('API Response:', response);
-          if (response && response.data) {
+          console.log('Perfumes API Response:', response);
+          if (response && response.status === 'success' && response.data) {
             return response.data.map((perfume: any) => this.mapPerfumeToFrontend(perfume));
           }
+          console.warn('Unexpected response format for perfumes:', response);
           return [];
         }),
         catchError(this.handleError)
@@ -69,7 +70,8 @@ export class ProductService {
     return this.http.get<any>(`${API_URL}/perfumes/public/${id}`)
       .pipe(
         map(response => {
-          if (response && response.data) {
+          console.log('Product by ID API Response:', response);
+          if (response && response.status === 'success' && response.data) {
             return this.mapPerfumeToFrontend(response.data);
           }
           throw new Error('Product not found');
@@ -80,18 +82,41 @@ export class ProductService {
 
   // ========== MARCAS PÚBLICAS ==========
   
-  getBrands(): Observable<Brand[]> {
-    return this.http.get<any>(`${API_URL}/brands/public`)
-      .pipe(
-        map(response => response?.data || []),
-        catchError(this.handleError)
-      );
-  }
+getBrands(): Observable<Brand[]> {
+  return this.http.get(`${API_URL}/brands/public`, { responseType: 'text' })
+    .pipe(
+      map(responseText => {
+        console.log('Raw Brands API Response:', responseText);
+        
+        try {
+          // Intentar parsear como JSON
+          const response = JSON.parse(responseText);
+          console.log('Parsed Brands API Response:', response);
+          
+          if (response && response.status === 'success' && response.data) {
+            return response.data;
+          }
+          console.warn('Unexpected response format for brands:', response);
+          return [];
+        } catch (parseError) {
+          console.error('JSON Parse Error:', parseError);
+          console.error('Raw response that failed to parse:', responseText);
+          return [];
+        }
+      }),
+      catchError(this.handleError)
+    );
+}
 
   getBrandById(id: number): Observable<Brand> {
     return this.http.get<any>(`${API_URL}/brands/public/${id}`)
       .pipe(
-        map(response => response?.data),
+        map(response => {
+          if (response && response.status === 'success' && response.data) {
+            return response.data;
+          }
+          throw new Error('Brand not found');
+        }),
         catchError(this.handleError)
       );
   }
@@ -100,7 +125,8 @@ export class ProductService {
     return this.http.get<any>(`${API_URL}/brands/public/${brandId}/perfumes`)
       .pipe(
         map(response => {
-          if (response && response.data) {
+          console.log('Brand perfumes API Response:', response);
+          if (response && response.status === 'success' && response.data) {
             return response.data.map((perfume: any) => this.mapPerfumeToFrontend(perfume));
           }
           return [];
@@ -112,9 +138,16 @@ export class ProductService {
   // ========== CATEGORÍAS PÚBLICAS ==========
   
   getCategories(): Observable<Category[]> {
-    return this.http.get<any>(`${API_URL}/categories/public`)
+    return this.http.get<any>(`${API_URL}/categories`)
       .pipe(
-        map(response => response?.data || []),
+        map(response => {
+          console.log('Categories API Response:', response);
+          if (response && response.status === 'success' && response.data) {
+            return response.data;
+          }
+          console.warn('Unexpected response format for categories:', response);
+          return [];
+        }),
         catchError(this.handleError)
       );
   }
@@ -125,22 +158,29 @@ export class ProductService {
     return this.getProducts(0, 50, query);
   }
 
-  // ========== MANEJO DE ERRORES ==========
+  // ========== MANEJO DE ERRORES MEJORADO ==========
   
   private handleError(error: HttpErrorResponse) {
-    console.error('API Error:', error);
+    console.error('API Error Details:', {
+      status: error.status,
+      statusText: error.statusText,
+      url: error.url,
+      error: error.error,
+      message: error.message
+    });
     
     let errorMessage = 'Error desconocido';
-    if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Error: ${error.error.message}`;
+    
+    if (error.status === 0) {
+      errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+    } else if (error.status === 403) {
+      errorMessage = 'Acceso denegado. No tienes permisos para acceder a este recurso.';
+    } else if (error.status === 404) {
+      errorMessage = 'Recurso no encontrado.';
+    } else if (error.status >= 500) {
+      errorMessage = 'Error del servidor. Intenta nuevamente más tarde.';
     } else {
-      // Error del lado del servidor
-      if (error.status === 0) {
-        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
-      } else {
-        errorMessage = `Error ${error.status}: ${error.message}`;
-      }
+      errorMessage = `Error ${error.status}: ${error.message}`;
     }
     
     return throwError(() => new Error(errorMessage));
