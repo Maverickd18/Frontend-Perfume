@@ -35,3 +35,51 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+// Estilos personalizados para Modal de Filtros
+.filter-modal {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+  --box-shadow: none;
+
+  ion-content {
+    --background: #ffffff;
+  }
+
+  ion-toolbar {
+    --background: #ffffff;
+    --border-bottom: 1px solid #e0e0e0;
+  }
+
+  ion-title {
+    font-weight: 600;
+    color: #000000;
+  }
+
+  ion-icon {
+    color: #000000;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-modal {
+    --width: 100%;
+    --height: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .filter-modal {
+    --width: 400px;
+    --height: 100%;
+  }
+}
+
+// Global styles for ion-toolbar
+ion-header {
+  ion-toolbar {
+    --background: #ffffff;
+    --border-bottom: 1px solid #e0e0e0;
+  }
+}

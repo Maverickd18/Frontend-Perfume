@@ -1,0 +1,9 @@
+{
+  "/api": {
+    "target": "https://tienda-de-perfumes-9t9e.onrender.com",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "/api"
+    }
+  }
+}

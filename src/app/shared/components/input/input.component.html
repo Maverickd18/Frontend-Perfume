@@ -1,3 +1,36 @@
-<p>
-  input works!
-</p>
+<ion-item class="input-wrapper" lines="none">
+  <ion-label position="floating" *ngIf="label">{{ label }}</ion-label>
+  <ion-icon *ngIf="icon" slot="start" [name]="icon"></ion-icon>
+  
+  <ion-input
+    *ngIf="type !== 'password'"
+    [type]="type"
+    [placeholder]="placeholder"
+    [value]="value"
+    (ionChange)="onInputChange($event)"
+    (ionBlur)="onTouched()"
+    [disabled]="disabled">
+  </ion-input>
+
+  <ion-input
+    *ngIf="type === 'password'"
+    [type]="showPassword ? 'text' : 'password'"
+    [placeholder]="placeholder"
+    [value]="value"
+    (ionChange)="onInputChange($event)"
+    (ionBlur)="onTouched()"
+    [disabled]="disabled">
+  </ion-input>
+
+  <ion-icon
+    *ngIf="type === 'password'"
+    slot="end"
+    [name]="showPassword ? 'eye-off' : 'eye'"
+    (click)="showPassword = !showPassword"
+    class="password-toggle">
+  </ion-icon>
+</ion-item>
+
+<ion-text color="danger" *ngIf="error" class="error-text">
+  <p>{{ error }}</p>
+</ion-text>

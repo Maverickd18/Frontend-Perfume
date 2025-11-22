@@ -1,0 +1,207 @@
+<app-header 
+  [title]="'Mi Perfil'" 
+  [showBackButton]="true" 
+  (backClicked)="onBackClick()">
+</app-header>
+
+<ion-content>
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-banner">
+      <div class="banner-gradient"></div>
+    </div>
+    <div class="profile-info-section">
+      <div class="avatar-wrapper">
+        <div class="avatar-circle">
+          <ion-icon name="person"></ion-icon>
+        </div>
+        <button class="edit-avatar-icon" (click)="changeAvatar()">
+          <ion-icon name="camera"></ion-icon>
+        </button>
+      </div>
+      <div class="user-details">
+        <h1 class="username">{{ userProfile.username || 'Usuario' }}</h1>
+        <p class="user-email">{{ userProfile.email }}</p>
+        <div class="user-badge">
+          <ion-icon name="shield-checkmark"></ion-icon>
+          <span>Vendedor Verificado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-container">
+    <div class="stat-box" (click)="goToProducts()">
+      <div class="stat-icon-wrapper products-icon">
+        <ion-icon name="cube-outline"></ion-icon>
+      </div>
+      <div class="stat-content">
+        <h2>{{ stats.totalProducts }}</h2>
+        <p>Productos</p>
+      </div>
+    </div>
+
+    <div class="stat-box" (click)="goToBrands()">
+      <div class="stat-icon-wrapper brands-icon">
+        <ion-icon name="business-outline"></ion-icon>
+      </div>
+      <div class="stat-content">
+        <h2>{{ stats.totalBrands }}</h2>
+        <p>Marcas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Information -->
+  <div class="info-section">
+    <div class="section-header">
+      <h2>
+        <ion-icon name="person-circle"></ion-icon>
+        Información Personal
+      </h2>
+      <button *ngIf="!isEditing" (click)="toggleEdit()" class="edit-button">
+        <ion-icon name="create-outline"></ion-icon>
+        Editar
+      </button>
+    </div>
+
+    <div class="info-form">
+      <!-- Username -->
+      <div class="form-field">
+        <label>
+          <ion-icon name="person-outline"></ion-icon>
+          Nombre de Usuario
+        </label>
+        <input 
+          *ngIf="isEditing" 
+          type="text" 
+          [(ngModel)]="userProfile.username"
+          class="form-input">
+        <p *ngIf="!isEditing" class="field-value">{{ userProfile.username }}</p>
+      </div>
+
+      <!-- Email -->
+      <div class="form-field">
+        <label>
+          <ion-icon name="mail-outline"></ion-icon>
+          Correo Electrónico
+        </label>
+        <input 
+          *ngIf="isEditing" 
+          type="email" 
+          [(ngModel)]="userProfile.email"
+          class="form-input">
+        <p *ngIf="!isEditing" class="field-value">{{ userProfile.email }}</p>
+      </div>
+
+      <!-- Phone -->
+      <div class="form-field">
+        <label>
+          <ion-icon name="call-outline"></ion-icon>
+          Teléfono
+        </label>
+        <input 
+          *ngIf="isEditing" 
+          type="tel" 
+          [(ngModel)]="userProfile.phone"
+          placeholder="Agregar teléfono"
+          class="form-input">
+        <p *ngIf="!isEditing" class="field-value">{{ userProfile.phone || 'No especificado' }}</p>
+      </div>
+
+      <!-- Company -->
+      <div class="form-field">
+        <label>
+          <ion-icon name="business-outline"></ion-icon>
+          Empresa
+        </label>
+        <input 
+          *ngIf="isEditing" 
+          type="text" 
+          [(ngModel)]="userProfile.company"
+          placeholder="Agregar empresa"
+          class="form-input">
+        <p *ngIf="!isEditing" class="field-value">{{ userProfile.company || 'No especificado' }}</p>
+      </div>
+
+      <!-- Address -->
+      <div class="form-field full-width">
+        <label>
+          <ion-icon name="location-outline"></ion-icon>
+          Dirección
+        </label>
+        <textarea 
+          *ngIf="isEditing" 
+          [(ngModel)]="userProfile.address"
+          placeholder="Agregar dirección"
+          rows="2"
+          class="form-textarea"></textarea>
+        <p *ngIf="!isEditing" class="field-value">{{ userProfile.address || 'No especificado' }}</p>
+      </div>
+
+      <!-- Bio -->
+      <div class="form-field full-width">
+        <label>
+          <ion-icon name="document-text-outline"></ion-icon>
+          Biografía
+        </label>
+        <textarea 
+          *ngIf="isEditing" 
+          [(ngModel)]="userProfile.bio"
+          placeholder="Cuéntanos sobre ti y tu negocio"
+          rows="3"
+          class="form-textarea"></textarea>
+        <p *ngIf="!isEditing" class="field-value">{{ userProfile.bio || 'No especificado' }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div *ngIf="isEditing" class="form-actions">
+      <button (click)="cancelEdit()" class="btn-cancel">
+        <ion-icon name="close-outline"></ion-icon>
+        Cancelar
+      </button>
+      <button (click)="saveProfile()" class="btn-save">
+        <ion-icon name="checkmark-outline"></ion-icon>
+        Guardar
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="actions-section">
+    <h2 class="section-title">
+      <ion-icon name="flash"></ion-icon>
+      Acciones Rápidas
+    </h2>
+    <div class="action-grid">
+      <button class="action-item" (click)="goToProducts()">
+        <ion-icon name="cube-outline"></ion-icon>
+        <span>Productos</span>
+      </button>
+      <button class="action-item" (click)="goToBrands()">
+        <ion-icon name="business-outline"></ion-icon>
+        <span>Marcas</span>
+      </button>
+      <button class="action-item" (click)="goToNotifications()">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <span>Notificaciones</span>
+      </button>
+      <button class="action-item" (click)="changePassword()">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <span>Contraseña</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <div class="logout-container">
+    <button (click)="logout()" class="logout-button">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Cerrar Sesión
+    </button>
+  </div>
+</ion-content>
+
+<app-footer></app-footer>

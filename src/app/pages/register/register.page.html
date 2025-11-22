@@ -1,13 +1,110 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>register</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="auth-content">
+  <div class="auth-container">
+    <!-- Brand Section -->
+    <div class="brand-section">
+      <div class="logo-container">
+        <ion-icon name="storefront" class="brand-logo"></ion-icon>
+      </div>
+      <h1 class="brand-name">LUMIERESHOP</h1>
+      <p class="brand-tagline">Crea tu cuenta y comienza a comprar</p>
+    </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Register Form Card -->
+    <div class="form-card">
+      <h2 class="form-title">Create Account</h2>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <!-- Full Name Input -->
+        <ion-item>
+          <ion-label position="stacked">Full Name *</ion-label>
+          <ion-input 
+            formControlName="fullName"
+            type="text" 
+            placeholder="Enter your full name">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getFullNameError()">
+          <small>{{ getFullNameError() }}</small>
+        </ion-text>
+
+        <!-- User Type Selection -->
+        <div class="user-type-section">
+          <label class="user-type-label">I am a:</label>
+          <ion-segment formControlName="userType" mode="ios" class="user-type-segment">
+            <ion-segment-button value="CLIENTE">
+              <ion-icon name="person-outline"></ion-icon>
+              <ion-label>Client</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="VENDEDOR">
+              <ion-icon name="storefront-outline"></ion-icon>
+              <ion-label>Seller</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- Email Input -->
+        <ion-item>
+          <ion-label position="stacked">Email *</ion-label>
+          <ion-input 
+            formControlName="email"
+            type="email" 
+            placeholder="Enter your email">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getEmailError()">
+          <small>{{ getEmailError() }}</small>
+        </ion-text>
+
+        <!-- Password Input -->
+        <ion-item>
+          <ion-label position="stacked">Password *</ion-label>
+          <ion-input 
+            formControlName="password"
+            type="password" 
+            placeholder="Enter your password">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getPasswordError()">
+          <small>{{ getPasswordError() }}</small>
+        </ion-text>
+
+        <!-- Confirm Password Input -->
+        <ion-item>
+          <ion-label position="stacked">Confirm Password *</ion-label>
+          <ion-input 
+            formControlName="confirmPassword"
+            type="password" 
+            placeholder="Confirm your password">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getConfirmPasswordError()">
+          <small>{{ getConfirmPasswordError() }}</small>
+        </ion-text>
+
+        <!-- Terms and Conditions -->
+        <ion-item lines="none" class="terms-item">
+          <ion-checkbox slot="start" [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+          <ion-label class="terms-label">
+            I accept the <a class="terms-link">Terms and Conditions</a> and <a class="terms-link">Privacy Policy</a>
+          </ion-label>
+        </ion-item>
+
+        <!-- Register Button -->
+        <ion-button 
+          type="submit"
+          expand="block" 
+          [disabled]="!registerForm.valid || !acceptTerms || isLoading"
+          class="register-button">
+          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+          <ion-icon *ngIf="!isLoading" slot="start" name="person-add-outline"></ion-icon>
+          {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+        </ion-button>
+      </form>
+
+      <!-- Switch to Login -->
+      <div class="switch-auth">
+        <p>Already have an account? <a (click)="goToLogin()">Log In</a></p>
+      </div>
+    </div>
+  </div>
 </ion-content>

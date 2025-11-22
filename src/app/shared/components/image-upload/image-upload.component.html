@@ -1,0 +1,54 @@
+<div class="image-upload">
+  <!-- Input file oculto -->
+  <input 
+    #fileInput
+    type="file" 
+    (change)="onFileSelected($event)" 
+    accept="image/*" 
+    hidden
+    [disabled]="isUploading">
+  
+  <!-- Preview de la imagen -->
+  <div *ngIf="imageUrl" class="image-preview">
+    <div class="preview-container">
+      <img [src]="imageUrl" alt="Preview" class="preview-image">
+      <div class="preview-overlay" *ngIf="isUploading">
+        <ion-spinner></ion-spinner>
+        <p>Subiendo...</p>
+      </div>
+    </div>
+    <div class="action-buttons">
+      <ion-button 
+        size="small" 
+        fill="outline" 
+        (click)="changeImage()"
+        [disabled]="isUploading">
+        <ion-icon slot="start" name="camera"></ion-icon>
+        Cambiar
+      </ion-button>
+      <ion-button 
+        size="small" 
+        fill="outline" 
+        color="danger" 
+        (click)="removeImage()"
+        [disabled]="isUploading">
+        <ion-icon slot="start" name="trash"></ion-icon>
+        Eliminar
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Placeholder para subir -->
+  <div 
+    *ngIf="!imageUrl" 
+    class="upload-placeholder" 
+    (click)="openFileSelector()"
+    [class.uploading]="isUploading">
+    
+    <div class="placeholder-content">
+      <ion-icon name="image-outline" class="placeholder-icon"></ion-icon>
+      <h4>Haz clic para subir una imagen</h4>
+      <p>PNG, JPG, JPEG hasta 10MB</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+.product-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+ion-card-header {
+  padding: 16px 16px 8px;
+}
+
+ion-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-title .title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-title .brand {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff6f00;
+  text-transform: uppercase;
+}
+
+.card-title .title-text {
+  font-size: 16px;
+  color: #222;
+  font-weight: 600;
+}
+
+.description {
+  color: #666;
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  .specs {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .size, .stock {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+.price {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+
+  .btn-view, .btn-cart {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .btn-view {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+
+    &:hover {
+      background-color: #e8e8e8;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .btn-cart {
+    background-color: #ff6f00;
+    color: white;
+
+    &:hover {
+      background-color: #e65100;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+
+  app-button {
+    flex: 0 1 auto;
+  }
+}

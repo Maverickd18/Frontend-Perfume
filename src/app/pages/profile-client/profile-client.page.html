@@ -1,0 +1,87 @@
+<app-header
+  title="Mi Perfil"
+  (homeClicked)="goHome()"
+  (cartClicked)="onCartClick()"
+  (profileClicked)="goProfile()"
+  (logoutClicked)="logout()">
+</app-header>
+
+<ion-content [fullscreen]="true" class="profile-content">
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div class="profile-name">
+        <h2>{{ profile.firstName }} {{ profile.lastName }}</h2>
+        <p class="profile-type">Cliente</p>
+      </div>
+    </div>
+
+    <form #profileForm="ngForm" (ngSubmit)="save()" class="profile-form">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="firstName">Nombre</label>
+          <app-input [disabled]="!editing" name="firstName" placeholder="Ingresa tu nombre" [(ngModel)]="profile.firstName"></app-input>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Apellido</label>
+          <app-input [disabled]="!editing" name="lastName" placeholder="Ingresa tu apellido" [(ngModel)]="profile.lastName"></app-input>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <app-input [disabled]="!editing" name="phone" placeholder="+1 (555) 000-0000" type="tel" [(ngModel)]="profile.phone"></app-input>
+        </div>
+        <div class="form-group">
+          <label for="cedula">Cédula</label>
+          <app-input [disabled]="!editing" name="cedula" placeholder="12345678" [(ngModel)]="profile.cedula"></app-input>
+        </div>
+      </div>
+    </form>
+
+    <div class="profile-actions">
+      <app-button *ngIf="!editing" text="Editar Perfil" type="primary" (clicked)="startEdit()"></app-button>
+      <div *ngIf="editing" class="action-buttons">
+        <app-button text="Guardar" type="primary" (clicked)="save()"></app-button>
+        <app-button text="Cancelar" type="outline" (clicked)="cancel()"></app-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="favorites-section">
+    <h3>Mis Productos Favoritos</h3>
+    <div class="grid">
+      <div class="col" *ngFor="let p of favoriteProducts">
+        <div class="card-wrapper">
+          <app-card
+            [title]="p.title"
+            [description]="p.description"
+            [image]="p.image"
+            [price]="p.price"
+            [size]="p.size"
+            [stock]="p.stock"
+            [brand]="p.brand"
+            [category]="p.category"
+            (viewProduct)="onViewProduct(p)"
+          ></app-card>
+          <button class="delete-button" (click)="removeFavorite(p.id)" title="Eliminar de favoritos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+</ion-content>

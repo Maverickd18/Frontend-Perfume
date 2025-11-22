@@ -1,0 +1,826 @@
+.auth-content {
+  --background: #0a0a0a;
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+/* Elegant gold shimmer effect */
+.auth-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 80%;
+  height: 150%;
+  background: radial-gradient(ellipse at center,
+    rgba(218, 165, 32, 0.08) 0%,
+    rgba(212, 175, 55, 0.05) 35%,
+    transparent 70%);
+  filter: blur(100px);
+  animation: shimmer 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-content::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 70%;
+  height: 100%;
+  background: radial-gradient(ellipse at center,
+    rgba(184, 134, 11, 0.06) 0%,
+    rgba(218, 165, 32, 0.04) 40%,
+    transparent 70%);
+  filter: blur(80px);
+  animation: shimmer 12s ease-in-out infinite reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(20px, -20px) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.auth-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 30px;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  gap: 80px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* LEFT SIDE - Brand & Welcome (Order 1) */
+.brand-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation: fadeInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  order: 1;
+
+  .logo-container {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #d4af37 0%, #c9a935 50%, #b8860b 100%);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    box-shadow: 
+      0 25px 50px rgba(218, 165, 32, 0.3),
+      0 0 0 1px rgba(218, 165, 32, 0.2) inset,
+      0 0 80px rgba(218, 165, 32, 0.15);
+    position: relative;
+    animation: goldGlow 3s ease-in-out infinite;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, #d4af37, #b8860b);
+      border-radius: 24px;
+      z-index: -1;
+      filter: blur(20px);
+      opacity: 0.6;
+    }
+
+    .brand-logo {
+      font-size: 50px;
+      color: #0a0a0a;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  .brand-name {
+    font-size: 72px;
+    font-weight: 900;
+    margin: 0 0 20px 0;
+    letter-spacing: -2px;
+    line-height: 1;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% auto;
+    animation: goldShine 4s linear infinite;
+    text-transform: uppercase;
+    font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  }
+
+  .brand-tagline {
+    font-size: 18px;
+    color: rgba(212, 175, 55, 0.8);
+    margin: 0 0 16px 0;
+    line-height: 1.6;
+    font-weight: 400;
+    max-width: 450px;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-description {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    line-height: 1.7;
+    max-width: 420px;
+  }
+}
+
+@keyframes goldGlow {
+  0%, 100% {
+    box-shadow: 
+      0 25px 50px rgba(218, 165, 32, 0.3),
+      0 0 0 1px rgba(218, 165, 32, 0.2) inset,
+      0 0 80px rgba(218, 165, 32, 0.15);
+  }
+  50% {
+    box-shadow: 
+      0 30px 60px rgba(218, 165, 32, 0.4),
+      0 0 0 1px rgba(218, 165, 32, 0.3) inset,
+      0 0 100px rgba(218, 165, 32, 0.2);
+  }
+}
+
+@keyframes goldShine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* RIGHT SIDE - Form Card (Order 2) */
+.form-card {
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%);
+  backdrop-filter: blur(40px);
+  border-radius: 28px;
+  padding: 50px 40px;
+  box-shadow: 
+    0 30px 70px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(218, 165, 32, 0.2) inset,
+    0 0 100px rgba(218, 165, 32, 0.08);
+  border: 1px solid rgba(218, 165, 32, 0.15);
+  animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  order: 2;
+  position: relative;
+
+  /* Gold accent line on top */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      #d4af37 20%, 
+      #f4e4c1 50%, 
+      #d4af37 80%, 
+      transparent);
+    box-shadow: 0 0 20px rgba(218, 165, 32, 0.5);
+  }
+
+  .form-title {
+    font-size: 30px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .form-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 35px 0;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  app-input {
+    display: block;
+  }
+
+  /* Input Styling - CORREGIDO PARA MÓVIL */
+  ion-item {
+    --background: rgba(10, 10, 10, 0.9);
+    --border-radius: 12px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+    --min-height: 62px;
+    border: 1.5px solid rgba(218, 165, 32, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+
+    &:hover {
+      --background: rgba(15, 15, 15, 1);
+      border-color: rgba(218, 165, 32, 0.5);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(218, 165, 32, 0.1);
+    }
+
+    &.item-has-focus {
+      --background: rgba(15, 15, 15, 1);
+      border-color: #d4af37;
+      box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.15);
+      transform: translateY(-1px);
+      z-index: 10;
+    }
+
+    &.ion-invalid.ion-touched {
+      border-color: rgba(255, 107, 107, 0.6);
+      
+      &:hover, &.item-has-focus {
+        border-color: #ff6b6b;
+      }
+    }
+
+    ion-label {
+      --color: rgba(212, 175, 55, 1) !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      margin-bottom: 10px !important;
+      letter-spacing: 0.5px !important;
+      text-transform: uppercase;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    ion-input {
+      --color: rgba(255, 255, 255, 1) !important;
+      --placeholder-color: rgba(255, 255, 255, 0.4) !important;
+      --placeholder-opacity: 1 !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      margin-top: 6px;
+      position: relative;
+      z-index: 3;
+      pointer-events: auto;
+      cursor: text;
+      
+      input {
+        pointer-events: auto !important;
+        cursor: text !important;
+        z-index: 3;
+      }
+    }
+
+    ion-icon {
+      color: #d4af37;
+      font-size: 22px;
+      margin-right: 14px;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    /* Asegurar que el native input sea clickeable */
+    &::part(native) {
+      pointer-events: auto;
+    }
+  }
+
+  /* Error messages - MÁS VISIBLES */
+  ion-text[color="danger"] {
+    display: block;
+    font-size: 13px;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 4px 0 12px 0;
+    border-left: 3px solid #ff6b6b;
+    
+    small {
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+  }
+
+  /* User Type Section - Clickeable en móvil */
+  .user-type-section {
+    margin: 22px 0;
+    position: relative;
+    z-index: 2;
+
+    .user-type-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(212, 175, 55, 0.9);
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .user-type-segment {
+      --background: rgba(25, 25, 25, 0.6);
+      border-radius: 14px;
+      padding: 5px;
+      border: 1px solid rgba(218, 165, 32, 0.2);
+      position: relative;
+      z-index: 3;
+      pointer-events: auto;
+      
+      ion-segment-button {
+        --indicator-color: transparent;
+        --color: rgba(255, 255, 255, 0.5);
+        --color-checked: #0a0a0a;
+        --padding-top: 12px;
+        --padding-bottom: 12px;
+        min-height: 46px;
+        border-radius: 10px;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        pointer-events: auto;
+        touch-action: manipulation;
+
+        &.segment-button-checked {
+          background: linear-gradient(135deg, #d4af37 0%, #c9a935 100%);
+          box-shadow: 
+            0 4px 15px rgba(218, 165, 32, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+          ion-icon {
+            color: #0a0a0a;
+          }
+
+          ion-label {
+            color: #0a0a0a;
+            font-weight: 700;
+          }
+        }
+
+        ion-icon {
+          font-size: 20px;
+          margin-right: 8px;
+          transition: all 0.3s ease;
+          pointer-events: none;
+        }
+
+        ion-label {
+          font-size: 14px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          pointer-events: none;
+        }
+      }
+    }
+  }
+
+  /* Terms Checkbox - Clickeable en móvil */
+  .terms-item {
+    --background: transparent;
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    --min-height: auto;
+    margin: 28px 0;
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(15, 15, 15, 0.5);
+    border: 1.5px solid rgba(218, 165, 32, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+    touch-action: manipulation;
+    
+    &:hover, &:active {
+      background: rgba(20, 20, 20, 0.7);
+      border-color: rgba(218, 165, 32, 0.4);
+      transform: translateY(-1px);
+    }
+    
+    ion-checkbox {
+      --border-color: rgba(218, 165, 32, 0.7);
+      --border-color-checked: #d4af37;
+      --checkbox-background: rgba(10, 10, 10, 0.9);
+      --checkbox-background-checked: linear-gradient(135deg, #d4af37 0%, #c9a935 100%);
+      --checkmark-color: #0a0a0a;
+      --checkmark-width: 3px;
+      --border-radius: 8px;
+      --size: 28px;
+      --border-width: 2.5px;
+      margin-right: 16px;
+      margin-top: 0;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+      touch-action: manipulation;
+      z-index: 10;
+
+      &:hover, &:active {
+        --border-color: #d4af37;
+        transform: scale(1.05);
+      }
+
+      &::part(container) {
+        border-width: 2.5px;
+        pointer-events: auto;
+      }
+    }
+
+    .terms-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.8;
+      cursor: pointer;
+      flex: 1;
+      font-weight: 500;
+      pointer-events: auto;
+
+      .terms-link {
+        color: #d4af37;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s;
+        cursor: pointer;
+        border-bottom: 1px solid transparent;
+        pointer-events: auto;
+
+        &:hover, &:active {
+          color: #f4e4c1;
+          border-bottom-color: #f4e4c1;
+        }
+      }
+    }
+
+    &:hover, &:active {
+      .terms-label {
+        color: rgba(255, 255, 255, 0.95);
+      }
+      
+      ion-checkbox {
+        --border-color: rgba(218, 165, 32, 0.9);
+      }
+    }
+  }
+
+  /* Primary Button - Gold */
+  ion-button {
+    --border-radius: 14px;
+    --padding-top: 15px;
+    --padding-bottom: 15px;
+    --background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+    --color: #0a0a0a;
+    --box-shadow: 0 10px 30px rgba(218, 165, 32, 0.4);
+    margin: 14px 0 0 0;
+    font-weight: 700;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+      transition: left 0.5s ease;
+    }
+
+    &:hover {
+      --box-shadow: 0 15px 40px rgba(218, 165, 32, 0.5);
+      transform: translateY(-2px);
+
+      &::before {
+        left: 100%;
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &[disabled] {
+      --background: rgba(218, 165, 32, 0.3);
+      --box-shadow: none;
+      opacity: 0.4;
+    }
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 26px 0;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, 
+        transparent, 
+        rgba(218, 165, 32, 0.3), 
+        transparent);
+    }
+
+    span {
+      padding: 0 18px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: lowercase;
+    }
+  }
+
+  /* Social Buttons */
+  .social-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+
+    app-button,
+    ion-button {
+      --background: rgba(25, 25, 25, 0.6);
+      --color: rgba(255, 255, 255, 0.85);
+      --box-shadow: none;
+      --border-radius: 14px;
+      --border-width: 0;
+      border: 1px solid rgba(218, 165, 32, 0.25);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: none;
+      margin: 0;
+      letter-spacing: 0;
+
+      &:hover {
+        --background: rgba(25, 25, 25, 0.9);
+        border-color: rgba(218, 165, 32, 0.5);
+        transform: none;
+        --box-shadow: 0 4px 12px rgba(218, 165, 32, 0.15);
+      }
+
+      &::before {
+        display: none;
+      }
+
+      /* Remove blue outline */
+      &::part(native) {
+        border: none;
+        outline: none;
+      }
+    }
+  }
+
+  /* Switch Auth */
+  .switch-auth {
+    text-align: center;
+    margin: 22px 0 0 0;
+
+    p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      margin: 0;
+      font-weight: 400;
+
+      a {
+        color: #d4af37;
+        font-weight: 700;
+        text-decoration: none;
+        margin-left: 5px;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #f4e4c1;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* LOGIN PAGE SPECIFIC STYLES */
+.auth-content.login-page {
+  .auth-container {
+    max-width: 500px;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 40px 20px;
+  }
+
+  .brand-section {
+    order: 1;
+    text-align: center;
+    align-items: center;
+    margin-bottom: 40px;
+
+    .logo-container {
+      margin: 0 auto 30px;
+      width: 85px;
+      height: 85px;
+
+      .brand-logo {
+        font-size: 42px;
+      }
+    }
+
+    .brand-name {
+      font-size: 48px;
+    }
+
+    .brand-tagline {
+      max-width: 100%;
+    }
+
+    .brand-description {
+      display: none;
+    }
+  }
+
+  .form-card {
+    order: 2;
+    padding: 45px 35px;
+  }
+
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+
+    .remember-item {
+      --background: transparent;
+      --padding-start: 0;
+      --inner-padding-end: 0;
+      --min-height: auto;
+      
+      ion-checkbox {
+        --border-color: rgba(218, 165, 32, 0.5);
+        --checkbox-background-checked: #d4af37;
+        --checkmark-color: #0a0a0a;
+        --border-radius: 5px;
+        --size: 18px;
+        margin-right: 10px;
+      }
+
+      ion-label {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    .forgot-link {
+      color: #d4af37;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #f4e4c1;
+      }
+    }
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    padding: 50px 30px;
+    max-width: 520px;
+  }
+
+  .brand-section {
+    order: 1;
+    align-items: center;
+    text-align: center;
+
+    .logo-container {
+      margin: 0 auto 35px;
+    }
+
+    .brand-name {
+      font-size: 56px;
+    }
+
+    .brand-tagline,
+    .brand-description {
+      max-width: 100%;
+    }
+  }
+
+  .form-card {
+    order: 2;
+  }
+
+  .auth-content.login-page .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-container {
+    padding: 35px 20px;
+    gap: 35px;
+  }
+
+  .brand-section {
+    .logo-container {
+      width: 85px;
+      height: 85px;
+      margin-bottom: 30px;
+
+      .brand-logo {
+        font-size: 42px;
+      }
+    }
+
+    .brand-name {
+      font-size: 44px;
+      letter-spacing: -1px;
+    }
+
+    .brand-tagline {
+      font-size: 16px;
+    }
+
+    .brand-description {
+      font-size: 14px;
+    }
+  }
+
+  .form-card {
+    padding: 40px 28px;
+    border-radius: 24px;
+
+    .form-title {
+      font-size: 26px;
+    }
+
+    .social-buttons {
+      grid-template-columns: 1fr;
+    }
+  }
+}

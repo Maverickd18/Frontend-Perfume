@@ -1,0 +1,123 @@
+<app-header [title]="'Notifications'" [showBackButton]="true" (backClicked)="onBackClick()"></app-header>
+
+<ion-content class="ion-padding">
+  <!-- Filtros -->
+  <ion-card class="filter-card">
+    <ion-card-content>
+      <ion-segment 
+        [(ngModel)]="selectedFilter" 
+        (ionChange)="onFilterChange(selectedFilter)"
+        class="filter-segment">
+        <ion-segment-button value="all" layout="icon-start">
+          <ion-label>Todas</ion-label>
+          <ion-badge color="primary" *ngIf="notifications.length > 0">{{ notifications.length }}</ion-badge>
+        </ion-segment-button>
+        <ion-segment-button value="unread" layout="icon-start">
+          <ion-label>No leidas</ion-label>
+          <ion-badge color="danger" *ngIf="unreadCount > 0">{{ unreadCount }}</ion-badge>
+        </ion-segment-button>
+        <ion-segment-button value="interes" layout="icon-start">
+          <ion-icon name="heart"></ion-icon>
+        </ion-segment-button>
+        <ion-segment-button value="compra" layout="icon-start">
+          <ion-icon name="cart"></ion-icon>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de notificaciones -->
+  <div *ngIf="filteredNotifications.length > 0">
+    <ion-card 
+      *ngFor="let notification of filteredNotifications" 
+      [class.unread]="!notification.leida"
+      (click)="markAsRead(notification)"
+      class="notification-card">
+      <ion-card-header>
+        <div class="notification-header">
+          <ion-icon 
+            [name]="getNotificationIcon(notification.tipo)" 
+            [color]="getNotificationColor(notification.tipo)"
+            class="notification-icon">
+          </ion-icon>
+          <div class="notification-title">
+            <ion-card-title>{{ notification.cliente }}</ion-card-title>
+            <p class="notification-date">{{ formatDate(notification.fecha) }}</p>
+          </div>
+          <ion-button 
+            fill="clear" 
+            size="small"
+            class="delete-btn"
+            (click)="deleteNotification(notification.id!, $event)">
+            <ion-icon slot="icon-only" name="close" color="medium"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="notification-product">
+          <strong>Producto:</strong> {{ notification.producto }}
+        </p>
+        <p class="notification-message">{{ notification.mensaje }}</p>
+        <ion-badge 
+          [color]="getNotificationColor(notification.tipo)"
+          class="notification-badge">
+          {{ notification.tipo | uppercase }}
+        </ion-badge>
+        <div *ngIf="notification.detalles" class="notification-details">
+          <p *ngIf="notification.detalles.amount">
+            <strong>Monto:</strong> ${{ notification.detalles.amount }}
+          </p>
+          <p *ngIf="notification.detalles.stock">
+            <strong>Stock:</strong> {{ notification.detalles.stock }} unidades
+          </p>
+        </div>
+      </ion-card-content>
+      <div *ngIf="!notification.leida" class="unread-indicator"></div>
+    </ion-card>
+  </div>
+
+  <!-- Mensaje sin notificaciones -->
+  <ion-card *ngIf="filteredNotifications.length === 0" class="empty-state">
+    <ion-card-content class="ion-text-center">
+      <ion-icon name="notifications-off" size="large" color="medium"></ion-icon>
+      <h2>Sin notificaciones</h2>
+      <p>
+        <span *ngIf="selectedFilter !== 'all'">No hay notificaciones en esta categoría</span>
+        <span *ngIf="selectedFilter === 'all'">Por ahora no tienes notificaciones. Las notificaciones aparecerán aquí cuando los clientes interactúen con tus productos.</span>
+      </p>
+      <ion-button 
+        class="back-to-products-btn"
+        expand="block"
+        (click)="onBackClick()">
+        <ion-icon slot="start" name="arrow-back"></ion-icon>
+        Volver a Mis Productos
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Action Buttons -->
+  <ion-card *ngIf="notifications.length > 0" class="action-buttons">
+    <ion-card-content>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <app-button 
+          *ngIf="unreadCount > 0"
+          [text]="'Mark All Read'" 
+          [type]="'primary'" 
+          [expand]="'block'"
+          [icon]="'checkmark-done'"
+          (clicked)="markAllAsRead()">
+        </app-button>
+        <app-button 
+          [text]="'Clear All'" 
+          [type]="'outline'" 
+          [expand]="'block'"
+          [icon]="'trash'"
+          (clicked)="clearAll()">
+        </app-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
+
+<app-footer></app-footer>
