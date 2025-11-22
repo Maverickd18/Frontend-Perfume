@@ -45,30 +45,6 @@ const routes: Routes = [
     path: 'forgot-password',
     loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
   },
-<<<<<<< HEAD
-  {
-    path: 'profile-seller',
-    loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'profile-client',
-    loadChildren: () => import('./pages/profile-client/profile-client.module').then(m => m.ProfileClientPageModule),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'cart',
-    loadChildren: () => import('./pages/cart/cart.module').then(m => m.CartPageModule),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'product-detail',
-    loadChildren: () => import('./pages/product-detail/product-detail.module').then(m => m.ProductDetailPageModule),
-    canActivate: [AuthGuard]
-  }
-=======
-
->>>>>>> 0753791a7806ce6872ea4c24f76f2f923f17145e
 ];
 
 @NgModule({

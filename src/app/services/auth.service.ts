@@ -175,9 +175,6 @@ export class AuthService {
   getCurrentUser(): User | null {
     return this.getUserData();
   }
-<<<<<<< HEAD
-}
-=======
 
   // Método para verificar el token de verificación
   verifyAccount(token: string): Observable<any> {
@@ -214,4 +211,3 @@ export class AuthService {
     );
   }
 }
->>>>>>> 0753791a7806ce6872ea4c24f76f2f923f17145e
