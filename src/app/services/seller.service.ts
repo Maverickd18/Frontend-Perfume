@@ -43,6 +43,8 @@ export interface Perfume {
   rejectionReason?: string;
   moderatedBy?: string;
   moderationDate?: string;
+  createdAt?: string; // Hacer opcional
+  updatedAt?: string;
 }
 
 export interface Brand {
@@ -58,6 +60,8 @@ export interface Brand {
   rejectionReason?: string;
   moderatedBy?: string;
   moderationDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {
@@ -65,6 +69,10 @@ export interface Category {
   name: string;
   description: string;
   imageUrl?: string;
+  moderationStatus?: ModerationStatus;
+  rejectionReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ApiResponse<T> {
@@ -194,6 +202,45 @@ export class SellerService {
     }
   }
 
+  updateMyBrand(brandId: number, brandData: any): Observable<Brand> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.put<ApiResponse<Brand>>(`${API_URL}/brands/mis-marcas/${brandId}`, brandData, { headers })
+        .pipe(
+          map(response => {
+            const updatedBrand = response.data!;
+            const index = this.brands.findIndex(b => b.id === brandId);
+            if (index !== -1) {
+              this.brands[index] = updatedBrand;
+            }
+            return updatedBrand;
+        }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  deleteMyBrand(brandId: number): Observable<void> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.delete<void>(`${API_URL}/brands/mis-marcas/${brandId}`, { headers })
+        .pipe(
+          tap(() => {
+            this.brands = this.brands.filter(b => b.id !== brandId);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
   // ============= CATEGORÍAS =============
   getCategories(): Observable<Category[]> {
     try {
@@ -214,35 +261,70 @@ export class SellerService {
   }
 
   createCategory(category: Omit<Category, 'id'>): Observable<Category> {
-  try {
-    this.checkPermissions();
-    const headers = this.getHeaders();
-    
-    console.log('🆕 Creating category:', category);
-    
-    return this.http.post<any>(`${API_URL}/categories`, category, { headers })
-      .pipe(
-        map(response => {
-          console.log('✅ Category creation response:', response);
-          
-          // Extraer la categoría de la respuesta
-          if (response.data) {
-            const categoryData = response.data;
-            console.log('✅ Category created successfully:', categoryData);
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      console.log('🆕 Creating category:', category);
+      
+      return this.http.post<any>(`${API_URL}/categories`, category, { headers })
+        .pipe(
+          map(response => {
+            console.log('✅ Category creation response:', response);
             
-            // Actualizar la lista de categorías
-            this.getCategories().subscribe();
-            return categoryData;
-          } else {
-            throw new Error('No se pudo crear la categoría - respuesta inválida del servidor');
-          }
-        }),
-        catchError(this.handleError)
-      );
-  } catch (error: any) {
-    return throwError(() => error);
+            if (response.data) {
+              const categoryData = response.data;
+              console.log('✅ Category created successfully:', categoryData);
+              
+              this.getCategories().subscribe();
+              return categoryData;
+            } else {
+              throw new Error('No se pudo crear la categoría - respuesta inválida del servidor');
+            }
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
   }
-}
+
+  updateCategory(categoryId: number, categoryData: any): Observable<Category> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.put<Category>(`${API_URL}/categories/${categoryId}`, categoryData, { headers })
+        .pipe(
+          tap(updatedCategory => {
+            const index = this.categories.findIndex(c => c.id === categoryId);
+            if (index !== -1) {
+              this.categories[index] = updatedCategory;
+            }
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  deleteCategory(categoryId: number): Observable<void> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.delete<void>(`${API_URL}/categories/${categoryId}`, { headers })
+        .pipe(
+          tap(() => {
+            this.categories = this.categories.filter(c => c.id !== categoryId);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
 
   // ============= PERFUMES DEL USUARIO =============
   getMyPerfumes(page: number = 0, size: number = 50, filtro: string = '', status?: ModerationStatus): Observable<ApiResponse<Perfume[]>> {
@@ -284,54 +366,42 @@ export class SellerService {
     }
   }
 
-  createPerfume(perfume: Omit<Perfume, 'id'>): Observable<Perfume> {
-  try {
-    this.checkPermissions();
-    const headers = this.getHeaders();
-    
-    console.log('🔄 Creating perfume with data:', perfume);
-    
-    return this.http.post<ApiResponse<Perfume>>(`${API_URL}/perfumes/nuevo`, perfume, { headers })
-      .pipe(
-        map(response => {
-          const perfumeData = response.data!;
-          console.log('✅ Perfume created successfully:', perfumeData);
-          
-          this.loadPerfumesAfterCreate();
-          
-          return perfumeData;
-        }),
-        catchError(error => {
-          console.error('❌ Error in createPerfume:', error);
-          console.error('❌ Error details:', error.error);
-          
-          // MOSTRAR LOS ERRORES ESPECÍFICOS DE VALIDACIÓN
-          if (error.error && error.error.errors) {
-            console.error('🔍 Validation errors:', error.error.errors);
-            const errorMessages = Object.entries(error.error.errors)
-              .map(([field, message]) => `${field}: ${message}`)
-              .join(', ');
-            throw new Error(`Errores de validación: ${errorMessages}`);
-          }
-          
-          return this.handleError(error);
-        })
-      );
-  } catch (error: any) {
-    console.error('❌ Error in createPerfume:', error);
-    return throwError(() => error);
-  }
-}
-  // Método auxiliar para recargar perfumes después de crear uno nuevo
-  private loadPerfumesAfterCreate() {
-    this.getMyPerfumes(0, 50, '').subscribe({
-      next: (response) => {
-        console.log('🔄 Perfumes reloaded after creation');
-      },
-      error: (error) => {
-        console.error('❌ Error reloading perfumes:', error);
-      }
-    });
+  createPerfume(perfume: Omit<Perfume, 'id' | 'createdAt' | 'updatedAt'>): Observable<Perfume> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      console.log('🔄 Creating perfume with data:', perfume);
+      
+      return this.http.post<ApiResponse<Perfume>>(`${API_URL}/perfumes/nuevo`, perfume, { headers })
+        .pipe(
+          map(response => {
+            const perfumeData = response.data!;
+            console.log('✅ Perfume created successfully:', perfumeData);
+            
+            this.loadPerfumesAfterCreate();
+            
+            return perfumeData;
+          }),
+          catchError(error => {
+            console.error('❌ Error in createPerfume:', error);
+            console.error('❌ Error details:', error.error);
+            
+            if (error.error && error.error.errors) {
+              console.error('🔍 Validation errors:', error.error.errors);
+              const errorMessages = Object.entries(error.error.errors)
+                .map(([field, message]) => `${field}: ${message}`)
+                .join(', ');
+              throw new Error(`Errores de validación: ${errorMessages}`);
+            }
+            
+            return this.handleError(error);
+          })
+        );
+    } catch (error: any) {
+      console.error('❌ Error in createPerfume:', error);
+      return throwError(() => error);
+    }
   }
 
   updatePerfume(id: number, perfume: Partial<Perfume>): Observable<Perfume> {
@@ -411,6 +481,44 @@ export class SellerService {
     }
   }
 
+  uploadBrandImage(brandId: number, image: File): Observable<any> {
+    try {
+      this.checkPermissions();
+      const formData = new FormData();
+      formData.append('imagen', image);
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${this.authService.getToken()}`
+      });
+
+      return this.http.post<any>(`${API_URL}/brands/mis-marcas/${brandId}/image`, formData, { headers })
+        .pipe(
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  uploadCategoryImage(categoryId: number, image: File): Observable<any> {
+    try {
+      this.checkPermissions();
+      const formData = new FormData();
+      formData.append('imagen', image);
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${this.authService.getToken()}`
+      });
+
+      return this.http.post<any>(`${API_URL}/categories/${categoryId}/image`, formData, { headers })
+        .pipe(
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
   private getFullImageUrl(imageUrl: string | null | undefined): string | null {
     console.log('🖼️ Processing image URL:', imageUrl);
     
@@ -433,6 +541,18 @@ export class SellerService {
     const fullUrl = `http://localhost:8080/uploads/${imageUrl}`;
     console.log('🔗 Built URL from filename:', fullUrl);
     return fullUrl;
+  }
+
+  // Método auxiliar para recargar perfumes después de crear uno nuevo
+  private loadPerfumesAfterCreate() {
+    this.getMyPerfumes(0, 50, '').subscribe({
+      next: (response) => {
+        console.log('🔄 Perfumes reloaded after creation');
+      },
+      error: (error) => {
+        console.error('❌ Error reloading perfumes:', error);
+      }
+    });
   }
 
   getBrandsList(): Brand[] {

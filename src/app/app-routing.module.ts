@@ -27,8 +27,13 @@ const routes: Routes = [
   {
     path: 'seller',
     loadChildren: () => import('./pages/seller/seller.module').then(m => m.SellerPageModule),
-    canActivate: [AuthGuard, RoleGuard],
+    //canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['VENDEDOR'] }
+  },
+  {
+    path: 'seller-profile',
+    loadChildren: () => import('./pages/seller-profile/seller-profile.module').then(m => m.SellerProfilePageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'notifications',
