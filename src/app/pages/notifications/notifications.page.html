@@ -47,8 +47,9 @@
           <ion-button 
             fill="clear" 
             size="small"
+            class="delete-btn"
             (click)="deleteNotification(notification.id!, $event)">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
+            <ion-icon slot="icon-only" name="close" color="medium"></ion-icon>
           </ion-button>
         </div>
       </ion-card-header>
@@ -82,8 +83,15 @@
       <h2>Sin notificaciones</h2>
       <p>
         <span *ngIf="selectedFilter !== 'all'">No hay notificaciones en esta categoría</span>
-        <span *ngIf="selectedFilter === 'all'">¡Mantente atento a las actividades de tus clientes!</span>
+        <span *ngIf="selectedFilter === 'all'">Por ahora no tienes notificaciones. Las notificaciones aparecerán aquí cuando los clientes interactúen con tus productos.</span>
       </p>
+      <ion-button 
+        class="back-to-products-btn"
+        expand="block"
+        (click)="onBackClick()">
+        <ion-icon slot="start" name="arrow-back"></ion-icon>
+        Volver a Mis Productos
+      </ion-button>
     </ion-card-content>
   </ion-card>
 

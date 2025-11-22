@@ -1,12 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
-import { ProfileClientPageRoutingModule } from './profile-client-routing.module';
-
-import { ProfileClientPage } from './profile-client.page';
+import { SellerProfilePageRoutingModule } from './seller-profile-routing.module';
+import { SellerProfilePage } from './seller-profile.page';
 import { SharedModule } from '../../shared/shared-module';
 
 @NgModule({
@@ -14,9 +11,9 @@ import { SharedModule } from '../../shared/shared-module';
     CommonModule,
     FormsModule,
     IonicModule,
-    SharedModule,
-    ProfileClientPageRoutingModule
+    SellerProfilePageRoutingModule,
+    SharedModule
   ],
-  declarations: [ProfileClientPage]
+  declarations: [SellerProfilePage]
 })
-export class ProfileClientPageModule {}
+export class SellerProfilePageModule {}

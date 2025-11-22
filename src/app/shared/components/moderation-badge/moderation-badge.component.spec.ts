@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { SearchbarComponent } from './searchbar.component';
+import { ModerationBadgeComponent } from './moderation-badge.component';
 
-describe('SearchbarComponent', () => {
-  let component: SearchbarComponent;
-  let fixture: ComponentFixture<SearchbarComponent>;
+describe('ModerationBadgeComponent', () => {
+  let component: ModerationBadgeComponent;
+  let fixture: ComponentFixture<ModerationBadgeComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchbarComponent ],
+      declarations: [ ModerationBadgeComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SearchbarComponent);
+    fixture = TestBed.createComponent(ModerationBadgeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

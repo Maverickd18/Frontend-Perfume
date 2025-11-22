@@ -5,7 +5,7 @@
       <div class="logo-container">
         <ion-icon name="storefront" class="brand-logo"></ion-icon>
       </div>
-      <h1 class="brand-name">MarketPlace</h1>
+      <h1 class="brand-name">LUMIERESHOP</h1>
       <p class="brand-tagline">Crea tu cuenta y comienza a comprar</p>
     </div>
 
@@ -15,111 +15,95 @@
 
       <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
         <!-- Full Name Input -->
-        <app-input
-          label="Full Name"
-          placeholder=""
-          type="text"
-          icon="person-outline"
-          [error]="getFullNameError()"
-          formControlName="fullName">
-        </app-input>
+        <ion-item>
+          <ion-label position="stacked">Full Name *</ion-label>
+          <ion-input 
+            formControlName="fullName"
+            type="text" 
+            placeholder="Enter your full name">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getFullNameError()">
+          <small>{{ getFullNameError() }}</small>
+        </ion-text>
+
+        <!-- User Type Selection -->
         <div class="user-type-section">
-  <label class="user-type-label">I am a:</label>
-  <ion-segment formControlName="userType" mode="ios" class="user-type-segment">
-    <ion-segment-button value="client">
-      <ion-icon name="person-outline"></ion-icon>
-      <ion-label>Client</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="seller">
-      <ion-icon name="storefront-outline"></ion-icon>
-      <ion-label>Seller</ion-label>
-    </ion-segment-button>
-  </ion-segment>
-</div>
+          <label class="user-type-label">I am a:</label>
+          <ion-segment formControlName="userType" mode="ios" class="user-type-segment">
+            <ion-segment-button value="CLIENTE">
+              <ion-icon name="person-outline"></ion-icon>
+              <ion-label>Client</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="VENDEDOR">
+              <ion-icon name="storefront-outline"></ion-icon>
+              <ion-label>Seller</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
 
         <!-- Email Input -->
-        <app-input
-          label="Email"
-          placeholder=""
-          type="email"
-          icon="mail-outline"
-          [error]="getEmailError()"
-          formControlName="email">
-        </app-input>
-
-        <!-- Phone Input -->
-        <app-input
-          label="Phone"
-          placeholder=""
-          type="tel"
-          icon="call-outline"
-          [error]="getPhoneError()"
-          formControlName="phone">
-        </app-input>
+        <ion-item>
+          <ion-label position="stacked">Email *</ion-label>
+          <ion-input 
+            formControlName="email"
+            type="email" 
+            placeholder="Enter your email">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getEmailError()">
+          <small>{{ getEmailError() }}</small>
+        </ion-text>
 
         <!-- Password Input -->
-        <app-input
-          label="Password"
-          placeholder="••••••••"
-          type="password"
-          icon="lock-closed-outline"
-          [error]="getPasswordError()"
-          formControlName="password">
-        </app-input>
+        <ion-item>
+          <ion-label position="stacked">Password *</ion-label>
+          <ion-input 
+            formControlName="password"
+            type="password" 
+            placeholder="Enter your password">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getPasswordError()">
+          <small>{{ getPasswordError() }}</small>
+        </ion-text>
 
         <!-- Confirm Password Input -->
-        <app-input
-          label="Confirm Password"
-          placeholder="••••••••"
-          type="password"
-          icon="lock-closed-outline"
-          [error]="getConfirmPasswordError()"
-          formControlName="confirmPassword">
-        </app-input>
+        <ion-item>
+          <ion-label position="stacked">Confirm Password *</ion-label>
+          <ion-input 
+            formControlName="confirmPassword"
+            type="password" 
+            placeholder="Confirm your password">
+          </ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getConfirmPasswordError()">
+          <small>{{ getConfirmPasswordError() }}</small>
+        </ion-text>
 
         <!-- Terms and Conditions -->
         <ion-item lines="none" class="terms-item">
-          <ion-checkbox [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+          <ion-checkbox slot="start" [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}"></ion-checkbox>
           <ion-label class="terms-label">
-            acceptTerms <a class="terms-link">Terms and Conditions</a> y la <a class="terms-link">Privacy policies</a>
+            I accept the <a class="terms-link">Terms and Conditions</a> and <a class="terms-link">Privacy Policy</a>
           </ion-label>
         </ion-item>
 
         <!-- Register Button -->
-        <app-button
-          text="Create Account"
-          type="primary"
-          expand="block"
-          icon="person-add-outline"
-          [disabled]="!acceptTerms"
-          (clicked)="onRegister()">
-        </app-button>
+        <ion-button 
+          type="submit"
+          expand="block" 
+          [disabled]="!registerForm.valid || !acceptTerms || isLoading"
+          class="register-button">
+          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+          <ion-icon *ngIf="!isLoading" slot="start" name="person-add-outline"></ion-icon>
+          {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+        </ion-button>
       </form>
-
-      <!-- Divider -->
-      <div class="divider">
-        <span>Or register with</span>
-      </div>
-
-      <!-- Social Register Buttons -->
-      <div class="social-buttons">
-        <app-button
-          text="Google"
-          type="outline"
-          icon="logo-google"
-          (clicked)="onGoogleRegister()">
-        </app-button>
-        <app-button
-          text="Facebook"
-          type="outline"
-          icon="logo-facebook"
-          (clicked)="onFacebookRegister()">
-        </app-button>
-      </div>
 
       <!-- Switch to Login -->
       <div class="switch-auth">
-        <p>¿Do you have an account? <a (click)="goToLogin()">Log In</a></p>
+        <p>Already have an account? <a (click)="goToLogin()">Log In</a></p>
       </div>
     </div>
   </div>

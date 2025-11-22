@@ -1,36 +1,81 @@
-.custom-header {
-  --background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
-  color: white;
+/* Header Component - Dark/Gold Theme */
+ion-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    --color: #d4af37;
+    --border-color: rgba(218, 165, 32, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(218, 165, 32, 0.2);
+    position: relative;
 
-  .header-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 0 12px;
-    width: 100%;
-  }
-
-  .header-title {
-    margin: 0 auto; /* centra el titulo */
-    font-size: 20px;
-    font-weight: 600;
-    color: white;
-    text-align: center;
-    flex: 1 1 auto;
-  }
-
-  .header-search {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-  }
-
-  app-button {
-    --color: white;
-
-    ion-icon {
-      font-size: 22px;
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(218, 165, 32, 0.5) 50%, 
+        transparent 100%);
     }
   }
+
+  ion-title {
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(218, 165, 32, 0.3);
+  }
+
+  ion-back-button {
+    --color: #d4af37;
+    --icon-font-size: 24px;
+    
+    &:hover {
+      --color: #dab863;
+    }
+  }
+
+  ion-button {
+    --color: #d4af37;
+    
+    &:hover {
+      --color: #dab863;
+    }
+
+    ion-icon {
+      color: #d4af37;
+      font-size: 24px;
+    }
+  }
+
+  ion-badge {
+    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+    color: #0a0a0a;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(218, 165, 32, 0.4);
+  }
+}
+
+/* Animation for header */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+ion-header {
+  animation: slideDown 0.4s ease-out;
 }

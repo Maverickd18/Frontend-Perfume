@@ -1,0 +1,119 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle del Pedido</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Order Header -->
+  <ion-card class="order-header-card">
+    <ion-card-header>
+      <ion-card-title>{{ order.orderNumber }}</ion-card-title>
+      <p class="order-date">{{ formatDate(order.fecha) }}</p>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="order-info">
+        <div class="info-row">
+          <ion-icon name="person-outline"></ion-icon>
+          <div>
+            <h4>Cliente</h4>
+            <p>{{ order.cliente }}</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <ion-icon name="cube-outline"></ion-icon>
+          <div>
+            <h4>Producto</h4>
+            <p>{{ order.producto }}</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <ion-icon name="calculator-outline"></ion-icon>
+          <div>
+            <h4>Cantidad</h4>
+            <p>{{ order.cantidad }} unidad(es)</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <ion-icon name="cash-outline"></ion-icon>
+          <div>
+            <h4>Total</h4>
+            <p class="total-amount">${{ order.total.toFixed(2) }}</p>
+          </div>
+        </div>
+        <div class="info-row" *ngIf="order.direccion">
+          <ion-icon name="location-outline"></ion-icon>
+          <div>
+            <h4>Dirección de Entrega</h4>
+            <p>{{ order.direccion }}</p>
+          </div>
+        </div>
+        <div class="info-row" *ngIf="order.telefono">
+          <ion-icon name="call-outline"></ion-icon>
+          <div>
+            <h4>Teléfono</h4>
+            <p>{{ order.telefono }}</p>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Status Checklist -->
+  <ion-card class="status-card">
+    <ion-card-header>
+      <ion-card-title>Estado del Pedido</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list class="status-checklist">
+        <ion-item 
+          *ngFor="let step of statusSteps"
+          [class.completed]="isStatusCompleted(step.key)"
+          [class.active]="isStatusActive(step.key)"
+          [class.disabled]="order.estado === 'cancelado'"
+          lines="none">
+          <ion-icon 
+            [name]="isStatusCompleted(step.key) ? 'checkmark-circle' : step.icon" 
+            slot="start"
+            [color]="isStatusCompleted(step.key) ? 'success' : 'medium'">
+          </ion-icon>
+          <ion-label>
+            <h3>{{ step.label }}</h3>
+          </ion-label>
+          <ion-button 
+            *ngIf="canUpdateToStatus(step.key)"
+            fill="solid"
+            size="small"
+            class="btn-update-status"
+            (click)="updateOrderStatus(step.key)">
+            Marcar
+          </ion-button>
+        </ion-item>
+      </ion-list>
+
+      <!-- Current Status Badge -->
+      <div class="current-status">
+        <ion-badge [color]="getStatusColor(order.estado)">
+          {{ getStatusLabel(order.estado) }}
+        </ion-badge>
+      </div>
+
+      <!-- Cancel Button -->
+      <ion-button 
+        *ngIf="order.estado !== 'cancelado' && order.estado !== 'entregado'"
+        expand="block"
+        fill="outline"
+        color="danger"
+        class="cancel-order-btn"
+        (click)="cancelOrder()">
+        <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+        Cancelar Pedido
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

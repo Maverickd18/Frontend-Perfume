@@ -1,162 +1,669 @@
-<app-header [title]="'My Store'" [showBackButton]="true" [unreadNotifications]="store.nombre ? unreadNotifications : 0" (backClicked)="onBackClick()"></app-header>
+<app-header 
+  [title]="'Mis Productos'" 
+  [showBackButton]="true" 
+  [unreadNotifications]="unreadNotifications"
+  (backClicked)="onBackClick()">
+  <ion-button slot="end" fill="clear" (click)="goToProfile()" class="profile-header-btn">
+    <ion-icon name="person-circle"></ion-icon>
+  </ion-button>
+</app-header>
 
-<ion-content class="ion-padding">
-  
-  <!-- Form to Create My Store (show only if store doesn't exist) -->
-  <ion-card *ngIf="showCreateStore && !store.nombre">
-    <ion-card-header>
-      <ion-card-title>Create My Store</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <app-input 
-        [label]="'Store Name'" 
-        [placeholder]="'e.g., My Perfume Shop'"
-        [type]="'text'"
-        [(ngModel)]="newStore.nombre">
-      </app-input>
-      <app-input 
-        [label]="'Description'" 
-        [placeholder]="'Describe your store...'"
-        [type]="'text'"
-        [(ngModel)]="newStore.descripcion">
-      </app-input>
-      <app-input 
-        [label]="'Owner Name'" 
-        [placeholder]="'Your name'"
-        [type]="'text'"
-        [(ngModel)]="newStore.propietario">
-      </app-input>
-      <div class="ion-margin-top">
-        <app-button [type]="'primary'" [text]="'Create Store'" (clicked)="createStore()"></app-button>
-      </div>
-    </ion-card-content>
-  </ion-card>
+<ion-content class="products-management">
+  <!-- Tabs Navigation Original -->
+  <div class="tabs-navigation">
+    <ion-segment [value]="activeTab" (ionChange)="onTabChange($event)">
+      <ion-segment-button value="overview">
+        <ion-label>
+          <ion-icon name="grid"></ion-icon>
+          Resumen
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="perfumes">
+        <ion-label>
+          <ion-icon name="flask"></ion-icon>
+          Perfumes
+          <ion-badge color="primary" *ngIf="perfumes.length > 0">{{ perfumes.length }}</ion-badge>
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="brands">
+        <ion-label>
+          <ion-icon name="business"></ion-icon>
+          Marcas
+          <ion-badge color="secondary" *ngIf="brands.length > 0">{{ brands.length }}</ion-badge>
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="categories">
+        <ion-label>
+          <ion-icon name="list"></ion-icon>
+          Categorías
+          <ion-badge color="tertiary" *ngIf="categories.length > 0">{{ categories.length }}</ion-badge>
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 
-  <!-- Store Info Card (show only after store is created) -->
-  <ion-card *ngIf="store.nombre">
-    <ion-card-header>
-      <ion-card-title>{{ store.nombre }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>{{ store.descripcion }}</p>
-      <p><strong>Owner:</strong> {{ store.propietario }}</p>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Add Products Button (show only after store is created) -->
-  <app-button *ngIf="store.nombre" [type]="'primary'" [icon]="'add-circle'" [iconPosition]="'start'" [text]="'Add Products'" (clicked)="openAddProductStepper()"></app-button>
-
-  <!-- Products List (show only after store is created) -->
-  <div *ngIf="store.nombre">
-    <ion-card>
+  <!-- Overview Tab -->
+  <div *ngIf="activeTab === 'overview'" class="tab-content">
+    <!-- Welcome Section -->
+    <ion-card class="welcome-card">
       <ion-card-header>
-        <ion-card-title>My Products ({{ perfumes.length || 0 }})</ion-card-title>
+        <ion-card-title>Gestión de Productos</ion-card-title>
+        <ion-card-subtitle>Bienvenido a tu panel de control</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <!-- Toolbar with Delete Selected Button -->
-        <div *ngIf="perfumes && perfumes.length > 0" class="ion-margin-bottom">
-          <app-button 
-            [type]="'outline'"
-            [disabled]="selectedPerfumes.size === 0"
-            [icon]="'trash'"
-            [iconPosition]="'start'"
-            [text]="'Delete Selected (' + (selectedPerfumes.size || 0) + ')'"
-            (clicked)="deleteSelectedPerfumes()">
-          </app-button>
-        </div>
-
-        <ion-list *ngIf="perfumes && perfumes.length > 0">
-          <div *ngFor="let perfume of perfumes">
-            <!-- Product Card View -->
-            <ion-item-sliding *ngIf="editingPerfume?.id !== perfume.id">
-              <ion-item>
-                <ion-checkbox 
-                  slot="start" 
-                  [checked]="isSelected(perfume.id!)"
-                  (ionChange)="toggleSelectPerfume(perfume.id!)">
-                </ion-checkbox>
-                <ion-label>
-                  <h2>{{ perfume.nombre }}</h2>
-                  <p>{{ perfume.descripcion }}</p>
-                  <p *ngIf="perfume.categoria"><strong>Category:</strong> {{ perfume.categoria }}</p>
-                  <p *ngIf="perfume.marca"><strong>Brand:</strong> {{ perfume.marca }}</p>
-                  <p><strong>Price:</strong> ${{ perfume.precio }} | <strong>Stock:</strong> {{ perfume.stock }} | <strong>Size:</strong> {{ perfume.tamano_ml }}ml | <strong>Gender:</strong> {{ perfume.genero }}</p>
-                </ion-label>
-              </ion-item>
-              <ion-item-options side="end">
-                <ion-item-option color="primary" (click)="startEditPerfume(perfume)">
-                  <ion-icon slot="icon-only" name="pencil"></ion-icon>
-                </ion-item-option>
-                <ion-item-option color="danger" (click)="deletePerfume(perfume.id!)">
-                  <ion-icon slot="icon-only" name="trash"></ion-icon>
-                </ion-item-option>
-              </ion-item-options>
-            </ion-item-sliding>
-
-            <!-- Edit Form inside Product Card -->
-            <ion-card *ngIf="editingPerfume?.id === perfume.id" class="ion-margin-top ion-margin-bottom">
-              <ion-card-header>
-                <ion-card-title>Edit: {{ perfume.nombre }}</ion-card-title>
-              </ion-card-header>
-              <ion-card-content>
-                <app-input 
-                  [label]="'Product Name'" 
-                  [placeholder]="'e.g., Rose Perfume Premium'"
-                  [type]="'text'"
-                  [(ngModel)]="editingPerfume!.nombre">
-                </app-input>
-                <app-input 
-                  [label]="'Description'" 
-                  [placeholder]="'Describe the scent...'"
-                  [type]="'text'"
-                  [(ngModel)]="editingPerfume!.descripcion">
-                </app-input>
-                <app-input 
-                  [label]="'Price ($)'" 
-                  [placeholder]="'150'"
-                  [type]="'number'"
-                  [(ngModel)]="editingPerfume!.precio">
-                </app-input>
-                <app-input 
-                  [label]="'Stock (Units)'" 
-                  [placeholder]="'10'"
-                  [type]="'number'"
-                  [(ngModel)]="editingPerfume!.stock">
-                </app-input>
-                <app-input 
-                  [label]="'Size (ml)'" 
-                  [placeholder]="'100'"
-                  [type]="'number'"
-                  [(ngModel)]="editingPerfume!.tamano_ml">
-                </app-input>
-                <ion-item>
-                  <ion-label position="floating">Gender</ion-label>
-                  <ion-select [(ngModel)]="editingPerfume!.genero" placeholder="Select a gender">
-                    <ion-select-option value="Masculine">Masculine</ion-select-option>
-                    <ion-select-option value="Feminine">Feminine</ion-select-option>
-                    <ion-select-option value="Unisex">Unisex</ion-select-option>
-                  </ion-select>
-                </ion-item>
-                <div class="ion-margin-top">
-                  <app-button [type]="'primary'" [text]="'Save Changes'" (clicked)="saveEditPerfume()"></app-button>
-                  <app-button [type]="'outline'" [text]="'Cancel'" (clicked)="cancelEditPerfume()"></app-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
+        <p>Desde aquí puedes gestionar tus perfumes, marcas y categorías de manera eficiente.</p>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-item">
+            <div class="stat-icon primary">
+              <ion-icon name="flask"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ perfumes.length }}</div>
+              <div class="stat-label">Total Perfumes</div>
+            </div>
           </div>
-        </ion-list>
+          <div class="stat-item">
+            <div class="stat-icon secondary">
+              <ion-icon name="business"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ brands.length }}</div>
+              <div class="stat-label">Mis Marcas</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon tertiary">
+              <ion-icon name="list"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ categories.length }}</div>
+              <div class="stat-label">Categorías</div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
-        <!-- Message if no products -->
-        <ion-text *ngIf="!perfumes || perfumes.length === 0" color="medium">
-          <p class="ion-text-center ion-margin-top">No products yet. Create your first product!</p>
-        </ion-text>
+    <!-- Action Cards -->
+    <div class="action-cards">
+      <ion-card class="action-card" (click)="openAddProductStepper()">
+        <ion-card-content>
+          <div class="action-icon primary">
+            <ion-icon name="add-circle"></ion-icon>
+          </div>
+          <h3>Agregar Perfume</h3>
+          <p>Crea un nuevo perfume en tu catálogo</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="action-card" (click)="openCreateBrand()">
+        <ion-card-content>
+          <div class="action-icon secondary">
+            <ion-icon name="business"></ion-icon>
+          </div>
+          <h3>Nueva Marca</h3>
+          <p>Registra una nueva marca</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="action-card" (click)="openCreateCategory()">
+        <ion-card-content>
+          <div class="action-icon tertiary">
+            <ion-icon name="list"></ion-icon>
+          </div>
+          <h3>Nueva Categoría</h3>
+          <p>Crea una nueva categoría</p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Moderation Stats -->
+    <ion-card class="stats-card">
+      <ion-card-header>
+        <ion-card-title>Estadísticas de Moderación</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="moderation-stats-grid">
+          <div class="mod-stat approved">
+            <div class="stat-number">{{ moderationStats.approved }}</div>
+            <div class="stat-label">Aprobados</div>
+          </div>
+          <div class="mod-stat pending">
+            <div class="stat-number">{{ moderationStats.pending }}</div>
+            <div class="stat-label">En Revisión</div>
+          </div>
+          <div class="mod-stat rejected">
+            <div class="stat-number">{{ moderationStats.rejected }}</div>
+            <div class="stat-label">Rechazados</div>
+          </div>
+          <div class="mod-stat draft">
+            <div class="stat-number">{{ moderationStats.draft || 0 }}</div>
+            <div class="stat-label">Borradores</div>
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
   </div>
 
+  <!-- Perfumes Tab -->
+  <div *ngIf="activeTab === 'perfumes'" class="tab-content">
+    <div class="tab-header">
+      <h2>Mis Perfumes</h2>
+      <div class="header-actions">
+        <ion-button (click)="openAddProductStepper()" color="primary">
+          <ion-icon slot="start" name="add"></ion-icon>
+          Nuevo Perfume
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <ion-card class="filters-card">
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label>Filtrar por estado</ion-label>
+                <ion-select [value]="moderationFilter" (ionChange)="onModerationFilterChange($event)">
+                  <ion-select-option value="ALL">Todos los estados</ion-select-option>
+                  <ion-select-option value="APPROVED">Aprobados</ion-select-option>
+                  <ion-select-option value="PENDING_REVIEW">En Revisión</ion-select-option>
+                  <ion-select-option value="REJECTED">Rechazados</ion-select-option>
+                  <ion-select-option value="DRAFT">Borradores</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label>Buscar</ion-label>
+                <ion-input 
+                  type="text" 
+                  placeholder="Buscar perfumes..."
+                  (ionInput)="onSearchPerfumes($event)">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Perfumes Grid -->
+    <div class="products-grid">
+      <ion-card *ngFor="let perfume of getFilteredPerfumes()" class="product-card">
+        <div class="product-image-container">
+          <img 
+            [src]="getPerfumeImage(perfume)" 
+            [alt]="perfume.name"
+            class="product-image"
+            (error)="onImageError(perfume)">
+          
+          <div class="moderation-status-overlay">
+            <app-moderation-badge 
+              [status]="perfume.moderationStatus || ModerationStatus.DRAFT" 
+              [rejectionReason]="perfume.rejectionReason">
+            </app-moderation-badge>
+          </div>
+
+          <div class="stock-badge" [class.low-stock]="perfume.stock! < 10">
+            <ion-icon name="cube-outline"></ion-icon>
+            {{ perfume.stock }} u.
+          </div>
+        </div>
+
+        <ion-card-header>
+          <ion-card-title class="product-name">{{ perfume.name }}</ion-card-title>
+          <ion-card-subtitle>
+            {{ perfume.brandName || 'Sin marca' }} • {{ perfume.categoryName || 'Sin categoría' }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p class="product-description">{{ getTruncatedDescription(perfume.description, 100) }}</p>
+          
+          <div class="product-meta">
+            <div class="meta-item">
+              <span class="label">Género:</span>
+              <span class="value">{{ perfume.genre }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="label">Precio:</span>
+              <span class="value price">${{ perfume.price | number:'1.2-2' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="label">Tamaño:</span>
+              <span class="value">{{ perfume.sizeMl }}ml</span>
+            </div>
+          </div>
+        </ion-card-content>
+
+        <div class="card-actions">
+          <ion-button fill="clear" color="primary" (click)="editPerfume(perfume)">
+            <ion-icon name="create" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="danger" (click)="deletePerfume(perfume.id!)">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="secondary" (click)="viewPerfumeDetails(perfume)">
+            <ion-icon name="eye" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="getFilteredPerfumes().length === 0" class="empty-state">
+      <ion-icon name="flask-outline"></ion-icon>
+      <h3>No hay perfumes</h3>
+      <p *ngIf="moderationFilter !== 'ALL'">
+        No se encontraron perfumes con el estado "{{ moderationFilter }}"
+      </p>
+      <p *ngIf="moderationFilter === 'ALL'">
+        ¡Comienza agregando tu primer perfume!
+      </p>
+    </div>
+  </div>
+
+  <!-- Brands Tab -->
+  <div *ngIf="activeTab === 'brands'" class="tab-content">
+    <div class="tab-header">
+      <h2>Mis Marcas</h2>
+      <div class="header-actions">
+        <ion-button (click)="openCreateBrand()" color="secondary">
+          <ion-icon slot="start" name="add"></ion-icon>
+          Nueva Marca
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Brands Grid -->
+    <div class="brands-grid">
+      <ion-card *ngFor="let brand of getFilteredBrands()" class="brand-card">
+        <div class="brand-image-container">
+          <img 
+            [src]="getBrandImage(brand)" 
+            [alt]="brand.name"
+            class="brand-image"
+            (error)="onBrandImageError(brand)">
+          
+          <div class="moderation-status-overlay">
+            <app-moderation-badge 
+              [status]="brand.moderationStatus || ModerationStatus.DRAFT" 
+              [rejectionReason]="brand.rejectionReason">
+            </app-moderation-badge>
+          </div>
+
+          <div class="perfumes-badge">
+            <ion-icon name="flask-outline"></ion-icon>
+            {{ brand.totalPerfumes || 0 }}
+          </div>
+
+          <!-- Image Upload Overlay -->
+          <div class="image-upload-overlay" (click)="openBrandImageUpload(brand)">
+            <ion-icon name="camera"></ion-icon>
+            <span>Cambiar imagen</span>
+          </div>
+        </div>
+
+        <ion-card-header>
+          <ion-card-title class="brand-name">{{ brand.name }}</ion-card-title>
+          <ion-card-subtitle>{{ brand.countryOrigin || 'País no especificado' }}</ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p class="brand-description">{{ getTruncatedDescription(brand.description, 120) }}</p>
+          
+          <div class="brand-meta">
+            <div class="meta-item">
+              <span class="label">Perfumes:</span>
+              <span class="value">{{ brand.totalPerfumes || 0 }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="label">Estado:</span>
+              <span class="value">{{ getModerationStatusText(brand.moderationStatus) }}</span>
+            </div>
+            <div class="meta-item" *ngIf="brand.createdAt">
+              <span class="label">Creada:</span>
+              <span class="value">{{ brand.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+
+        <div class="card-actions">
+          <ion-button fill="clear" color="primary" (click)="editBrand(brand)">
+            <ion-icon name="create" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+          <ion-button fill="clear" color="secondary" (click)="viewBrandPerfumes(brand)">
+            <ion-icon name="eye" slot="start"></ion-icon>
+            Ver
+          </ion-button>
+          <ion-button fill="clear" color="danger" (click)="deleteBrand(brand.id!)">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="getFilteredBrands().length === 0" class="empty-state">
+      <ion-icon name="business-outline"></ion-icon>
+      <h3>No hay marcas</h3>
+      <p>¡Crea tu primera marca para comenzar!</p>
+    </div>
+  </div>
+
+  <!-- Categories Tab -->
+  <div *ngIf="activeTab === 'categories'" class="tab-content">
+    <div class="tab-header">
+      <h2>Categorías</h2>
+      <div class="header-actions">
+        <ion-button (click)="openCreateCategory()" color="tertiary">
+          <ion-icon slot="start" name="add"></ion-icon>
+          Nueva Categoría
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Categories List -->
+    <div class="categories-list">
+      <ion-card *ngFor="let category of categories" class="category-card">
+        <div class="category-image-container">
+          <img 
+            [src]="getCategoryImage(category)" 
+            [alt]="category.name"
+            class="category-image"
+            (error)="onCategoryImageError(category)">
+          
+          <div class="image-upload-overlay" (click)="openCategoryImageUpload(category)">
+            <ion-icon name="camera"></ion-icon>
+            <span>Cambiar imagen</span>
+          </div>
+        </div>
+
+        <ion-card-header>
+          <ion-card-title class="category-name">{{ category.name }}</ion-card-title>
+        </ion-card-header>
+        
+        <ion-card-content>
+          <p class="category-description">{{ category.description }}</p>
+          
+          <div class="category-meta">
+            <div class="meta-item">
+              <span class="label">Estado:</span>
+              <span class="value">{{ getModerationStatusText(category.moderationStatus) }}</span>
+            </div>
+            <div class="meta-item" *ngIf="category.createdAt">
+              <span class="label">Creada:</span>
+              <span class="value">{{ category.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+
+          <div class="category-actions">
+            <ion-button fill="clear" color="primary" (click)="editCategory(category)">
+              <ion-icon name="create" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+            <ion-button fill="clear" color="danger" (click)="deleteCategory(category.id!)">
+              <ion-icon name="trash" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="categories.length === 0" class="empty-state">
+      <ion-icon name="list-outline"></ion-icon>
+      <h3>No hay categorías</h3>
+      <p>¡Crea tu primera categoría!</p>
+    </div>
+  </div>
 </ion-content>
 
-<!-- Stepper Component Overlay -->
-<app-stepper></app-stepper>
+<!-- Modal para crear/editar marca -->
+<ion-modal [isOpen]="isCreateBrandModalOpen" (didDismiss)="closeCreateBrandModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ editingBrand ? 'Editar Marca' : 'Crear Nueva Marca' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeCreateBrandModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <!-- Image Upload Section -->
+      <div class="image-upload-section" *ngIf="!editingBrand">
+        <div class="upload-area" (click)="fileInputBrand.click()" [class.has-image]="newBrand.imageUrl">
+          <div *ngIf="!newBrand.imageUrl" class="upload-placeholder">
+            <ion-icon name="camera"></ion-icon>
+            <p>Agregar imagen de la marca</p>
+            <span>Haz clic para seleccionar una imagen</span>
+          </div>
+          <div *ngIf="newBrand.imageUrl" class="image-preview">
+            <img [src]="newBrand.imageUrl" alt="Preview">
+            <div class="image-overlay">
+              <ion-icon name="camera"></ion-icon>
+              <span>Cambiar imagen</span>
+            </div>
+          </div>
+          <input #fileInputBrand type="file" accept="image/*" (change)="onBrandImageSelected($event)" hidden>
+        </div>
+      </div>
 
+      <ion-item>
+        <ion-label position="stacked">Nombre de la Marca *</ion-label>
+        <ion-input 
+          type="text" 
+          [(ngModel)]="newBrand.name"
+          placeholder="Ej: Chanel">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Descripción *</ion-label>
+        <ion-textarea 
+          [(ngModel)]="newBrand.description"
+          placeholder="Descripción de la marca"
+          rows="4">
+        </ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">País de Origen</ion-label>
+        <ion-input 
+          type="text" 
+          [(ngModel)]="newBrand.countryOrigin"
+          placeholder="Ej: Francia">
+        </ion-input>
+      </ion-item>
+
+      <div class="modal-actions">
+        <ion-button expand="block" (click)="editingBrand ? updateBrand() : createBrand()" [disabled]="!isValidBrand()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          {{ editingBrand ? 'Actualizar Marca' : 'Crear Marca' }}
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para crear/editar categoría -->
+<ion-modal [isOpen]="isCreateCategoryModalOpen" (didDismiss)="closeCreateCategoryModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ editingCategory ? 'Editar Categoría' : 'Crear Nueva Categoría' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeCreateCategoryModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <!-- Image Upload Section -->
+      <div class="image-upload-section" *ngIf="!editingCategory">
+        <div class="upload-area" (click)="fileInputCategory.click()" [class.has-image]="newCategory.imageUrl">
+          <div *ngIf="!newCategory.imageUrl" class="upload-placeholder">
+            <ion-icon name="image"></ion-icon>
+            <p>Agregar imagen de la categoría</p>
+            <span>Haz clic para seleccionar una imagen</span>
+          </div>
+          <div *ngIf="newCategory.imageUrl" class="image-preview">
+            <img [src]="newCategory.imageUrl" alt="Preview">
+            <div class="image-overlay">
+              <ion-icon name="camera"></ion-icon>
+              <span>Cambiar imagen</span>
+            </div>
+          </div>
+          <input #fileInputCategory type="file" accept="image/*" (change)="onCategoryImageSelected($event)" hidden>
+        </div>
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Nombre de la Categoría *</ion-label>
+        <ion-input 
+          type="text" 
+          [(ngModel)]="newCategory.name"
+          placeholder="Ej: Fragancias Florales">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Descripción *</ion-label>
+        <ion-textarea 
+          [(ngModel)]="newCategory.description"
+          placeholder="Descripción de la categoría"
+          rows="4">
+        </ion-textarea>
+      </ion-item>
+
+      <div class="modal-actions">
+        <ion-button expand="block" (click)="editingCategory ? updateCategory() : createCategory()" [disabled]="!isValidCategory()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          {{ editingCategory ? 'Actualizar Categoría' : 'Crear Categoría' }}
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para subir imagen de marca -->
+<ion-modal [isOpen]="isBrandImageModalOpen" (didDismiss)="closeBrandImageModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Cambiar imagen de {{ selectedBrand?.name }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeBrandImageModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <div class="image-upload-section">
+        <div class="current-image" *ngIf="selectedBrand?.imageUrl">
+          <p>Imagen actual:</p>
+          <img [src]="getBrandImage(selectedBrand!)" [alt]="selectedBrand?.name" class="current-image-preview">
+        </div>
+        
+        <div class="upload-area" (click)="fileInputBrandUpload.click()" [class.has-image]="brandImagePreview">
+          <div *ngIf="!brandImagePreview" class="upload-placeholder">
+            <ion-icon name="camera"></ion-icon>
+            <p>Seleccionar nueva imagen</p>
+            <span>Haz clic para seleccionar una imagen</span>
+          </div>
+          <div *ngIf="brandImagePreview" class="image-preview">
+            <img [src]="brandImagePreview" alt="Preview">
+            <div class="image-overlay">
+              <ion-icon name="camera"></ion-icon>
+              <span>Cambiar imagen</span>
+            </div>
+          </div>
+          <input #fileInputBrandUpload type="file" accept="image/*" (change)="onBrandImageUploadSelected($event)" hidden>
+        </div>
+
+        <div class="upload-info">
+          <p><strong>Recomendaciones:</strong></p>
+          <ul>
+            <li>Formato: JPG, PNG, WebP</li>
+            <li>Tamaño máximo: 5MB</li>
+            <li>Resolución recomendada: 500x500px</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <ion-button expand="block" (click)="uploadBrandImage()" [disabled]="!selectedBrandImage" color="primary">
+          <ion-icon slot="start" name="cloud-upload"></ion-icon>
+          Subir Imagen
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="closeBrandImageModal()" color="medium">
+          Cancelar
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para subir imagen de categoría -->
+<ion-modal [isOpen]="isCategoryImageModalOpen" (didDismiss)="closeCategoryImageModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Cambiar imagen de {{ selectedCategory?.name }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeCategoryImageModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <div class="image-upload-section">
+        <div class="current-image" *ngIf="selectedCategory?.imageUrl">
+          <p>Imagen actual:</p>
+          <img [src]="getCategoryImage(selectedCategory!)" [alt]="selectedCategory?.name" class="current-image-preview">
+        </div>
+        
+        <div class="upload-area" (click)="fileInputCategoryUpload.click()" [class.has-image]="categoryImagePreview">
+          <div *ngIf="!categoryImagePreview" class="upload-placeholder">
+            <ion-icon name="image"></ion-icon>
+            <p>Seleccionar nueva imagen</p>
+            <span>Haz clic para seleccionar una imagen</span>
+          </div>
+          <div *ngIf="categoryImagePreview" class="image-preview">
+            <img [src]="categoryImagePreview" alt="Preview">
+            <div class="image-overlay">
+              <ion-icon name="camera"></ion-icon>
+              <span>Cambiar imagen</span>
+            </div>
+          </div>
+          <input #fileInputCategoryUpload type="file" accept="image/*" (change)="onCategoryImageUploadSelected($event)" hidden>
+        </div>
+
+        <div class="upload-info">
+          <p><strong>Recomendaciones:</strong></p>
+          <ul>
+            <li>Formato: JPG, PNG, WebP</li>
+            <li>Tamaño máximo: 5MB</li>
+            <li>Resolución recomendada: 400x400px</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <ion-button expand="block" (click)="uploadCategoryImage()" [disabled]="!selectedCategoryImage" color="primary">
+          <ion-icon slot="start" name="cloud-upload"></ion-icon>
+          Subir Imagen
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="closeCategoryImageModal()" color="medium">
+          Cancelar
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<app-stepper></app-stepper>
 <app-footer></app-footer>
