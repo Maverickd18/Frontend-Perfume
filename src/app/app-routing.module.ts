@@ -14,6 +14,7 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule)
   },
+
   {
     path: 'register',
     loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule)
@@ -44,6 +45,7 @@ const routes: Routes = [
     path: 'forgot-password',
     loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
   },
+<<<<<<< HEAD
   {
     path: 'profile-seller',
     loadChildren: () => import('./pages/profile-seller/profile-seller.module').then(m => m.ProfileSellerPageModule),
@@ -64,6 +66,9 @@ const routes: Routes = [
     loadChildren: () => import('./pages/product-detail/product-detail.module').then(m => m.ProductDetailPageModule),
     canActivate: [AuthGuard]
   }
+=======
+
+>>>>>>> 0753791a7806ce6872ea4c24f76f2f923f17145e
 ];
 
 @NgModule({

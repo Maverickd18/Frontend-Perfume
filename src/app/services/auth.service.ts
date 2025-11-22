@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface LoginRequest {
@@ -16,17 +16,28 @@ export interface RegisterRequest {
   role?: string;
 }
 
-// Interface CORREGIDA basada en la respuesta REAL de tu backend
 export interface AuthResponse {
   token: string;
-  usuario: {  // ← Cambiado de 'user' a 'usuario'
+  usuario: {
     id: number;
-    nombre: string;      // ← Cambiado de 'name' a 'nombre'
-    apellido: string;    // ← Cambiado de 'lastName' a 'apellido'
+    nombre: string;
+    apellido: string;
     email: string;
-    rol: string;         // ← Cambiado de 'role' a 'rol'
+    rol: string;
     username: string;
     active: boolean;
+  };
+}
+
+export interface RegisterResponse {
+  status: string;
+  message: string;
+  data: {
+    id: number;
+    email: string;
+    name: string;
+    lastName: string;
+    role: string;
   };
 }
 
@@ -72,39 +83,56 @@ export class AuthService {
             console.log('Token guardado:', response.token);
             console.log('User data mapeado y guardado:', userData);
           }
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error en login:', error);
+          let errorMessage = 'Error en el inicio de sesión';
+          
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 401) {
+            errorMessage = 'Credenciales inválidas';
+          } else if (error.status === 403) {
+            errorMessage = 'Acceso denegado';
+          }
+          
+          return throwError(() => new Error(errorMessage));
         })
       );
   }
 
-  register(registerData: RegisterRequest): Observable<AuthResponse> {
-    // Asegurar que el role esté en mayúsculas como espera el backend
+  register(registerData: RegisterRequest): Observable<RegisterResponse> {
+    // Datos sin username - el backend generará el username automáticamente
     const dataToSend = {
-      ...registerData,
+      name: registerData.name,
+      lastName: registerData.lastName,
+      email: registerData.email,
+      password: registerData.password,
       role: registerData.role?.toUpperCase() || 'CLIENTE'
     };
     
-    console.log('Enviando datos de registro:', dataToSend);
+    console.log('Enviando datos de registro SIN username:', dataToSend);
     
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, dataToSend)
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, dataToSend)
       .pipe(
         tap(response => {
-          console.log('Respuesta REAL del registro:', response);
+          console.log('Respuesta del registro:', response);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error en registro:', error);
+          let errorMessage = 'Error en el registro';
           
-          // Mapear la respuesta del backend (español) a nuestra interfaz (inglés)
-          if (response.token && response.usuario) {
-            const userData: User = {
-              id: response.usuario.id,
-              name: response.usuario.nombre,
-              lastName: response.usuario.apellido,
-              email: response.usuario.email,
-              role: response.usuario.rol,
-              username: response.usuario.username,
-              active: response.usuario.active
-            };
-            
-            localStorage.setItem('authToken', response.token);
-            localStorage.setItem('userData', JSON.stringify(userData));
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 400) {
+            errorMessage = 'Datos inválidos';
+          } else if (error.status === 403) {
+            errorMessage = 'Acceso denegado';
+          } else if (error.status === 409) {
+            errorMessage = 'El email ya está registrado';
           }
+          
+          return throwError(() => new Error(errorMessage));
         })
       );
   }
@@ -112,6 +140,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
+    console.log('Usuario cerró sesión');
   }
 
   getToken(): string | null {
@@ -124,7 +153,8 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token;
   }
 
   isSeller(): boolean {
@@ -145,4 +175,43 @@ export class AuthService {
   getCurrentUser(): User | null {
     return this.getUserData();
   }
+<<<<<<< HEAD
 }
+=======
+
+  // Método para verificar el token de verificación
+  verifyAccount(token: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/verify?token=${token}`)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error verificando cuenta:', error);
+          let errorMessage = 'Error verificando la cuenta';
+          
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          }
+          
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
+  // Método para reenviar email de verificación
+  resendVerificationEmail(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/resend-verification`, null, {
+      params: { email }
+    }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error reenviando verificación:', error);
+        let errorMessage = 'Error reenviando email de verificación';
+        
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        }
+        
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+}
+>>>>>>> 0753791a7806ce6872ea4c24f76f2f923f17145e

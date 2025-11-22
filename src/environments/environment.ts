@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://tienda-de-perfumes-9t9e.onrender.com',
+  apiUrl: 'https://tienda-de-perfumes-2.onrender.com',
 };
 /*
  * For easier debugging in development mode, you can import the following file

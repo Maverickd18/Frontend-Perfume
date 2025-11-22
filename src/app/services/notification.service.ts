@@ -16,26 +16,7 @@ export interface Notification {
   providedIn: 'root'
 })
 export class NotificationService {
-  private notifications: Notification[] = [
-    {
-      id: 1,
-      tipo: 'interes',
-      cliente: 'Juan Pérez',
-      producto: 'Rose Perfume Premium',
-      mensaje: 'El cliente mostró interés en tu producto',
-      fecha: new Date(),
-      leida: false
-    },
-    {
-      id: 2,
-      tipo: 'compra',
-      cliente: 'María García',
-      producto: 'Lavender Dream',
-      mensaje: 'El cliente realizó una compra',
-      fecha: new Date(Date.now() - 3600000),
-      leida: true
-    }
-  ];
+  private notifications: Notification[] = [];
 
   private notificationsSubject = new BehaviorSubject<Notification[]>(this.notifications);
   public notifications$ = this.notificationsSubject.asObservable();

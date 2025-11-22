@@ -171,54 +171,61 @@
       </div>
 
       <!-- STEP 3: Category Selection -->
-      <div class="step-content" *ngIf="state.currentStep === 3">
-        <h3>Selección de Categoría</h3>
-        <p class="step-description">Elige una categoría existente o crea una nueva</p>
+<div class="step-content" *ngIf="state.currentStep === 3">
+  <h3>Selección de Categoría</h3>
+  <p class="step-description">Elige una categoría existente o crea una nueva</p>
 
-        <!-- Option to use existing category -->
-        <ion-item class="ion-margin-bottom">
-          <ion-checkbox slot="start" [(ngModel)]="useExistingCategory"></ion-checkbox>
-          <ion-label>Usar categoría existente</ion-label>
-        </ion-item>
+  <!-- Option to use existing category -->
+  <ion-item class="ion-margin-bottom">
+    <ion-checkbox slot="start" [(ngModel)]="useExistingCategory"></ion-checkbox>
+    <ion-label>Usar categoría existente</ion-label>
+  </ion-item>
 
-        <!-- Existing categories dropdown -->
-        <div *ngIf="useExistingCategory" class="ion-margin-bottom">
-          <ion-item [class.error]="!state.selectedCategory && useExistingCategory">
-            <ion-label position="stacked">Seleccionar Categoría *</ion-label>
-            <ion-select 
-              [(ngModel)]="state.selectedCategory"
-              (ionChange)="selectCategory($event.detail.value)"
-              placeholder="Selecciona una categoría">
-              <ion-select-option *ngFor="let category of state.categories" [value]="category.id">
-                {{ category.name }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-        </div>
+  <!-- Existing categories dropdown -->
+  <div *ngIf="useExistingCategory" class="ion-margin-bottom">
+    <ion-item [class.error]="!state.selectedCategory && useExistingCategory">
+      <ion-label position="stacked">Seleccionar Categoría *</ion-label>
+      <ion-select 
+        [(ngModel)]="state.selectedCategory"
+        (ionChange)="selectCategory($event.detail.value)"
+        placeholder="Selecciona una categoría">
+        <ion-select-option *ngFor="let category of state.categories" [value]="category.id">
+          {{ category.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
 
-        <!-- New category form -->
-        <div *ngIf="!useExistingCategory">
-          <ion-item class="ion-margin-bottom" [class.error]="!newCategoryName.trim() && newCategoryName !== ''">
-            <ion-label position="stacked">Nombre de Categoría *</ion-label>
-            <ion-input 
-              [(ngModel)]="newCategoryName"
-              placeholder="Ej: Fragancias Premium"
-              required>
-            </ion-input>
-          </ion-item>
+  <!-- New category form -->
+  <div *ngIf="!useExistingCategory">
+    <ion-item class="ion-margin-bottom" [class.error]="!newCategoryName.trim() && newCategoryName !== ''">
+      <ion-label position="stacked">Nombre de Categoría *</ion-label>
+      <ion-input 
+        [(ngModel)]="newCategoryName"
+        placeholder="Ej: Fragancias Premium"
+        required>
+      </ion-input>
+    </ion-item>
 
-          <ion-item class="ion-margin-bottom" [class.error]="!newCategoryDescription.trim() && newCategoryDescription !== ''">
-            <ion-label position="stacked">Descripción *</ion-label>
-            <ion-textarea 
-              [(ngModel)]="newCategoryDescription"
-              placeholder="Ej: Colección de perfumes de lujo"
-              rows="3"
-              required>
-            </ion-textarea>
-          </ion-item>
-        </div>
-      </div>
+    <ion-item class="ion-margin-bottom" [class.error]="!newCategoryDescription.trim() && newCategoryDescription !== ''">
+      <ion-label position="stacked">Descripción *</ion-label>
+      <ion-textarea 
+        [(ngModel)]="newCategoryDescription"
+        placeholder="Ej: Colección de perfumes de lujo"
+        rows="3"
+        required>
+      </ion-textarea>
+    </ion-item>
 
+    <!-- Category Image Upload (Opcional) -->
+    <div class="image-upload-section">
+      <label class="section-label">Imagen de Categoría (Opcional)</label>
+      <app-image-upload
+        (imageUploaded)="onCategoryImageUploaded($event)">
+      </app-image-upload>
+    </div>
+  </div>
+</div>
       <!-- STEP 4: Brand Selection/Creation -->
       <div class="step-content" *ngIf="state.currentStep === 4">
         <h3>Selección de Marca</h3>
@@ -283,6 +290,7 @@
       <ion-button 
         *ngIf="state.currentStep > 1"
         fill="outline"
+        class="btn-previous"
         (click)="previousStep()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         Anterior
@@ -292,7 +300,7 @@
 
       <ion-button 
         fill="outline"
-        color="medium"
+        class="btn-cancel"
         (click)="closeStepper()">
         Cancelar
       </ion-button>
@@ -300,6 +308,7 @@
       <ion-button 
         *ngIf="state.currentStep < 4"
         [disabled]="!validateCurrentStep()"
+        class="btn-next"
         (click)="nextStep()">
         Siguiente
         <ion-icon slot="end" name="chevron-forward"></ion-icon>
@@ -308,6 +317,7 @@
       <ion-button 
         *ngIf="state.currentStep === 4"
         [disabled]="!validateCurrentStep() || isLoading"
+        class="btn-create"
         (click)="savePerfume()">
         <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
         <ion-icon *ngIf="!isLoading" slot="start" name="checkmark"></ion-icon>
