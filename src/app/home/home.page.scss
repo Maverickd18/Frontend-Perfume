@@ -1,3 +1,234 @@
+// Estilos para la barra de búsqueda personalizada
+.custom-searchbar {
+  .searchbar-input-container {
+    input {
+      background: #f5f5f5 !important;
+      border-radius: 20px !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+  }
+}
+
+// Estilos para las tarjetas de producto
+.product-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.product-brand {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.product-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-size {
+  font-size: 12px;
+  color: #888;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.product-category {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.product-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.product-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+.add-to-cart-btn {
+  --background: #000000;
+  --background-hover: #333333;
+  --background-activated: #555555;
+  --color: #ffffff;
+  margin: 0;
+}
+
+// Grid responsivo
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 12px;
+}
+
+.col {
+  display: block;
+}
+
+// Estados de carga y error mejorados
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  text-align: center;
+  
+  ion-spinner {
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    margin: 0;
+    color: #666;
+  }
+}
+
+.error-container {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 1rem;
+    color: #ff6b6b;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 18px;
+  }
+
+  p {
+    margin: 0 0 1.5rem 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .retry-button {
+    padding: 0.75rem 1.5rem;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #333333;
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #666;
+
+  ion-icon {
+    font-size: 80px;
+    margin-bottom: 1rem;
+    color: #ddd;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    padding: 8px;
+  }
+  
+  .product-image {
+    height: 180px;
+  }
+  
+  .custom-searchbar {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .custom-searchbar {
+    max-width: 150px;
+  }
+  
+  .icon-button {
+    width: 36px;
+    height: 36px;
+    
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+// Incluir todos los estilos anteriores de filtros
 .perfume-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -6,7 +237,7 @@
 }
 
 .floating-filter-button {
-  position: absolute;
+  position: fixed;
   top: 1rem;
   right: 1rem;
   width: 48px;
@@ -23,12 +254,9 @@
   transition: all 0.2s ease;
   z-index: 50;
 
-  svg {
-    width: 24px;
-    height: 24px;
-    stroke: #ffffff;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  ion-icon {
+    font-size: 24px;
+    color: #ffffff;
   }
 
   &:hover {
@@ -105,12 +333,9 @@
       justify-content: center;
       transition: all 0.2s ease;
 
-      svg {
-        width: 24px;
-        height: 24px;
-        stroke: #000000;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+      ion-icon {
+        font-size: 24px;
+        color: #000000;
       }
 
       &:hover {
@@ -199,6 +424,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #000000;
+  text-align: center;
 }
 
 .range-input {
@@ -289,18 +515,15 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
-  svg {
-    width: 18px;
-    height: 18px;
+  ion-icon {
+    font-size: 18px;
     color: #000000;
-    stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
   &:hover {
     background: #000000;
 
-    svg {
+    ion-icon {
       color: #ffffff;
     }
   }
@@ -329,10 +552,11 @@
   .floating-filter-button {
     width: 44px;
     height: 44px;
+    top: 0.5rem;
+    right: 0.5rem;
 
-    svg {
-      width: 20px;
-      height: 20px;
+    ion-icon {
+      font-size: 20px;
     }
   }
 
@@ -340,9 +564,8 @@
     width: 36px;
     height: 36px;
 
-    svg {
-      width: 16px;
-      height: 16px;
+    ion-icon {
+      font-size: 16px;
     }
   }
 }

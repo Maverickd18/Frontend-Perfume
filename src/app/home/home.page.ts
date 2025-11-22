@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
-import { ProductService } from '../services/product.service';
+import { ProductService, Perfume, Brand, Category } from '../services/product.service';
 import { CartService } from '../services/cart.service';
 
 @Component({
@@ -10,13 +10,20 @@ import { CartService } from '../services/cart.service';
   standalone: false,
 })
 export class HomePage implements OnInit {
-  allProducts: any[] = [];
-  products: any[] = [];
+  allProducts: Perfume[] = [];
+  products: Perfume[] = [];
+  brands: Brand[] = [];
+  categories: Category[] = [];
+  
   showFilters: boolean = false;
   filterCategory: string[] = [];
   filterBrand: string[] = [];
   filterSize: string[] = [];
-  filterPriceRange: number[] = [0, 100];
+  filterPriceRange: number[] = [0, 500];
+
+  isLoading = false;
+  searchQuery: string = '';
+  errorMessage: string = '';
 
   constructor(
     private navCtrl: NavController,
@@ -25,79 +32,86 @@ export class HomePage implements OnInit {
     private alertCtrl: AlertController
   ) {}
 
-  ngOnInit() {
-    this.loadProducts();
-    this.addTestProduct();
+  async ngOnInit() {
+    await this.loadInitialData();
   }
 
-  private loadProducts() {
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.allProducts = products;
-        this.products = [...this.allProducts];
-      },
-      error: (err) => {
-        console.error('Error loading products:', err);
-      }
-    });
+  async loadInitialData() {
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    try {
+      console.log('Cargando datos iniciales...');
+      
+      // Cargar productos
+      const products = await this.productService.getProducts().toPromise();
+      this.allProducts = products || [];
+      this.products = [...this.allProducts];
+      console.log('Productos cargados:', this.allProducts.length);
+
+      // Cargar marcas para filtros
+      const brands = await this.productService.getBrands().toPromise();
+      this.brands = brands || [];
+      console.log('Marcas cargadas:', this.brands.length);
+
+      // Cargar categorías para filtros
+      const categories = await this.productService.getCategories().toPromise();
+      this.categories = categories || [];
+      console.log('Categorías cargadas:', this.categories.length);
+
+    } catch (error: any) {
+      console.error('Error loading initial data:', error);
+      this.errorMessage = error.message || 'Error al cargar los datos';
+      this.showErrorAlert(this.errorMessage);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
-  private addTestProduct() {
-    const testProduct = {
-      id: 999,
-      title: 'Eau de Parfum Floral',
-      description: 'Perfume floral con notas de rosa y jazmín',
-      image: 'https://via.placeholder.com/200x200?text=Perfume',
-      price: 59.99,
-      size: '100ml',
-      stock: 15,
-      brand: 'Chanel',
-      category: 'floral'
-    };
-    this.allProducts.unshift(testProduct);
-    this.products.unshift(testProduct);
+  // ========== MÉTODOS DE BÚSQUEDA ==========
+
+  onSearchChange(event: any) {
+    const query = event.detail.value?.toLowerCase().trim() || '';
+    this.searchQuery = query;
+    this.applyFilters();
   }
 
-  get brands(): string[] {
-    const set = new Set<string>();
-    this.allProducts.forEach((p: any) => p.brand && set.add(p.brand));
-    return Array.from(set);
-  }
+  // ========== MÉTODOS DE FILTROS ==========
 
   toggleFilters() {
     this.showFilters = !this.showFilters;
   }
 
   onFilterChange() {
-    // Empty for now
+    this.applyFilters();
   }
 
-  toggleFilterCategory(value: string) {
-    const index = this.filterCategory.indexOf(value);
+  toggleFilterCategory(categoryName: string) {
+    const index = this.filterCategory.indexOf(categoryName);
     if (index > -1) {
       this.filterCategory.splice(index, 1);
     } else {
-      this.filterCategory.push(value);
+      this.filterCategory.push(categoryName);
     }
     this.onFilterChange();
   }
 
-  toggleFilterBrand(value: string) {
-    const index = this.filterBrand.indexOf(value);
+  toggleFilterBrand(brandName: string) {
+    const index = this.filterBrand.indexOf(brandName);
     if (index > -1) {
       this.filterBrand.splice(index, 1);
     } else {
-      this.filterBrand.push(value);
+      this.filterBrand.push(brandName);
     }
     this.onFilterChange();
   }
 
-  toggleFilterSize(value: string) {
-    const index = this.filterSize.indexOf(value);
+  toggleFilterSize(size: string) {
+    const index = this.filterSize.indexOf(size);
     if (index > -1) {
       this.filterSize.splice(index, 1);
     } else {
-      this.filterSize.push(value);
+      this.filterSize.push(size);
     }
     this.onFilterChange();
   }
@@ -106,20 +120,41 @@ export class HomePage implements OnInit {
     this.filterCategory = [];
     this.filterBrand = [];
     this.filterSize = [];
-    this.filterPriceRange = [0, 100];
-    this.onFilterChange();
+    this.filterPriceRange = [0, 500];
+    this.searchQuery = '';
+    this.products = [...this.allProducts];
+    this.showFilters = false;
   }
 
   applyFilters() {
-    this.onFiltersChange({
-      text: '',
-      category: this.filterCategory,
-      brand: this.filterBrand,
-      size: this.filterSize,
-      priceRange: this.filterPriceRange
+    const text = this.searchQuery.toLowerCase().trim();
+    const categories = this.filterCategory;
+    const sizes = this.filterSize;
+    const brands = this.filterBrand;
+    const priceRange = this.filterPriceRange;
+    const min = priceRange[0] ?? 0;
+    const max = priceRange[1] ?? 500;
+
+    this.products = this.allProducts.filter((p: Perfume) => {
+      const matchesText = !text || 
+        (p.name + ' ' + p.description + ' ' + p.brandName).toLowerCase().includes(text);
+      
+      const matchesCategory = categories.length === 0 || 
+        (p.categoryName && categories.includes(p.categoryName));
+      
+      const matchesSize = sizes.length === 0 || 
+        sizes.includes(p.sizeMl + 'ml');
+      
+      const matchesBrand = brands.length === 0 || 
+        (p.brandName && brands.includes(p.brandName));
+      
+      const matchesPrice = (p.price ?? 0) >= min && (p.price ?? 0) <= max;
+      
+      return matchesText && matchesCategory && matchesSize && matchesBrand && matchesPrice;
     });
-    this.showFilters = false;
   }
+
+  // ========== MÉTODOS DE NAVEGACIÓN ==========
 
   goProfile() {
     this.navCtrl.navigateForward('/profile-client');
@@ -130,54 +165,47 @@ export class HomePage implements OnInit {
   }
 
   logout() {
-    alert('Sesión cerrada');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
     this.navCtrl.navigateRoot('/login');
   }
 
-  goHome() {
-    this.navCtrl.navigateRoot('/home');
-  }
-
-  onView(p: any) {
+  onView(product: Perfume) {
     this.navCtrl.navigateForward('/product-detail', {
-      state: { product: p }
+      state: { product }
     });
   }
 
-  onFiltersChange(filters: any) {
-    const text = (filters?.text || '').toLowerCase().trim();
-    const categories = filters?.category || [];
-    const sizes = filters?.size || [];
-    const brands = filters?.brand || [];
-    const priceRange = filters?.priceRange || [0, Infinity];
-    const min = priceRange[0] ?? 0;
-    const max = priceRange[1] ?? Infinity;
-
-    this.products = this.allProducts.filter((p: any) => {
-      const matchesText = !text || (p.title + ' ' + p.description).toLowerCase().includes(text);
-      const matchesCategory = categories.length === 0 || categories.includes(p.category);
-      const matchesSize = sizes.length === 0 || sizes.includes(p.size);
-      const matchesBrand = brands.length === 0 || brands.includes(p.brand);
-      const matchesPrice = (p.price ?? 0) >= min && (p.price ?? 0) <= max;
-      return matchesText && matchesCategory && matchesSize && matchesBrand && matchesPrice;
-    });
+  addToCart(product: Perfume) {
+    if (product.stock > 0) {
+      this.cartService.addToCart({
+        id: product.id,
+        title: product.name,
+        description: product.description,
+        price: product.price,
+        image: product.imageUrl,
+        size: product.sizeMl + 'ml',
+        brand: product.brandName,
+        category: product.categoryName,
+        stock: product.stock
+      }, 1);
+      
+      this.showAddToCartAlert(product.name);
+    } else {
+      this.showErrorAlert('Este producto no está disponible en stock');
+    }
   }
 
-  addToCart(product: any) {
-    this.cartService.addToCart(product, 1);
-    this.showAddToCartAlert(product.title);
-  }
+  // ========== MÉTODOS DE ALERTA ==========
 
   private async showAddToCartAlert(productName: string) {
     const alert = await this.alertCtrl.create({
       header: 'Producto Agregado',
-      message: `${productName} ha sido agregado a tu carrito`,
+      message: productName + ' ha sido agregado a tu carrito',
       buttons: [
         {
           text: 'Continuar Comprando',
-          handler: () => {
-            // Close alert and stay on page
-          }
+          role: 'cancel'
         },
         {
           text: 'Ir al Carrito',
@@ -188,5 +216,62 @@ export class HomePage implements OnInit {
       ]
     });
     await alert.present();
+  }
+
+  private async showErrorAlert(message: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message: message,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
+  // ========== GETTERS PARA FILTROS ==========
+
+  get availableSizes(): string[] {
+    const sizes = new Set<string>();
+    this.allProducts.forEach(p => {
+      sizes.add(p.sizeMl + 'ml');
+    });
+    return Array.from(sizes).sort((a, b) => {
+      const sizeA = parseInt(a.replace('ml', ''));
+      const sizeB = parseInt(b.replace('ml', ''));
+      return sizeA - sizeB;
+    });
+  }
+
+  get availableBrands(): string[] {
+    const brands = new Set<string>();
+    this.allProducts.forEach(p => {
+      if (p.brandName) {
+        brands.add(p.brandName);
+      }
+    });
+    return Array.from(brands).sort();
+  }
+
+  get availableCategories(): string[] {
+    const categories = new Set<string>();
+    this.allProducts.forEach(p => {
+      if (p.categoryName) {
+        categories.add(p.categoryName);
+      }
+    });
+    return Array.from(categories).sort();
+  }
+
+  // ========== MÉTODOS PARA TEMPLATE ==========
+
+  get filteredProductsCount(): number {
+    return this.products.length;
+  }
+
+  get totalProductsCount(): number {
+    return this.allProducts.length;
+  }
+
+  get hasError(): boolean {
+    return !!this.errorMessage;
   }
 }

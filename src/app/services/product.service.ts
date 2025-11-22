@@ -1,222 +1,166 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, map, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+
+const API_URL = environment.apiUrl + '/api';
+
+export interface Perfume {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  sizeMl: number;
+  genre: string;
+  releaseDate: string;
+  imageUrl?: string;
+  brandName?: string;
+  categoryName?: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  description: string;
+  countryOrigin?: string;
+  imageUrl?: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+  imageUrl?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private baseUrl = `${environment.apiUrl}/api/products`;
-  private products$ = new BehaviorSubject<any[]>([]);
 
-  constructor(private http: HttpClient) {
-    this.loadProductsFromServer();
+  constructor(private http: HttpClient) { }
+
+  // ========== PERFUMES PÚBLICOS ==========
+  
+  getProducts(page: number = 0, size: number = 20, filtro?: string): Observable<Perfume[]> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (filtro) {
+      params = params.set('filtro', filtro);
+    }
+
+    return this.http.get<any>(`${API_URL}/perfumes`, { params })
+      .pipe(
+        map(response => {
+          console.log('API Response:', response);
+          if (response && response.data) {
+            return response.data.map((perfume: any) => this.mapPerfumeToFrontend(perfume));
+          }
+          return [];
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  private loadProductsFromServer() {
-    this.http.get<any[]>(this.baseUrl).pipe(
-      catchError(() => {
-        return of(this.getMockProducts());
-      }),
-      tap(products => this.products$.next(products))
-    ).subscribe();
+  getProductById(id: number): Observable<Perfume> {
+    return this.http.get<any>(`${API_URL}/perfumes/public/${id}`)
+      .pipe(
+        map(response => {
+          if (response && response.data) {
+            return this.mapPerfumeToFrontend(response.data);
+          }
+          throw new Error('Product not found');
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  getProducts(): Observable<any[]> {
-    return this.products$.asObservable();
+  // ========== MARCAS PÚBLICAS ==========
+  
+  getBrands(): Observable<Brand[]> {
+    return this.http.get<any>(`${API_URL}/brands/public`)
+      .pipe(
+        map(response => response?.data || []),
+        catchError(this.handleError)
+      );
   }
 
-  getProductById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${id}`).pipe(
-      catchError(() => {
-        const product = this.products$.value.find(p => p.id === id);
-        return of(product);
-      })
-    );
+  getBrandById(id: number): Observable<Brand> {
+    return this.http.get<any>(`${API_URL}/brands/public/${id}`)
+      .pipe(
+        map(response => response?.data),
+        catchError(this.handleError)
+      );
   }
 
-  searchProducts(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/search?q=${query}`).pipe(
-      catchError(() => {
-        const lowerQuery = query.toLowerCase();
-        const filtered = this.products$.value.filter(p =>
-          p.title.toLowerCase().includes(lowerQuery) ||
-          p.description.toLowerCase().includes(lowerQuery)
-        );
-        return of(filtered);
-      })
-    );
+  getBrandPerfumes(brandId: number): Observable<Perfume[]> {
+    return this.http.get<any>(`${API_URL}/brands/public/${brandId}/perfumes`)
+      .pipe(
+        map(response => {
+          if (response && response.data) {
+            return response.data.map((perfume: any) => this.mapPerfumeToFrontend(perfume));
+          }
+          return [];
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  filterProducts(filters: any): Observable<any[]> {
-    return new Observable(observer => {
-      let filtered = [...this.products$.value];
+  // ========== CATEGORÍAS PÚBLICAS ==========
+  
+  getCategories(): Observable<Category[]> {
+    return this.http.get<any>(`${API_URL}/categories/public`)
+      .pipe(
+        map(response => response?.data || []),
+        catchError(this.handleError)
+      );
+  }
 
-      if (filters.category && filters.category.length > 0) {
-        filtered = filtered.filter(p => filters.category.includes(p.category));
+  // ========== BÚSQUEDA AVANZADA ==========
+  
+  searchProducts(query: string): Observable<Perfume[]> {
+    return this.getProducts(0, 50, query);
+  }
+
+  // ========== MANEJO DE ERRORES ==========
+  
+  private handleError(error: HttpErrorResponse) {
+    console.error('API Error:', error);
+    
+    let errorMessage = 'Error desconocido';
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Error del lado del servidor
+      if (error.status === 0) {
+        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+      } else {
+        errorMessage = `Error ${error.status}: ${error.message}`;
       }
-
-      if (filters.brand && filters.brand.length > 0) {
-        filtered = filtered.filter(p => filters.brand.includes(p.brand));
-      }
-
-      if (filters.size && filters.size.length > 0) {
-        filtered = filtered.filter(p => filters.size.includes(p.size));
-      }
-
-      if (filters.priceRange) {
-        const [min, max] = filters.priceRange;
-        filtered = filtered.filter(p => p.price >= min && p.price <= max);
-      }
-
-      observer.next(filtered);
-      observer.complete();
-    });
+    }
+    
+    return throwError(() => new Error(errorMessage));
   }
 
-  createProduct(product: any): Observable<any> {
-    return this.http.post<any>(this.baseUrl, product).pipe(
-      catchError(() => of({ success: true, id: Math.random() }))
-    );
-  }
-
-  updateProduct(id: number, product: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${id}`, product).pipe(
-      catchError(() => of({ success: true, id: id }))
-    );
-  }
-
-  deleteProduct(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/${id}`).pipe(
-      catchError(() => of({ success: true }))
-    );
-  }
-
-  private getMockProducts(): any[] {
-    return [
-      {
-        id: 1,
-        title: 'Soft Rose',
-        description: 'Aromatic floral with soft musk notes.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 29.99,
-        size: '100ml',
-        brand: 'LuxeCo',
-        category: 'floral',
-        stock: 15
-      },
-      {
-        id: 2,
-        title: 'Amber Night',
-        description: 'Warm, amber and vanilla tones for evening wear.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 39.99,
-        size: '50ml',
-        brand: 'NoirScent',
-        category: 'oriental',
-        stock: 8
-      },
-      {
-        id: 3,
-        title: 'Citrus Fresh',
-        description: 'Bright citrus with green top notes, perfect for daytime.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 24.99,
-        size: '75ml',
-        brand: 'FreshAura',
-        category: 'citrus',
-        stock: 20
-      },
-      {
-        id: 4,
-        title: 'Midnight Bloom',
-        description: 'Deep floral essence with exotic undertones.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 44.99,
-        size: '100ml',
-        brand: 'LuxeCo',
-        category: 'floral',
-        stock: 12
-      },
-      {
-        id: 5,
-        title: 'Ocean Breeze',
-        description: 'Fresh and aquatic notes perfect for summer.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 32.99,
-        size: '75ml',
-        brand: 'FreshAura',
-        category: 'citrus',
-        stock: 18
-      },
-      {
-        id: 6,
-        title: 'Velvet Spice',
-        description: 'Luxurious warm spices with woody base.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 49.99,
-        size: '50ml',
-        brand: 'NoirScent',
-        category: 'oriental',
-        stock: 10
-      },
-      {
-        id: 7,
-        title: 'Garden Petals',
-        description: 'Soft blend of iris and peony flowers.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 27.99,
-        size: '100ml',
-        brand: 'LuxeCo',
-        category: 'floral',
-        stock: 25
-      },
-      {
-        id: 8,
-        title: 'Lemon Zest',
-        description: 'Energetic citrus burst with bergamot.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 21.99,
-        size: '75ml',
-        brand: 'FreshAura',
-        category: 'citrus',
-        stock: 30
-      },
-      {
-        id: 9,
-        title: 'Oud Heritage',
-        description: 'Premium oud blended with rose and sandalwood.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 64.99,
-        size: '50ml',
-        brand: 'NoirScent',
-        category: 'oriental',
-        stock: 6
-      },
-      {
-        id: 10,
-        title: 'Cherry Blossom',
-        description: 'Sweet floral with light fruity notes.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 31.99,
-        size: '100ml',
-        brand: 'LuxeCo',
-        category: 'floral',
-        stock: 16
-      },
-      {
-        id: 11,
-        title: 'Tropical Storm',
-        description: 'Exotic mix of mango, pineapple and coconut.',
-        image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-        price: 28.99,
-        size: '75ml',
-        brand: 'FreshAura',
-        category: 'citrus',
-        stock: 22
-      }
-    ];
+  // ========== MÉTODO PARA MAPEAR DATOS ==========
+  
+  private mapPerfumeToFrontend(backendPerfume: any): Perfume {
+    return {
+      id: backendPerfume.id,
+      name: backendPerfume.name,
+      description: backendPerfume.description,
+      price: backendPerfume.price,
+      stock: backendPerfume.stock,
+      sizeMl: backendPerfume.sizeMl,
+      genre: backendPerfume.genre,
+      releaseDate: backendPerfume.releaseDate,
+      imageUrl: backendPerfume.imageUrl,
+      brandName: backendPerfume.brandName || backendPerfume.brand?.name,
+      categoryName: backendPerfume.categoryName || backendPerfume.category?.name
+    };
   }
 }
