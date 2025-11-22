@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { SellerService, Perfume } from '../../services/seller.service';
-import { NotificationService } from '../../services/notification.service';
-import { StepperService } from '../../services/stepper.service';
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
+import { SellerService, Perfume, Brand, ModerationStatus, ModerationStats } from '../../services/seller.service';
+import { StepperService } from '../../services/stepper.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-seller',
@@ -12,197 +11,272 @@ import { Location } from '@angular/common';
   standalone: false
 })
 export class SellerPage implements OnInit {
-
   perfumes: Perfume[] = [];
-  selectedPerfumes: Set<number> = new Set();
-  unreadNotifications = 0;
-  
-  editingPerfume: Perfume | null = null;
+  brands: Brand[] = [];
+  selectedPerfumes = new Set<number>();
+  showBrandsSection = false;
   isLoading = false;
-  currentPage = 0;
-  pageSize = 50;
+  isLoadingBrands = false;
+  isCreateModalOpen = false;
+  unreadNotifications = 0;
+
+  // Filtros de moderación
+  moderationFilter: ModerationStatus | 'ALL' = 'ALL';
+  brandModerationFilter: ModerationStatus | 'ALL' = 'ALL';
+
+  // Estadísticas
+  moderationStats: ModerationStats = { approved: 0, pending: 0, rejected: 0, draft: 0 };
+  brandModerationStats: ModerationStats = { approved: 0, pending: 0, rejected: 0, draft: 0 };
+
+  // Nueva marca
+  newBrand = {
+    name: '',
+    description: '',
+    countryOrigin: '',
+    imageUrl: ''
+  };
+
+  ModerationStatus = ModerationStatus;
 
   constructor(
-    private sellerService: SellerService, 
-    private notificationService: NotificationService,
+    private sellerService: SellerService,
     private stepperService: StepperService,
-    private router: Router, 
-    private location: Location
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.loadPerfumes();
-    
-    this.sellerService.perfumes$.subscribe(perfumes => {
-      this.perfumes = perfumes;
-    });
-
-    this.notificationService.unreadCount$.subscribe(count => {
-      this.unreadNotifications = count;
-    });
-
-    this.sellerService.initializeData();
-    
-    // Agregar producto de muestra para visualización
-    this.addSampleProduct();
+    this.loadData();
+    this.setupSubscriptions();
   }
 
-  addSampleProduct() {
-    const samplePerfume: Perfume = {
-      id: 999,
-      name: 'Sauvage Eau de Parfum',
-      description: 'Una fragancia icónica que combina notas frescas de bergamota con toques especiados de pimienta Sichuan y un fondo amaderado de ámbar gris. Perfecta para el hombre moderno y sofisticado.',
-      price: 125.99,
-      stock: 45,
-      sizeMl: 100,
-      genre: 'Masculino',
-      releaseDate: '2023-06-15',
-      brandId: 1,
-      categoryId: 2,
-      imageUrl: 'https://fimgs.net/mdimg/perfume/375x500.68668.jpg',
-      brand: {
-        id: 1,
-        name: 'Dior',
-        description: 'Casa de moda francesa de lujo',
-        countryOrigin: 'Francia',
-        imageUrl: 'https://example.com/dior-logo.jpg'
-      },
-      category: {
-        id: 2,
-        name: 'Eau de Parfum',
-        description: 'Concentración de fragancia alta'
-      }
-    };
-    
-    // Agregar el producto de muestra al array si no existe
-    if (!this.perfumes.find(p => p.id === 999)) {
-      this.perfumes = [samplePerfume, ...this.perfumes];
-    }
+  setupSubscriptions() {
+    // Suscribirse a estadísticas de moderación
+    this.sellerService.moderationStats$.subscribe(stats => {
+      this.moderationStats = stats;
+    });
   }
 
-  loadPerfumes() {
+  loadData() {
     this.isLoading = true;
-    this.sellerService.getMyPerfumes(this.currentPage, this.pageSize).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        console.log('Perfumes loaded successfully');
-      },
-      error: (error) => {
-        console.error('Error loading perfumes:', error);
-        this.isLoading = false;
-        alert('Error loading perfumes: ' + error.message);
-      }
-    });
+    this.isLoadingBrands = true;
+
+    // Cargar perfumes
+    this.sellerService.getMyPerfumes(0, 50, '', this.moderationFilter !== 'ALL' ? this.moderationFilter : undefined)
+      .subscribe({
+        next: (response) => {
+          this.perfumes = response.data || [];
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading perfumes:', error);
+          this.isLoading = false;
+        }
+      });
+
+    // Cargar marcas
+    this.sellerService.getMyBrands('', this.brandModerationFilter !== 'ALL' ? this.brandModerationFilter : undefined)
+      .subscribe({
+        next: (brands) => {
+          this.brands = brands;
+          this.calculateBrandStats();
+          this.isLoadingBrands = false;
+        },
+        error: (error) => {
+          console.error('Error loading brands:', error);
+          this.isLoadingBrands = false;
+        }
+      });
   }
 
+  calculateBrandStats() {
+    this.brandModerationStats = {
+      approved: this.brands.filter(b => b.moderationStatus === ModerationStatus.APPROVED).length,
+      pending: this.brands.filter(b => b.moderationStatus === ModerationStatus.PENDING_REVIEW).length,
+      rejected: this.brands.filter(b => b.moderationStatus === ModerationStatus.REJECTED).length,
+      draft: this.brands.filter(b => b.moderationStatus === ModerationStatus.DRAFT).length
+    };
+  }
+
+  // ============= FILTROS DE MODERACIÓN =============
+  onModerationFilterChange(event: any) {
+    this.moderationFilter = event.detail.value;
+    this.loadData();
+  }
+
+  onBrandModerationFilterChange(event: any) {
+    this.brandModerationFilter = event.detail.value;
+    this.loadData();
+  }
+
+  getFilteredPerfumes(): Perfume[] {
+    if (this.moderationFilter === 'ALL') return this.perfumes;
+    return this.perfumes.filter(p => p.moderationStatus === this.moderationFilter);
+  }
+
+  getFilteredBrands(): Brand[] {
+    if (this.brandModerationFilter === 'ALL') return this.brands;
+    return this.brands.filter(b => b.moderationStatus === this.brandModerationFilter);
+  }
+
+  // ============= MÉTODOS EXISTENTES ACTUALIZADOS =============
   openAddProductStepper() {
+    if (!this.sellerService.canCreatePerfume()) {
+      const user = this.authService.getCurrentUser();
+      alert('No tienes permisos para crear perfumes. Tu rol actual es: ' + (user?.role || 'No definido'));
+      return;
+    }
     this.stepperService.openStepper();
   }
 
-  toggleSelectPerfume(id: number) {
-    if (this.selectedPerfumes.has(id)) {
-      this.selectedPerfumes.delete(id);
+  getPerfumeImage(perfume: Perfume): string {
+    if (perfume.imageUrl) {
+      return perfume.imageUrl;
+    }
+    return 'assets/images/default-perfume.jpg';
+  }
+
+  getBrandImage(brand: Brand): string {
+    if (brand.imageUrl) {
+      return brand.imageUrl;
+    }
+    return 'assets/images/default-brand.jpg';
+  }
+
+  onImageError(perfume: Perfume) {
+    console.log('Image error for perfume:', perfume.name);
+  }
+
+  onImageLoad(perfume: Perfume) {
+    console.log('Image loaded for perfume:', perfume.name);
+  }
+
+  onBrandImageError(brand: Brand) {
+    console.log('Image error for brand:', brand.name);
+  }
+
+  onBrandImageLoad(brand: Brand) {
+    console.log('Image loaded for brand:', brand.name);
+  }
+
+  getTotalStock(): number {
+    return this.perfumes.reduce((total, perfume) => total + (perfume.stock || 0), 0);
+  }
+
+  getUniqueBrands(): number {
+    const brandIds = new Set(this.perfumes.map(p => p.brandId).filter(id => id !== undefined));
+    return brandIds.size;
+  }
+
+  getLowStockCount(): number {
+    return this.perfumes.filter(p => (p.stock || 0) < 10).length;
+  }
+
+  // ============= GESTIÓN DE SELECCIÓN =============
+  toggleSelectPerfume(perfumeId: number) {
+    if (this.selectedPerfumes.has(perfumeId)) {
+      this.selectedPerfumes.delete(perfumeId);
     } else {
-      this.selectedPerfumes.add(id);
+      this.selectedPerfumes.add(perfumeId);
     }
   }
 
-  isSelected(id: number): boolean {
-    return this.selectedPerfumes.has(id);
+  isSelected(perfumeId: number): boolean {
+    return this.selectedPerfumes.has(perfumeId);
   }
 
   deleteSelectedPerfumes() {
-    if (this.selectedPerfumes.size === 0) {
-      alert('Please select at least one product to delete');
-      return;
-    }
-    
-    if (confirm(`Are you sure you want to delete ${this.selectedPerfumes.size} product(s)?`)) {
-      const deletePromises = Array.from(this.selectedPerfumes).map(id => 
-        this.sellerService.deletePerfume(id).toPromise()
-      );
+    const selectedIds = Array.from(this.selectedPerfumes);
+    if (selectedIds.length === 0) return;
 
-      Promise.all(deletePromises).then(() => {
-        this.selectedPerfumes.clear();
-        this.loadPerfumes(); // Recargar la lista
-      }).catch(error => {
-        console.error('Error deleting perfumes:', error);
-        alert('Error deleting some products. Please try again.');
+    if (confirm(`¿Estás seguro de que quieres eliminar ${selectedIds.length} perfume(s)?`)) {
+      selectedIds.forEach(id => {
+        this.sellerService.deletePerfume(id).subscribe({
+          next: () => {
+            this.selectedPerfumes.delete(id);
+          },
+          error: (error) => {
+            console.error('Error deleting perfume:', error);
+          }
+        });
       });
+      this.selectedPerfumes.clear();
     }
   }
 
-  startEditPerfume(perfume: Perfume) {
-    this.editingPerfume = { ...perfume };
+  // ============= GESTIÓN DE MARCAS =============
+  openCreateBrand() {
+    this.isCreateModalOpen = true;
   }
 
-  saveEditPerfume() {
-    if (!this.editingPerfume || !this.editingPerfume.id) return;
-    
-    if (!this.editingPerfume.name.trim() || !this.editingPerfume.description.trim() || 
-        this.editingPerfume.price <= 0 || this.editingPerfume.stock < 0 || this.editingPerfume.sizeMl <= 0) {
-      alert('Please complete all fields correctly');
+  closeCreateModal() {
+    this.isCreateModalOpen = false;
+    this.newBrand = { name: '', description: '', countryOrigin: '', imageUrl: '' };
+  }
+
+  isValidBrand(): boolean {
+    return this.newBrand.name.trim().length > 0 && this.newBrand.description.trim().length > 0;
+  }
+
+  createBrand() {
+    if (!this.isValidBrand()) {
+      alert('Por favor completa todos los campos obligatorios');
       return;
     }
 
-    this.sellerService.updatePerfume(this.editingPerfume.id, this.editingPerfume).subscribe({
-      next: () => {
-        this.editingPerfume = null;
-        this.loadPerfumes(); // Recargar la lista
+    this.sellerService.createMyBrand(this.newBrand).subscribe({
+      next: (brand) => {
+        this.brands.push(brand);
+        this.closeCreateModal();
+        alert('Marca creada exitosamente');
+        this.loadData(); // Recargar para actualizar estadísticas
       },
       error: (error) => {
-        console.error('Error updating perfume:', error);
-        alert('Error updating product. Please try again.');
+        console.error('Error creating brand:', error);
+        alert('Error creando la marca: ' + error.message);
       }
     });
   }
 
-  cancelEditPerfume() {
-    this.editingPerfume = null;
+  deleteBrand(brandId: number) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta marca?')) {
+      // Aquí deberías implementar el método deleteBrand en el servicio
+      alert('Funcionalidad de eliminar marca no implementada aún');
+    }
   }
 
-  deletePerfume(id: number) {
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.sellerService.deletePerfume(id).subscribe({
+  viewBrandPerfumes(brand: Brand) {
+    console.log('Viewing perfumes for brand:', brand.name);
+    // Implementar navegación a página de perfumes de la marca
+  }
+
+  // ============= GESTIÓN DE PERFUMES =============
+  startEditPerfume(perfume: Perfume) {
+    console.log('Editing perfume:', perfume.name);
+    // Implementar edición de perfume
+  }
+
+  deletePerfume(perfumeId: number) {
+    if (confirm('¿Estás seguro de que quieres eliminar este perfume?')) {
+      this.sellerService.deletePerfume(perfumeId).subscribe({
         next: () => {
-          this.loadPerfumes(); // Recargar la lista
+          this.perfumes = this.perfumes.filter(p => p.id !== perfumeId);
+          alert('Perfume eliminado exitosamente');
         },
         error: (error) => {
           console.error('Error deleting perfume:', error);
-          alert('Error deleting product. Please try again.');
+          alert('Error eliminando el perfume: ' + error.message);
         }
       });
     }
   }
 
-  onBackClick() {
-    this.location.back();
-  }
-
-  // Método para obtener la imagen del perfume
-  getPerfumeImage(perfume: Perfume): string {
-    if (perfume.imageUrl && perfume.imageUrl !== '/uploads/default-perfume.jpg') {
-      return `http://localhost:8080/uploads/${perfume.imageUrl}`;
-    }
-    return 'assets/images/default-perfume.jpg';
-  }
-
-  // Método para obtener la imagen de la marca
-  getBrandImage(brand: any): string {
-    if (brand.imageUrl && brand.imageUrl !== '/uploads/default-brand.jpg') {
-      return `http://localhost:8080/uploads/${brand.imageUrl}`;
-    }
-    return 'assets/images/default-brand.jpg';
-  }
-
-  // Método para manejar error de imagen
-  onImageError(perfume: Perfume) {
-    perfume.imageUrl = undefined;
-  }
-
-  // Método para ver detalles del perfume
   viewPerfumeDetails(perfume: Perfume) {
-    console.log('Ver detalles:', perfume);
-    // Aquí puedes abrir un modal o navegar a una página de detalles
+    console.log('Viewing details for perfume:', perfume.name);
+    // Implementar vista de detalles del perfume
+  }
+
+  onBackClick() {
+    this.router.navigate(['/home']);
   }
 }

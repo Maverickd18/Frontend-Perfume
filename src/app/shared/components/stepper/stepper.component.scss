@@ -498,3 +498,23 @@
     }
   }
 }
+
+.info-message {
+  display: flex;
+  align-items: center;
+  background: var(--ion-color-light);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+
+  ion-icon {
+    color: var(--ion-color-primary);
+    margin-right: 8px;
+    font-size: 18px;
+  }
+
+  span {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+  }
+}
