@@ -822,40 +822,111 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 20px 0;
+    gap: 24px;
+    margin: 32px 0 36px 0;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.06) 0%, rgba(212, 175, 55, 0.03) 100%);
+    border-radius: 14px;
+    border: 1.5px solid rgba(212, 175, 55, 0.2);
+    box-shadow:
+      0 8px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(244, 228, 193, 0.08);
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(244, 228, 193, 0.3), transparent);
+      pointer-events: none;
+    }
 
     .remember-item {
       --background: transparent;
       --padding-start: 0;
       --inner-padding-end: 0;
       --min-height: auto;
+      flex: 1;
+      display: flex;
+      align-items: center;
       
       ion-checkbox {
-        --border-color: rgba(218, 165, 32, 0.5);
-        --checkbox-background-checked: #d4af37;
+        --border-color: rgba(212, 175, 55, 0.6);
+        --checkbox-background-checked: linear-gradient(135deg, #d4af37 0%, #f4e4c1 100%);
         --checkmark-color: #0a0a0a;
-        --border-radius: 5px;
-        --size: 18px;
-        margin-right: 10px;
+        --border-radius: 6px;
+        --size: 22px;
+        margin-right: 14px;
+        flex-shrink: 0;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        &:hover {
+          --border-color: rgba(212, 175, 55, 0.9);
+          filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.3));
+        }
       }
 
       ion-label {
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.6);
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.85);
+        letter-spacing: 0.4px;
+        margin: 0;
+        text-transform: uppercase;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+      }
+
+      &:hover ion-label {
+        color: #f4e4c1;
       }
     }
 
     .forgot-link {
       color: #d4af37;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
       text-decoration: none;
       cursor: pointer;
       white-space: nowrap;
-      transition: color 0.2s;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      letter-spacing: 0.5px;
+      padding: 10px 14px;
+      border-bottom: 2px solid transparent;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      position: relative;
+      display: inline-block;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #f4e4c1, #d4af37);
+        transform: translateX(-50%);
+        transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
 
       &:hover {
         color: #f4e4c1;
+        filter: drop-shadow(0 2px 6px rgba(212, 175, 55, 0.3));
+
+        &::after {
+          width: 100%;
+        }
+      }
+
+      &:active {
+        transform: translateY(1px);
       }
     }
   }

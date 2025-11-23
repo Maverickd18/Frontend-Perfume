@@ -210,4 +210,22 @@ export class AuthService {
       })
     );
   }
+  // Agrega este método en tu auth.service.ts
+
+/**
+ * Solicitar restablecimiento de contraseña
+ */
+requestPasswordReset(email: string): Observable<any> {
+  console.log('Solicitando recuperación de contraseña para:', email);
+  
+  return this.http.post(`${this.apiUrl}/auth/forgot-password`, { email }).pipe(
+    tap(response => {
+      console.log('Respuesta de recuperación:', response);
+    }),
+    catchError(error => {
+      console.error('Error en recuperación de contraseña:', error);
+      return throwError(() => error);
+    })
+  );
+}
 }

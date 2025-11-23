@@ -3,19 +3,59 @@
     <!-- Brand Section -->
     <div class="brand-section">
       <div class="logo-container">
-        <ion-icon name="storefront" class="brand-logo"></ion-icon>
+        <!-- Logo SVG FIJO de perfume -->
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bottle" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#f4e4c1;stop-opacity:0.4" />
+              <stop offset="50%" style="stop-color:#d4af37;stop-opacity:0.6" />
+              <stop offset="100%" style="stop-color:#b8860b;stop-opacity:0.7" />
+            </linearGradient>
+            <linearGradient id="cap" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#f4e4c1" />
+              <stop offset="100%" style="stop-color:#d4af37" />
+            </linearGradient>
+          </defs>
+          
+          <!-- Botella -->
+          <rect x="35" y="45" width="30" height="35" rx="3" fill="url(#bottle)"/>
+          <ellipse cx="50" cy="80" rx="15" ry="8" fill="url(#bottle)" opacity="0.8"/>
+          
+          <!-- Cuello -->
+          <rect x="43" y="35" width="14" height="10" fill="url(#bottle)" opacity="0.7"/>
+          
+          <!-- Tapa -->
+          <rect x="40" y="28" width="20" height="9" rx="2" fill="url(#cap)"/>
+          <rect x="44" y="24" width="12" height="5" rx="2" fill="url(#cap)"/>
+          
+          <!-- Atomizador -->
+          <circle cx="50" cy="23" r="2" fill="#d4af37"/>
+          <line x1="52" y1="23" x2="62" y2="20" stroke="#d4af37" stroke-width="1.5"/>
+          <circle cx="60" cy="20" r="1.2" fill="#d4af37" opacity="0.7"/>
+          <circle cx="64" cy="19" r="1" fill="#d4af37" opacity="0.5"/>
+          <circle cx="67" cy="18" r="0.8" fill="#d4af37" opacity="0.3"/>
+          
+          <!-- Brillo -->
+          <ellipse cx="42" cy="55" rx="2" ry="18" fill="rgba(255,255,255,0.3)"/>
+          
+          <!-- Etiqueta -->
+          <rect x="38" y="58" width="24" height="12" rx="1" fill="rgba(218,165,32,0.2)"/>
+          <text x="50" y="66" font-size="6" fill="#d4af37" text-anchor="middle" font-weight="bold">LUMIÈRE</text>
+        </svg>
       </div>
-      <h1 class="brand-name">LUMIERESHOP</h1>
-      <p class="brand-tagline">WELCOME</p>
+      
+      <h1 class="brand-name">LUMIÈRESHOP</h1>
+      <p class="brand-tagline">WELCOME BACK</p>
     </div>
 
     <!-- Login Form Card -->
     <div class="form-card">
-      <h2 class="form-title">LogIn</h2>
+      <h2 class="form-title">Log In</h2>
+      <p class="form-subtitle">Enter your credentials to continue</p>
 
       <!-- Mensaje de error -->
       <div *ngIf="errorMessage" class="error-message">
-        <ion-icon name="warning-outline"></ion-icon>
+        <ion-icon name="alert-circle-outline"></ion-icon>
         {{ errorMessage }}
       </div>
 
@@ -46,12 +86,21 @@
           <small>{{ getPasswordError() }}</small>
         </ion-text>
 
+        <!-- Remember & Forgot Password -->
+        <div class="form-options">
+          <ion-item lines="none" class="remember-item">
+            <ion-checkbox slot="start"></ion-checkbox>
+            <ion-label>Remember me</ion-label>
+          </ion-item>
+          <!-- ✨ ENLACE A FORGOT PASSWORD -->
+          <a class="forgot-link" (click)="goToForgotPassword()">Forgot password?</a>
+        </div>
+
         <!-- Login Button -->
         <ion-button 
           type="submit"
           expand="block" 
-          [disabled]="!loginForm.valid || isLoading"
-          class="login-button">
+          [disabled]="!loginForm.valid || isLoading">
           <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
           <ion-icon *ngIf="!isLoading" slot="start" name="log-in-outline"></ion-icon>
           {{ isLoading ? 'Signing In...' : 'Log In' }}

@@ -1,22 +1,25 @@
+// src/app/pages/forgot-password/forgot-password.page.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AlertController } from '@ionic/angular';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
-  standalone:false
+  standalone: false
 })
 export class ForgotPasswordPage implements OnInit {
   forgotPasswordForm: FormGroup;
-  emailSent: boolean = false;
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    private alertController: AlertController
+    private authService: AuthService
   ) {
     this.forgotPasswordForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
@@ -24,35 +27,65 @@ export class ForgotPasswordPage implements OnInit {
   }
 
   ngOnInit() {
-    this.resetForm();
-  }
-    resetForm() {
-    this.forgotPasswordForm.reset();
-    this.emailSent = false;
+    // Inicialización básica
   }
 
-  async onSubmit() {
+  ionViewWillEnter() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.forgotPasswordForm.reset({
+      email: ''
+    });
+    this.isLoading = false;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  onSubmit() {
+    this.errorMessage = '';
+    this.successMessage = '';
+    
     if (this.forgotPasswordForm.valid) {
-      const email = this.forgotPasswordForm.get('email')?.value;
-      console.log('Password reset request for:', email);
+      this.isLoading = true;
       
-      // Aquí iría la lógica para enviar el correo de recuperación
-      this.emailSent = true;
-      
-      // Mostrar alerta de confirmación
-      const alert = await this.alertController.create({
-        header: 'Correo Enviado',
-        message: `Se ha enviado un enlace de recuperación a ${email}. Por favor revisa tu bandeja de entrada.`,
-        buttons: [{
-          text: 'OK',
-          handler: () => {
-            this.goToLogin();
+      const email = this.forgotPasswordForm.value.email;
+
+      console.log('Solicitud de recuperación para:', email);
+
+      // Aquí llamarías al servicio de recuperación de contraseña
+      // Por ahora simularé la respuesta
+      this.authService.requestPasswordReset(email).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+          console.log('Solicitud exitosa:', response);
+          
+          this.successMessage = 'Se ha enviado un correo con instrucciones para recuperar tu contraseña.';
+          
+          // Opcional: redirigir al login después de unos segundos
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 3000);
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          console.error('Error en recuperación:', error);
+          
+          if (error.status === 404) {
+            this.errorMessage = 'No existe una cuenta con este correo electrónico.';
+          } else if (error.status === 0) {
+            this.errorMessage = 'Error de conexión. Verifique su internet.';
+          } else if (error.error?.message) {
+            this.errorMessage = error.error.message;
+          } else {
+            this.errorMessage = 'Error en el servidor. Intente nuevamente.';
           }
-        }]
+        }
       });
-      await alert.present();
     } else {
       this.markFormGroupTouched(this.forgotPasswordForm);
+      this.errorMessage = 'Por favor ingrese un correo electrónico válido';
     }
   }
 
@@ -68,11 +101,11 @@ export class ForgotPasswordPage implements OnInit {
   }
 
   getEmailError(): string {
-    const emailControl = this.forgotPasswordForm.get('email');
-    if (emailControl?.hasError('required') && emailControl?.touched) {
+    const control = this.forgotPasswordForm.get('email');
+    if (control?.hasError('required') && control?.touched) {
       return 'El correo electrónico es requerido';
     }
-    if (emailControl?.hasError('email') && emailControl?.touched) {
+    if (control?.hasError('email') && control?.touched) {
       return 'Ingrese un correo electrónico válido';
     }
     return '';

@@ -113,6 +113,11 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/register']);
   }
 
+  // ✨ NUEVO: Navegar a la página de recuperación de contraseña
+  goToForgotPassword() {
+    this.router.navigate(['/forgot-password']);
+  }
+
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(key => {
       const control = formGroup.get(key);
