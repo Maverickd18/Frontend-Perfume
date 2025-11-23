@@ -1,19 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "www/**/*",
-      "use": "@vercel/static"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "www",
   "routes": [
     {
-      "src": "/(js|css|assets|svg|build|static|.*\\..*)$",
-      "dest": "/www/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/www/index.html"
+      "dest": "/index.html"
     }
   ]
 }
