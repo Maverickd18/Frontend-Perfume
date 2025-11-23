@@ -1,4 +1,3 @@
-// src/app/app-routing.module.ts
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guards';
@@ -14,7 +13,6 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule)
   },
-
   {
     path: 'register',
     loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule)
@@ -22,6 +20,27 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
+    canActivate: [AuthGuard]
+  },
+  // AGREGAR TODAS ESTAS RUTAS FALTANTES:
+  {
+    path: 'cart',
+    loadChildren: () => import('./pages/cart/cart.module').then(m => m.CartPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'checkout',
+    loadChildren: () => import('./pages/checkout/checkout.module').then(m => m.CheckoutPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile-client',
+    loadChildren: () => import('./pages/profile-client/profile-client.module').then(m => m.ProfileClientPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'product-detail',
+    loadChildren: () => import('./pages/product-detail/product-detail.module').then(m => m.ProductDetailPageModule),
     canActivate: [AuthGuard]
   },
   {

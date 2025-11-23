@@ -1,27 +1,23 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Perfumes</ion-title>
-    <ion-buttons slot="end">
-      <!-- Barra de búsqueda integrada en el header -->
+    <ion-buttons slot="end" style="gap: 8px;">
       <ion-searchbar 
         placeholder="Buscar perfumes..."
         [value]="searchQuery"
         (ionInput)="onSearchChange($event)"
         debounce="300"
-        style="padding: 0; margin-right: 1rem;"
+        style="padding: 0; margin-right: 8px;"
         class="custom-searchbar">
       </ion-searchbar>
       
-      <!-- Botones de acciones -->
-      <button class="icon-button" (click)="onCartClick()" title="Carrito">
-        <ion-icon name="cart-outline"></ion-icon>
-      </button>
-      <button class="icon-button" (click)="goProfile()" title="Perfil">
-        <ion-icon name="person-outline"></ion-icon>
-      </button>
-      <button class="icon-button" (click)="logout()" title="Salir">
-        <ion-icon name="log-out-outline"></ion-icon>
-      </button>
+      <!-- Header buttons para CLIENTE (sin campanita de notificaciones) -->
+      <app-header-buttons
+        (homeClicked)="ngOnInit()"
+        (cartClicked)="onCartClick()"
+        (profileClicked)="goProfile()"
+        (logoutClicked)="logout()">
+      </app-header-buttons>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

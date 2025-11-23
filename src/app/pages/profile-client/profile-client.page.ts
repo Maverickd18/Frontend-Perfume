@@ -29,41 +29,7 @@ export class ProfileClientPage implements OnInit {
   editing: boolean = false;
   private originalProfile: any = null;
 
-  favoriteProducts = [
-    {
-      id: 1,
-      title: 'Soft Rose',
-      description: 'Aromatic floral with soft musk notes.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 29.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 15
-    },
-    {
-      id: 7,
-      title: 'Garden Petals',
-      description: 'Soft blend of iris and peony flowers.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 27.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 25
-    },
-    {
-      id: 4,
-      title: 'Midnight Bloom',
-      description: 'Deep floral essence with exotic undertones.',
-      image: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      price: 44.99,
-      size: '100ml',
-      brand: 'LuxeCo',
-      category: 'floral',
-      stock: 12
-    }
-  ];
+  favoriteProducts: any[] = [];
 
   goProfile() {
   }

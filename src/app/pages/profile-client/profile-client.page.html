@@ -1,10 +1,17 @@
-<app-header
-  title="Mi Perfil"
-  (homeClicked)="goHome()"
-  (cartClicked)="onCartClick()"
-  (profileClicked)="goProfile()"
-  (logoutClicked)="logout()">
-</app-header>
+<!-- Header para CLIENTE (sin campanita de notificaciones) -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mi Perfil</ion-title>
+    <ion-buttons slot="end">
+      <app-header-buttons
+        (homeClicked)="goHome()"
+        (cartClicked)="onCartClick()"
+        (profileClicked)="goProfile()"
+        (logoutClicked)="logout()">
+      </app-header-buttons>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content [fullscreen]="true" class="profile-content">
   <div class="profile-container">

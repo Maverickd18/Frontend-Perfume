@@ -83,7 +83,6 @@ export class HomePage implements OnInit {
   }
 
   onFilterChange() {
-    this.applyFilters();
   }
 
   toggleFilterCategory(categoryName: string) {
@@ -93,7 +92,6 @@ export class HomePage implements OnInit {
     } else {
       this.filterCategory.push(categoryName);
     }
-    this.onFilterChange();
   }
 
   toggleFilterBrand(brandName: string) {
@@ -103,7 +101,6 @@ export class HomePage implements OnInit {
     } else {
       this.filterBrand.push(brandName);
     }
-    this.onFilterChange();
   }
 
   toggleFilterSize(size: string) {
@@ -113,7 +110,6 @@ export class HomePage implements OnInit {
     } else {
       this.filterSize.push(size);
     }
-    this.onFilterChange();
   }
 
   clearFilters() {
@@ -152,6 +148,8 @@ export class HomePage implements OnInit {
       
       return matchesText && matchesCategory && matchesSize && matchesBrand && matchesPrice;
     });
+
+    this.showFilters = false;
   }
 
   // ========== MÉTODOS DE NAVEGACIÓN ==========
@@ -275,3 +273,4 @@ export class HomePage implements OnInit {
     return !!this.errorMessage;
   }
 }
+
