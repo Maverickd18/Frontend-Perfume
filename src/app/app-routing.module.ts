@@ -1,4 +1,3 @@
-// src/app/app-routing.module.ts
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guards';
@@ -21,7 +20,28 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
+  },
+  // AGREGAR TODAS ESTAS RUTAS FALTANTES:
+  {
+    path: 'cart',
+    loadChildren: () => import('./pages/cart/cart.module').then(m => m.CartPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'checkout',
+    loadChildren: () => import('./pages/checkout/checkout.module').then(m => m.CheckoutPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile-client',
+    loadChildren: () => import('./pages/profile-client/profile-client.module').then(m => m.ProfileClientPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'product-detail',
+    loadChildren: () => import('./pages/product-detail/product-detail.module').then(m => m.ProductDetailPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'seller',
@@ -30,20 +50,25 @@ const routes: Routes = [
     data: { roles: ['VENDEDOR'] }
   },
   {
+    path: 'seller-profile',
+    loadChildren: () => import('./pages/seller-profile/seller-profile.module').then(m => m.SellerProfilePageModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'notifications',
     loadChildren: () => import('./pages/notifications/notifications.module').then(m => m.NotificationsPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule),
-    //canActivate: [AuthGuard, RoleGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN'] }
   },
   {
     path: 'forgot-password',
     loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
-  }
+  },
 ];
 
 @NgModule({

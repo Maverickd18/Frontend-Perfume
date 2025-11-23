@@ -1,0 +1,402 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/cart"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Finalizar Compra</ion-title>
+  </ion-toolbar>
+
+  <!-- Indicador de Progreso -->
+  <div class="progress-indicator">
+    <div class="step" [class.active]="currentStep === 'shipping'" [class.completed]="currentStep === 'payment' || currentStep === 'review'">
+      <div class="step-number">1</div>
+      <div class="step-label">Envío</div>
+    </div>
+    <div class="progress-line" [class.completed]="currentStep === 'payment' || currentStep === 'review'"></div>
+    <div class="step" [class.active]="currentStep === 'payment'" [class.completed]="currentStep === 'review'">
+      <div class="step-number">2</div>
+      <div class="step-label">Pago</div>
+    </div>
+    <div class="progress-line" [class.completed]="currentStep === 'review'"></div>
+    <div class="step" [class.active]="currentStep === 'review'">
+      <div class="step-number">3</div>
+      <div class="step-label">Revisar</div>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+  <div class="checkout-container">
+    
+    <!-- ============================================ -->
+    <!-- PASO 1: DATOS DE ENVÍO -->
+    <!-- ============================================ -->
+    <div class="checkout-section" *ngIf="currentStep === 'shipping'">
+      <div class="section-header">
+        <ion-icon name="location-outline"></ion-icon>
+        <h2>Datos de Envío</h2>
+      </div>
+
+      <form [formGroup]="shippingForm">
+        <ion-list>
+          <!-- Nombre Completo -->
+          <ion-item>
+            <ion-label position="stacked">Nombre Completo <span class="required">*</span></ion-label>
+            <ion-input 
+              type="text" 
+              formControlName="fullName" 
+              placeholder="Juan Pérez García">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="fullName?.invalid && fullName?.touched">
+            <ion-text color="danger">
+              <small *ngIf="fullName?.errors?.['required']">El nombre es requerido</small>
+              <small *ngIf="fullName?.errors?.['minlength']">Debe tener al menos 3 caracteres</small>
+            </ion-text>
+          </div>
+
+          <!-- Dirección -->
+          <ion-item>
+            <ion-label position="stacked">Dirección <span class="required">*</span></ion-label>
+            <ion-input 
+              type="text" 
+              formControlName="address" 
+              placeholder="Calle Principal #123, Col. Centro">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="address?.invalid && address?.touched">
+            <ion-text color="danger">
+              <small *ngIf="address?.errors?.['required']">La dirección es requerida</small>
+              <small *ngIf="address?.errors?.['minlength']">Debe tener al menos 10 caracteres</small>
+            </ion-text>
+          </div>
+
+          <!-- Ciudad -->
+          <ion-item>
+            <ion-label position="stacked">Ciudad <span class="required">*</span></ion-label>
+            <ion-input 
+              type="text" 
+              formControlName="city" 
+              placeholder="Ciudad de México">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="city?.invalid && city?.touched">
+            <ion-text color="danger">
+              <small *ngIf="city?.errors?.['required']">La ciudad es requerida</small>
+            </ion-text>
+          </div>
+
+          <!-- Código Postal -->
+          <ion-item>
+            <ion-label position="stacked">Código Postal <span class="required">*</span></ion-label>
+            <ion-input 
+              type="text" 
+              formControlName="postalCode" 
+              placeholder="12345"
+              maxlength="5">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="postalCode?.invalid && postalCode?.touched">
+            <ion-text color="danger">
+              <small *ngIf="postalCode?.errors?.['required']">El código postal es requerido</small>
+              <small *ngIf="postalCode?.errors?.['pattern']">Debe ser un código postal de 5 dígitos</small>
+            </ion-text>
+          </div>
+
+          <!-- Teléfono -->
+          <ion-item>
+            <ion-label position="stacked">Teléfono <span class="required">*</span></ion-label>
+            <ion-input 
+              type="tel" 
+              formControlName="phone" 
+              placeholder="5512345678"
+              maxlength="10">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="phone?.invalid && phone?.touched">
+            <ion-text color="danger">
+              <small *ngIf="phone?.errors?.['required']">El teléfono es requerido</small>
+              <small *ngIf="phone?.errors?.['pattern']">Debe ser un teléfono de 10 dígitos</small>
+            </ion-text>
+          </div>
+
+          <!-- Email -->
+          <ion-item>
+            <ion-label position="stacked">Email <span class="required">*</span></ion-label>
+            <ion-input 
+              type="email" 
+              formControlName="email" 
+              placeholder="correo@ejemplo.com">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="email?.invalid && email?.touched">
+            <ion-text color="danger">
+              <small *ngIf="email?.errors?.['required']">El email es requerido</small>
+              <small *ngIf="email?.errors?.['email']">Debe ser un email válido</small>
+            </ion-text>
+          </div>
+        </ion-list>
+
+        <div class="button-container">
+          <ion-button expand="block" (click)="goToPayment()" [disabled]="shippingForm.invalid">
+            Continuar al Pago
+            <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 2: MÉTODO DE PAGO -->
+    <!-- ============================================ -->
+    <div class="checkout-section" *ngIf="currentStep === 'payment'">
+      <div class="section-header">
+        <ion-icon name="card-outline"></ion-icon>
+        <h2>Método de Pago</h2>
+      </div>
+
+      <!-- Selector de Método de Pago -->
+      <div class="payment-methods">
+        <div 
+          class="payment-method-card" 
+          *ngFor="let method of paymentMethods"
+          [class.selected]="selectedPaymentMethod === method.id"
+          (click)="selectPaymentMethod(method.id)">
+          <ion-icon [name]="method.icon"></ion-icon>
+          <span>{{ method.name }}</span>
+          <ion-icon name="checkmark-circle" class="check-icon" *ngIf="selectedPaymentMethod === method.id"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Formulario de Pago -->
+      <form [formGroup]="paymentForm">
+        
+        <!-- Formulario de Tarjeta -->
+        <div *ngIf="selectedPaymentMethod === 'card'">
+          <ion-list>
+            <ion-item>
+              <ion-label position="stacked">Número de Tarjeta <span class="required">*</span></ion-label>
+              <ion-input 
+                type="text" 
+                formControlName="cardNumber"
+                placeholder="1234 5678 9012 3456"
+                maxlength="19"
+                (ionInput)="formatCardNumber($event)">
+              </ion-input>
+            </ion-item>
+            <div class="error-message" *ngIf="cardNumber?.invalid && cardNumber?.touched">
+              <ion-text color="danger">
+                <small>Número de tarjeta inválido</small>
+              </ion-text>
+            </div>
+
+            <ion-item>
+              <ion-label position="stacked">Titular de la Tarjeta <span class="required">*</span></ion-label>
+              <ion-input 
+                type="text" 
+                formControlName="cardHolderName"
+                placeholder="JUAN PEREZ">
+              </ion-input>
+            </ion-item>
+            <div class="error-message" *ngIf="cardHolderName?.invalid && cardHolderName?.touched">
+              <ion-text color="danger">
+                <small>El nombre del titular es requerido</small>
+              </ion-text>
+            </div>
+
+            <ion-row>
+              <ion-col size="6">
+                <ion-item>
+                  <ion-label position="stacked">Fecha de Vencimiento <span class="required">*</span></ion-label>
+                  <ion-input 
+                    type="text" 
+                    formControlName="expirationDate"
+                    placeholder="MM/AA"
+                    maxlength="5"
+                    (ionInput)="formatExpirationDate($event)">
+                  </ion-input>
+                </ion-item>
+                <div class="error-message" *ngIf="expirationDate?.invalid && expirationDate?.touched">
+                  <ion-text color="danger">
+                    <small>Fecha inválida</small>
+                  </ion-text>
+                </div>
+              </ion-col>
+              <ion-col size="6">
+                <ion-item>
+                  <ion-label position="stacked">CVV <span class="required">*</span></ion-label>
+                  <ion-input 
+                    type="text" 
+                    formControlName="cvv"
+                    placeholder="123"
+                    maxlength="4">
+                  </ion-input>
+                </ion-item>
+                <div class="error-message" *ngIf="cvv?.invalid && cvv?.touched">
+                  <ion-text color="danger">
+                    <small>CVV inválido</small>
+                  </ion-text>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-list>
+        </div>
+
+        <!-- Formulario de Transferencia -->
+        <div *ngIf="selectedPaymentMethod === 'transfer'">
+          <ion-list>
+            <ion-item>
+              <ion-label position="stacked">Referencia de Transferencia <span class="required">*</span></ion-label>
+              <ion-input 
+                type="text" 
+                formControlName="transferReference"
+                placeholder="ABC123456">
+              </ion-input>
+            </ion-item>
+            <div class="error-message" *ngIf="transferReference?.invalid && transferReference?.touched">
+              <ion-text color="danger">
+                <small>La referencia es requerida</small>
+              </ion-text>
+            </div>
+          </ion-list>
+
+          <ion-card class="info-card">
+            <ion-card-content>
+              <p><strong>Datos Bancarios:</strong></p>
+              <p>Banco: Banco Ejemplo</p>
+              <p>Cuenta: 1234567890</p>
+              <p>CLABE: 012345678901234567</p>
+              <p class="note">* Realiza la transferencia y anota la referencia arriba</p>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
+        <!-- Pago Contraentrega -->
+        <div *ngIf="selectedPaymentMethod === 'cash_on_delivery'">
+          <ion-card class="info-card">
+            <ion-card-content>
+              <p><strong>Pago Contraentrega</strong></p>
+              <p>Pagarás al momento de recibir tu pedido.</p>
+              <p class="note">* El repartidor llevará terminal para pagos con tarjeta</p>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </form>
+
+      <div class="button-container">
+        <ion-button expand="block" fill="outline" (click)="goToShipping()">
+          <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+          Regresar
+        </ion-button>
+        <ion-button expand="block" (click)="goToReview()">
+          Revisar Orden
+          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 3: REVISAR ORDEN -->
+    <!-- ============================================ -->
+    <div class="checkout-section" *ngIf="currentStep === 'review'">
+      <div class="section-header">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <h2>Revisar Orden</h2>
+      </div>
+
+      <!-- Resumen de Envío -->
+      <ion-card class="summary-card">
+        <ion-card-header>
+          <ion-card-title>Dirección de Envío</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>{{ shippingForm.value.fullName }}</strong></p>
+          <p>{{ shippingForm.value.address }}</p>
+          <p>{{ shippingForm.value.city }}, {{ shippingForm.value.postalCode }}</p>
+          <p>Tel: {{ shippingForm.value.phone }}</p>
+          <p>Email: {{ shippingForm.value.email }}</p>
+          <ion-button size="small" fill="clear" (click)="goToShipping()">Editar</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Resumen de Pago -->
+      <ion-card class="summary-card">
+        <ion-card-header>
+          <ion-card-title>Método de Pago</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p *ngIf="selectedPaymentMethod === 'card'">
+            <ion-icon name="card-outline"></ion-icon>
+            Tarjeta **** **** **** {{ paymentForm.value.cardNumber?.slice(-4) }}
+          </p>
+          <p *ngIf="selectedPaymentMethod === 'transfer'">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+            Transferencia Bancaria
+          </p>
+          <p *ngIf="selectedPaymentMethod === 'cash_on_delivery'">
+            <ion-icon name="cash-outline"></ion-icon>
+            Pago Contraentrega
+          </p>
+          <ion-button size="small" fill="clear" (click)="goBackToPayment()">Editar</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Resumen del Carrito -->
+      <ion-card class="summary-card">
+        <ion-card-header>
+          <ion-card-title>Resumen del Pedido</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="cart-items">
+            <div class="cart-item" *ngFor="let item of cartItems">
+              <img [src]="item.image" [alt]="item.title">
+              <div class="item-details">
+                <h4>{{ item.title }}</h4>
+                <p class="item-meta">{{ item.brand }} | {{ item.size }}</p>
+                <p class="item-price">{{ item.price | currency:'MXN':'symbol' }} x {{ item.quantity }}</p>
+              </div>
+              <div class="item-total">
+                {{ (item.price * item.quantity) | currency:'MXN':'symbol' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span>Subtotal:</span>
+              <span>{{ subtotal | currency:'MXN':'symbol' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Envío:</span>
+              <span>{{ shipping | currency:'MXN':'symbol' }}</span>
+            </div>
+            <div class="price-row">
+              <span>IVA (16%):</span>
+              <span>{{ tax | currency:'MXN':'symbol' }}</span>
+            </div>
+            <div class="price-row total">
+              <span><strong>Total:</strong></span>
+              <span><strong>{{ total | currency:'MXN':'symbol' }}</strong></span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="button-container">
+        <ion-button expand="block" fill="outline" (click)="goBackToPayment()">
+          <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+          Regresar
+        </ion-button>
+        <ion-button 
+          expand="block" 
+          color="success" 
+          (click)="processOrder()"
+          [disabled]="isProcessing">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          {{ isProcessing ? 'Procesando...' : 'Confirmar Compra' }}
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

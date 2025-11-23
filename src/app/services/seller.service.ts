@@ -5,6 +5,13 @@ import { AuthService } from './auth.service';
 
 const API_URL = 'http://localhost:8080/api';
 
+export enum ModerationStatus {
+  APPROVED = 'APPROVED',
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  REJECTED = 'REJECTED',
+  DRAFT = 'DRAFT'
+}
+
 export interface Perfume {
   id?: number;
   name: string;
@@ -29,23 +36,58 @@ export interface Perfume {
     name: string;
     description: string;
   };
+  creador?: string;
+  brandName?: string;
+  categoryName?: string;
+  moderationStatus?: ModerationStatus;
+  rejectionReason?: string;
+  moderatedBy?: string;
+  moderationDate?: string;
+  createdAt?: string; // Hacer opcional
+  updatedAt?: string;
 }
 
 export interface Brand {
   id?: number;
   name: string;
   description: string;
-  countryOrigin?: string | null;  // Change this line
+  countryOrigin?: string | null;
   imageUrl?: string | null;
   creador?: string;
   totalPerfumes?: number;
   perfumes?: Perfume[];
+  moderationStatus?: ModerationStatus;
+  rejectionReason?: string;
+  moderatedBy?: string;
+  moderationDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {
   id?: number;
   name: string;
   description: string;
+  imageUrl?: string;
+  moderationStatus?: ModerationStatus;
+  rejectionReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ApiResponse<T> {
+  status: string;
+  data?: T;
+  message?: string;
+  meta?: any;
+  moderationStats?: any;
+}
+
+export interface ModerationStats {
+  approved: number;
+  pending: number;
+  rejected: number;
+  draft?: number;
 }
 
 @Injectable({
@@ -57,6 +99,8 @@ export class SellerService {
 
   private brands: Brand[] = [];
   private categories: Category[] = [];
+  private moderationStatsSubject = new BehaviorSubject<ModerationStats>({ approved: 0, pending: 0, rejected: 0, draft: 0 });
+  public moderationStats$ = this.moderationStatsSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -107,16 +151,29 @@ export class SellerService {
   }
 
   // ============= MARCAS DEL USUARIO =============
-  getMyBrands(): Observable<Brand[]> {
+  getMyBrands(filtro?: string, status?: ModerationStatus): Observable<Brand[]> {
     try {
       this.checkPermissions();
       const headers = this.getHeaders();
       
-      return this.http.get<Brand[]>(`${API_URL}/brands/mis-marcas`, { headers })
+      let url = `${API_URL}/brands/mis-marcas`;
+      const params = [];
+      if (filtro) params.push(`filtro=${filtro}`);
+      if (status) params.push(`status=${status}`);
+      if (params.length > 0) url += `?${params.join('&')}`;
+      
+      return this.http.get<ApiResponse<Brand[]>>(url, { headers })
         .pipe(
-          tap(brands => {
+          map(response => {
+            const brands = response.data || [];
             this.brands = Array.isArray(brands) ? brands : [];
-            console.log('My brands loaded:', this.brands);
+            
+            if (response.moderationStats) {
+              this.moderationStatsSubject.next(response.moderationStats);
+            }
+            
+            console.log('📦 My brands loaded:', this.brands);
+            return this.brands;
           }),
           catchError(this.handleError)
         );
@@ -126,43 +183,56 @@ export class SellerService {
   }
 
   createMyBrand(brand: Omit<Brand, 'id'>): Observable<Brand> {
-  try {
-    this.checkPermissions();
-    const headers = this.getHeaders();
-    
-    return this.http.post<any>(`${API_URL}/brands/mis-marcas`, brand, { headers })
-      .pipe(
-        map(response => {
-          // Extraer la marca del objeto de respuesta
-          const brandData = response.data || response;
-          return brandData;
-        }),
-        tap(newBrand => {
-          this.brands = [...(Array.isArray(this.brands) ? this.brands : []), newBrand];
-        }),
-        catchError(this.handleError)
-      );
-  } catch (error: any) {
-    return throwError(() => error);
-  }
-}
-
-  createMyBrandWithImage(brand: Omit<Brand, 'id'>, image: File): Observable<Brand> {
     try {
       this.checkPermissions();
-      const formData = new FormData();
-      formData.append('brand', new Blob([JSON.stringify(brand)], { type: 'application/json' }));
-      formData.append('imagen', image);
-
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${this.authService.getToken()}`
-      });
-
-      return this.http.post<Brand>(`${API_URL}/brands/mis-marcas/con-imagen`, formData, { headers })
+      const headers = this.getHeaders();
+      
+      return this.http.post<ApiResponse<Brand>>(`${API_URL}/brands/mis-marcas`, brand, { headers })
         .pipe(
-          tap(newBrand => {
-            this.brands = [...(Array.isArray(this.brands) ? this.brands : []), newBrand];
-            console.log('My brand with image created:', newBrand);
+          map(response => {
+            const brandData = response.data!;
+            this.brands = [...this.brands, brandData];
+            console.log('✅ Brand created:', brandData);
+            return brandData;
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  updateMyBrand(brandId: number, brandData: any): Observable<Brand> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.put<ApiResponse<Brand>>(`${API_URL}/brands/mis-marcas/${brandId}`, brandData, { headers })
+        .pipe(
+          map(response => {
+            const updatedBrand = response.data!;
+            const index = this.brands.findIndex(b => b.id === brandId);
+            if (index !== -1) {
+              this.brands[index] = updatedBrand;
+            }
+            return updatedBrand;
+        }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  deleteMyBrand(brandId: number): Observable<void> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.delete<void>(`${API_URL}/brands/mis-marcas/${brandId}`, { headers })
+        .pipe(
+          tap(() => {
+            this.brands = this.brands.filter(b => b.id !== brandId);
           }),
           catchError(this.handleError)
         );
@@ -181,7 +251,7 @@ export class SellerService {
         .pipe(
           tap(categories => {
             this.categories = Array.isArray(categories) ? categories : [];
-            console.log('Categories loaded:', this.categories);
+            console.log('📦 Categories loaded:', this.categories);
           }),
           catchError(this.handleError)
         );
@@ -195,32 +265,21 @@ export class SellerService {
       this.checkPermissions();
       const headers = this.getHeaders();
       
-      return this.http.post<Category>(`${API_URL}/categories`, category, { headers })
-        .pipe(
-          tap(newCategory => {
-            this.categories = [...(Array.isArray(this.categories) ? this.categories : []), newCategory];
-            console.log('Category created:', newCategory);
-          }),
-          catchError(this.handleError)
-        );
-    } catch (error: any) {
-      return throwError(() => error);
-    }
-  }
-
-  // ============= PERFUMES DEL USUARIO =============
-  getMyPerfumes(page: number = 0, size: number = 50, filtro: string = ''): Observable<any> {
-    try {
-      this.checkPermissions();
-      const headers = this.getHeaders();
+      console.log('🆕 Creating category:', category);
       
-      const params = `?page=${page}&size=${size}${filtro ? `&filtro=${filtro}` : ''}`;
-      return this.http.get<any>(`${API_URL}/perfumes/mis-perfumes${params}`, { headers })
+      return this.http.post<any>(`${API_URL}/categories`, category, { headers })
         .pipe(
-          tap(response => {
-            console.log('My perfumes loaded:', response);
-            if (response.data && Array.isArray(response.data)) {
-              this.perfumesSubject.next(response.data);
+          map(response => {
+            console.log('✅ Category creation response:', response);
+            
+            if (response.data) {
+              const categoryData = response.data;
+              console.log('✅ Category created successfully:', categoryData);
+              
+              this.getCategories().subscribe();
+              return categoryData;
+            } else {
+              throw new Error('No se pudo crear la categoría - respuesta inválida del servidor');
             }
           }),
           catchError(this.handleError)
@@ -230,23 +289,117 @@ export class SellerService {
     }
   }
 
-  createPerfume(perfume: Omit<Perfume, 'id'>): Observable<Perfume> {
+  updateCategory(categoryId: number, categoryData: any): Observable<Category> {
     try {
       this.checkPermissions();
       const headers = this.getHeaders();
       
-      console.log('Creating perfume with data:', perfume);
-      
-      return this.http.post<Perfume>(`${API_URL}/perfumes/nuevo`, perfume, { headers })
+      return this.http.put<Category>(`${API_URL}/categories/${categoryId}`, categoryData, { headers })
         .pipe(
-          tap(newPerfume => {
-            console.log('Perfume created successfully:', newPerfume);
-            const currentPerfumes = this.perfumesSubject.getValue();
-            this.perfumesSubject.next([...currentPerfumes, newPerfume]);
+          tap(updatedCategory => {
+            const index = this.categories.findIndex(c => c.id === categoryId);
+            if (index !== -1) {
+              this.categories[index] = updatedCategory;
+            }
           }),
           catchError(this.handleError)
         );
     } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  deleteCategory(categoryId: number): Observable<void> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      return this.http.delete<void>(`${API_URL}/categories/${categoryId}`, { headers })
+        .pipe(
+          tap(() => {
+            this.categories = this.categories.filter(c => c.id !== categoryId);
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  // ============= PERFUMES DEL USUARIO =============
+  getMyPerfumes(page: number = 0, size: number = 50, filtro: string = '', status?: ModerationStatus): Observable<ApiResponse<Perfume[]>> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      let params = `?page=${page}&size=${size}`;
+      if (filtro) params += `&filtro=${filtro}`;
+      if (status) params += `&status=${status}`;
+      
+      return this.http.get<ApiResponse<Perfume[]>>(`${API_URL}/perfumes/mis-perfumes${params}`, { headers })
+        .pipe(
+          tap(response => {
+            console.log('🔍 DEBUG - Full API Response:', response);
+            
+            if (response.data && Array.isArray(response.data)) {
+              console.log('📦 Number of perfumes:', response.data.length);
+              
+              const perfumesWithImages = response.data.map(perfume => ({
+                ...perfume,
+                imageUrl: this.getFullImageUrl(perfume.imageUrl)
+              }));
+              
+              console.log('🖼️ After image processing:', perfumesWithImages);
+              this.perfumesSubject.next(perfumesWithImages);
+              
+              if (response.moderationStats) {
+                this.moderationStatsSubject.next(response.moderationStats);
+              }
+            } else {
+              console.warn('⚠️ No data in response or data is not an array');
+            }
+          }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  createPerfume(perfume: Omit<Perfume, 'id' | 'createdAt' | 'updatedAt'>): Observable<Perfume> {
+    try {
+      this.checkPermissions();
+      const headers = this.getHeaders();
+      
+      console.log('🔄 Creating perfume with data:', perfume);
+      
+      return this.http.post<ApiResponse<Perfume>>(`${API_URL}/perfumes/nuevo`, perfume, { headers })
+        .pipe(
+          map(response => {
+            const perfumeData = response.data!;
+            console.log('✅ Perfume created successfully:', perfumeData);
+            
+            this.loadPerfumesAfterCreate();
+            
+            return perfumeData;
+          }),
+          catchError(error => {
+            console.error('❌ Error in createPerfume:', error);
+            console.error('❌ Error details:', error.error);
+            
+            if (error.error && error.error.errors) {
+              console.error('🔍 Validation errors:', error.error.errors);
+              const errorMessages = Object.entries(error.error.errors)
+                .map(([field, message]) => `${field}: ${message}`)
+                .join(', ');
+              throw new Error(`Errores de validación: ${errorMessages}`);
+            }
+            
+            return this.handleError(error);
+          })
+        );
+    } catch (error: any) {
+      console.error('❌ Error in createPerfume:', error);
       return throwError(() => error);
     }
   }
@@ -258,14 +411,20 @@ export class SellerService {
       
       return this.http.put<Perfume>(`${API_URL}/perfumes/${id}`, perfume, { headers })
         .pipe(
-          tap(updatedPerfume => {
+          map(updatedPerfume => {
             const currentPerfumes = this.perfumesSubject.getValue();
             const index = currentPerfumes.findIndex(p => p.id === id);
             
             if (index !== -1) {
-              currentPerfumes[index] = { ...currentPerfumes[index], ...updatedPerfume };
+              currentPerfumes[index] = { 
+                ...currentPerfumes[index], 
+                ...updatedPerfume,
+                imageUrl: this.getFullImageUrl(updatedPerfume.imageUrl)
+              };
               this.perfumesSubject.next([...currentPerfumes]);
             }
+            
+            return updatedPerfume;
           }),
           catchError(this.handleError)
         );
@@ -303,11 +462,37 @@ export class SellerService {
         'Authorization': `Bearer ${this.authService.getToken()}`
       });
 
+      console.log('📤 Uploading image:', {
+        name: image.name,
+        size: image.size,
+        type: image.type
+      });
+
       return this.http.post<any>(`${API_URL}/upload/image`, formData, { headers })
         .pipe(
           tap(response => {
-            console.log('Image uploaded successfully:', response);
+            console.log('✅ Upload response received:', response);
           }),
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      console.error('❌ Error in uploadPerfumeImage:', error);
+      return throwError(() => error);
+    }
+  }
+
+  uploadBrandImage(brandId: number, image: File): Observable<any> {
+    try {
+      this.checkPermissions();
+      const formData = new FormData();
+      formData.append('imagen', image);
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${this.authService.getToken()}`
+      });
+
+      return this.http.post<any>(`${API_URL}/brands/mis-marcas/${brandId}/image`, formData, { headers })
+        .pipe(
           catchError(this.handleError)
         );
     } catch (error: any) {
@@ -315,7 +500,61 @@ export class SellerService {
     }
   }
 
-  // ============= MÉTODOS AUXILIARES =============
+  uploadCategoryImage(categoryId: number, image: File): Observable<any> {
+    try {
+      this.checkPermissions();
+      const formData = new FormData();
+      formData.append('imagen', image);
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${this.authService.getToken()}`
+      });
+
+      return this.http.post<any>(`${API_URL}/categories/${categoryId}/image`, formData, { headers })
+        .pipe(
+          catchError(this.handleError)
+        );
+    } catch (error: any) {
+      return throwError(() => error);
+    }
+  }
+
+  private getFullImageUrl(imageUrl: string | null | undefined): string | null {
+    console.log('🖼️ Processing image URL:', imageUrl);
+    
+    if (!imageUrl) {
+      console.log('ℹ️ No image URL, returning null');
+      return null;
+    }
+    
+    if (imageUrl.startsWith('http')) {
+      console.log('🔗 Already full URL:', imageUrl);
+      return imageUrl;
+    }
+    
+    if (imageUrl.startsWith('/uploads/')) {
+      const fullUrl = `http://localhost:8080${imageUrl}`;
+      console.log('🔗 Converted relative to full URL:', fullUrl);
+      return fullUrl;
+    }
+    
+    const fullUrl = `http://localhost:8080/uploads/${imageUrl}`;
+    console.log('🔗 Built URL from filename:', fullUrl);
+    return fullUrl;
+  }
+
+  // Método auxiliar para recargar perfumes después de crear uno nuevo
+  private loadPerfumesAfterCreate() {
+    this.getMyPerfumes(0, 50, '').subscribe({
+      next: (response) => {
+        console.log('🔄 Perfumes reloaded after creation');
+      },
+      error: (error) => {
+        console.error('❌ Error reloading perfumes:', error);
+      }
+    });
+  }
+
   getBrandsList(): Brand[] {
     return Array.isArray(this.brands) ? this.brands : [];
   }
@@ -326,6 +565,11 @@ export class SellerService {
 
   canCreatePerfume(): boolean {
     return this.authService.isSeller() || this.authService.isAdmin();
+  }
+
+  // ============= MÉTODOS DE MODERACIÓN =============
+  getModerationStats(): Observable<ModerationStats> {
+    return this.moderationStats$;
   }
 
   // Cargar datos iniciales

@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Producto</ion-title>
+    <ion-buttons slot="end">
+      <!-- Cambiar a app-header y usar los outputs correctos -->
+      <app-header
+        [showBackButton]="false"
+        (cartClicked)="onCartClick()"
+        (profileClicked)="goProfile()"
+        (logoutClicked)="logout()">
+        <!-- Agregar botón home manualmente -->
+        <button slot="end" class="icon-button" (click)="goHome()" title="Inicio">
+          <ion-icon name="home-outline"></ion-icon>
+        </button>
+      </app-header>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="product-detail">
+  <div *ngIf="product" class="detail-wrapper">
+    <div class="product-layout">
+      <div class="image-section">
+        <img [src]="product.imageUrl || product.image || 'assets/images/placeholder.jpg'" [alt]="product.name || product.title" class="product-image"/>
+      </div>
+
+      <div class="info-section">
+        <div class="header-info">
+          <div>
+            <p class="brand">{{ product.brandName || product.brand }}</p>
+            <h1 class="title">{{ product.name || product.title }}</h1>
+          </div>
+          <button class="heart-button" (click)="toggleFavorite()" [class.active]="isFavorite" title="Agregar a favoritos">
+            <svg *ngIf="!isFavorite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <svg *ngIf="isFavorite" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <p class="description">{{ product.description }}</p>
+
+        <div class="specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">Tamaño</span>
+            <span class="spec-value">{{ product.sizeMl || product.size }}ml</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Categoría</span>
+            <span class="spec-value">{{ product.categoryName || product.category }}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Stock</span>
+            <span class="spec-value">{{ product.stock }}</span>
+          </div>
+        </div>
+
+        <div class="price-box">
+          <p class="price">{{ product.price | currency:'USD' }}</p>
+        </div>
+
+        <div class="actions-buttons">
+          <button class="btn-primary" (click)="addToCart()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            Agregar
+          </button>
+          <button class="btn-secondary" (click)="goBack()">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!product" class="no-product">
+    <p>Producto no encontrado</p>
+  </div>
+</ion-content>

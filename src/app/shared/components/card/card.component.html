@@ -1,0 +1,27 @@
+<ion-card class="product-card">
+  <img *ngIf="image" [src]="image" [alt]="title" class="product-image" (click)="onCardClick()"/>
+  <ion-card-header>
+    <ion-card-title class="card-title">
+      <div class="title-row">
+        <span class="brand" *ngIf="brand">{{ brand }}</span>
+        <span class="title-text">{{ title }}</span>
+      </div>
+    </ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    <p class="description">{{ description }}</p>
+    <div class="product-details">
+      <div class="specs">
+        <span class="size" *ngIf="size">Size: {{ size }}</span>
+        <span class="stock">Stock: {{ stock }}</span>
+      </div>
+      <div class="price" *ngIf="price">{{ price | currency:'USD' }}</div>
+    </div>
+    
+    <div class="card-actions">
+      <button class="btn-view" (click)="onCardClick()">Ver Detalles</button>
+      <button class="btn-cart" (click)="onAddToCart()">Agregar</button>
+    </div>
+  </ion-card-content>
+</ion-card>

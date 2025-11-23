@@ -17,6 +17,9 @@ export class HeaderComponent {
   
   @Output() backClicked = new EventEmitter<void>();
   @Output() notificationClicked = new EventEmitter<void>();
+  @Output() cartClicked = new EventEmitter<void>();
+  @Output() profileClicked = new EventEmitter<void>();
+  @Output() logoutClicked = new EventEmitter<void>();
 
   constructor(private location: Location, private router: Router) {}
 
@@ -28,5 +31,17 @@ export class HeaderComponent {
   onNotificationClick() {
     this.notificationClicked.emit();
     this.router.navigate(['/notifications']);
+  }
+
+  onCartClick() {
+    this.cartClicked.emit();
+  }
+
+  onProfileClick() {
+    this.profileClicked.emit();
+  }
+
+  onLogoutClick() {
+    this.logoutClicked.emit();
   }
 }

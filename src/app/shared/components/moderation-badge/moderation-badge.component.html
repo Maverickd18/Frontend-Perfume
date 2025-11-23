@@ -1,0 +1,10 @@
+<ion-badge [color]="getStatusConfig().color" class="moderation-badge" [class]="getStatusConfig().class">
+  <ion-icon [name]="getStatusConfig().icon" slot="start"></ion-icon>
+  {{ getStatusConfig().text }}
+</ion-badge>
+
+<div *ngIf="rejectionReason && status === ModerationStatus.REJECTED" class="rejection-reason">
+  <ion-text color="danger">
+    <small><strong>Razón:</strong> {{ rejectionReason }}</small>
+  </ion-text>
+</div>
