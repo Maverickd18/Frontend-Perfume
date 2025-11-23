@@ -83,3 +83,83 @@ ion-header {
     --border-bottom: 1px solid #e0e0e0;
   }
 }
+
+// ============= GLOBAL FORM ELEMENTS STYLING =============
+// Estilos globales para inputs, textareas y selects en toda la aplicación
+
+// Admin page form styling
+.admin-content {
+  ion-input,
+  ion-textarea,
+  ion-select {
+    --background: #1a1a1a;
+    --color: #ffffff;
+    --placeholder-color: rgba(212, 175, 55, 0.5);
+    --border-radius: 8px;
+    border: 1px solid rgba(218, 165, 32, 0.3);
+    margin-bottom: 12px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: #d4af37;
+      --border-bottom-color: #d4af37;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+  }
+
+  ion-searchbar {
+    --background: #1a1a1a;
+    --color: #d4af37;
+    --placeholder-color: rgba(212, 175, 55, 0.6);
+    --icon-color: #d4af37;
+    --border-radius: 8px;
+    border: 1px solid rgba(218, 165, 32, 0.3);
+    margin-bottom: 12px;
+  }
+
+  ion-label {
+    color: #d4af37;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  ion-toggle {
+    --background: #0a0a0a;
+    --background-checked: #d4af37;
+    --handle-background: #1a1a1a;
+    --handle-background-checked: #0a0a0a;
+  }
+
+  ion-checkbox {
+    --background: #1a1a1a;
+    --background-checked: #d4af37;
+    --border-color: #d4af37;
+    --checkmark-color: #0a0a0a;
+  }
+
+  ion-radio {
+    --color: #d4af37;
+    --color-checked: #d4af37;
+    --indicator-color: #d4af37;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: rgba(218, 165, 32, 0.08);
+    border-left: 3px solid #d4af37;
+    border-radius: 8px;
+    border: 1px solid rgba(218, 165, 32, 0.2);
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+}
