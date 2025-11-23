@@ -1,95 +1,257 @@
-
 <ion-content>
   <div class="admin-content">
 
-    <!-- ============= NAVEGACIÓN POR TABS ============= -->
+    <!-- NAVEGACIÓN POR TABS -->
     <ion-segment [(ngModel)]="selectedTab" (ionChange)="selectTab(selectedTab)" class="admin-tabs">
-      <ion-segment-button value="dashboard" layout="icon-start">
-        <ion-icon name="stats-chart"></ion-icon>
+      <ion-segment-button value="dashboard">
+        <ion-icon name="analytics"></ion-icon>
         <ion-label>Dashboard</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="users" layout="icon-start">
+      <ion-segment-button value="users">
         <ion-icon name="people"></ion-icon>
         <ion-label>Usuarios</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="stores" layout="icon-start">
-        <ion-icon name="storefront"></ion-icon>
-        <ion-label>Tiendas</ion-label>
+      <ion-segment-button value="brands">
+        <ion-icon name="bookmark"></ion-icon>
+        <ion-label>Marcas</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="orders" layout="icon-start">
+      <ion-segment-button value="perfumes">
+        <ion-icon name="flower"></ion-icon>
+        <ion-label>Perfumes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="orders">
         <ion-icon name="cube"></ion-icon>
         <ion-label>Pedidos</ion-label>
       </ion-segment-button>
     </ion-segment>
 
-    <!-- ============= DASHBOARD TAB ============= -->
+    <!-- ============= DASHBOARD ============= -->
     <div *ngIf="selectedTab === 'dashboard'" class="tab-content">
-      <h1>Dashboard</h1>
+      <div class="dashboard-header">
+        <h1>Panel de Control</h1>
+        <p class="dashboard-subtitle">Resumen general y métricas importantes</p>
+      </div>
       
       <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
 
-      <!-- KPI Cards -->
-      <div class="kpi-grid" *ngIf="dashboardStats && !isLoading">
-        <div class="kpi-card">
-          <div class="kpi-icon users-icon">
-            <ion-icon name="people"></ion-icon>
-          </div>
-          <div class="kpi-content">
+      <div class="dashboard-wrapper" *ngIf="dashboardStats && !isLoading">
+        <!-- KPI PRINCIPALES -->
+        <div class="kpi-grid">
+          <div class="kpi-card gradient-primary">
+            <div class="kpi-header">
+              <ion-icon name="people"></ion-icon>
+              <span class="badge-count">{{ dashboardStats.totalUsers }}</span>
+            </div>
             <p class="kpi-label">Usuarios Totales</p>
-            <p class="kpi-value">{{ dashboardStats.totalUsers }}</p>
-            <p class="kpi-subtitle">{{ dashboardStats.activeUsers }} activos</p>
+            <div class="kpi-stats">
+              <span class="stat-item">{{ dashboardStats.activeUsers }} activos</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-success">
+            <div class="kpi-header">
+              <ion-icon name="cube"></ion-icon>
+              <span class="badge-count">{{ dashboardStats.totalOrders }}</span>
+            </div>
+            <p class="kpi-label">Pedidos Totales</p>
+            <div class="kpi-stats">
+              <span class="stat-item">{{ dashboardStats.pendingOrders }} pendientes</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-warning">
+            <div class="kpi-header">
+              <ion-icon name="cash"></ion-icon>
+              <span class="badge-count">${{ (dashboardStats.monthlyRevenue || 0) | number: '1.0-0' }}</span>
+            </div>
+            <p class="kpi-label">Ingresos Este Mes</p>
+            <div class="kpi-stats">
+              <span class="stat-item">Total: ${{ (dashboardStats.totalRevenue || 0) | number: '1.0-0' }}</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-info">
+            <div class="kpi-header">
+              <ion-icon name="flower"></ion-icon>
+              <span class="badge-count">{{ dashboardStats.totalPerfumes || 0 }}</span>
+            </div>
+            <p class="kpi-label">Perfumes en Catálogo</p>
+            <div class="kpi-stats">
+              <span class="stat-item">Disponibles</span>
+            </div>
           </div>
         </div>
 
-        <div class="kpi-card">
-          <div class="kpi-icon stores-icon">
-            <ion-icon name="storefront"></ion-icon>
+        <!-- SECCIÓN VENDEDORES -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h2>
+              <ion-icon name="storefront"></ion-icon>
+              Vendedores
+            </h2>
+            <span class="section-badge">{{ dashboardStats.totalSellers || 0 }}</span>
           </div>
-          <div class="kpi-content">
-            <p class="kpi-label">Tiendas</p>
-            <p class="kpi-value">{{ dashboardStats.totalStores }}</p>
-            <p class="kpi-subtitle">{{ dashboardStats.pendingStores }} pendientes</p>
+          
+          <div class="seller-summary-grid">
+            <div class="summary-card primary">
+              <ion-icon name="person-circle"></ion-icon>
+              <p class="summary-label">Vendedores Activos</p>
+              <p class="summary-value">{{ dashboardStats.activeSellers || 0 }}</p>
+            </div>
+            <div class="summary-card success">
+              <ion-icon name="trending-up"></ion-icon>
+              <p class="summary-label">Ingresos Vendedores</p>
+              <p class="summary-value">${{ (dashboardStats.sellerRevenue || 0) | number: '1.0-0' }}</p>
+            </div>
+            <div class="summary-card warning">
+              <ion-icon name="star"></ion-icon>
+              <p class="summary-label">Calificación Promedio</p>
+              <p class="summary-value">{{ dashboardStats.avgRating || '0' }}/5</p>
+            </div>
+            <div class="summary-card info">
+              <ion-icon name="cube-outline"></ion-icon>
+              <p class="summary-label">Productos Total</p>
+              <p class="summary-value">{{ dashboardStats.sellerProductCount || '0' }}</p>
+            </div>
+          </div>
+
+          <div class="sellers-list-container">
+            <h3 class="list-title">Detalle por Vendedor</h3>
+            <div class="seller-item" *ngFor="let seller of topSellers | slice:0:8">
+              <div class="seller-header">
+                <div class="seller-info">
+                  <p class="seller-name">{{ seller.nombre }}</p>
+                  <p class="seller-email">{{ seller.email }}</p>
+                </div>
+                <div class="seller-badge" [ngClass]="seller.estado === 'activo' ? 'active' : 'inactive'">
+                  {{ seller.estado }}
+                </div>
+              </div>
+              <div class="seller-metrics">
+                <div class="metric">
+                  <span class="metric-label">Productos</span>
+                  <span class="metric-value">{{ seller.productCount || 0 }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Ingresos</span>
+                  <span class="metric-value">${{ (seller.totalRevenue || 0) | number: '1.0-0' }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Pedidos</span>
+                  <span class="metric-value">{{ seller.orderCount || 0 }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Rating</span>
+                  <span class="metric-value">{{ seller.rating || '0' }}/5</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="kpi-card">
-          <div class="kpi-icon orders-icon">
-            <ion-icon name="cube"></ion-icon>
+        <!-- SECCIÓN CLIENTES -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h2>
+              <ion-icon name="shopping-cart"></ion-icon>
+              Clientes
+            </h2>
+            <span class="section-badge">{{ dashboardStats.totalCustomers || 0 }}</span>
           </div>
-          <div class="kpi-content">
-            <p class="kpi-label">Pedidos</p>
-            <p class="kpi-value">{{ dashboardStats.totalOrders }}</p>
-            <p class="kpi-subtitle">{{ dashboardStats.pendingOrders }} pendientes</p>
+
+          <div class="customer-summary-grid">
+            <div class="summary-card primary">
+              <ion-icon name="person"></ion-icon>
+              <p class="summary-label">Clientes Activos</p>
+              <p class="summary-value">{{ dashboardStats.activeCustomers || 0 }}</p>
+            </div>
+            <div class="summary-card success">
+              <ion-icon name="cart"></ion-icon>
+              <p class="summary-label">Gasto Total Clientes</p>
+              <p class="summary-value">${{ (dashboardStats.customerSpending || 0) | number: '1.0-0' }}</p>
+            </div>
+            <div class="summary-card warning">
+              <ion-icon name="wallet"></ion-icon>
+              <p class="summary-label">Ticket Promedio</p>
+              <p class="summary-value">${{ dashboardStats.avgOrderValue || '0' | number: '1.0-0' }}</p>
+            </div>
+            <div class="summary-card info">
+              <ion-icon name="repeat"></ion-icon>
+              <p class="summary-label">Clientes Recurrentes</p>
+              <p class="summary-value">{{ dashboardStats.repeatCustomers || '0' }}%</p>
+            </div>
+          </div>
+
+          <div class="customers-list-container">
+            <h3 class="list-title">Detalle por Cliente</h3>
+            <div class="customer-item" *ngFor="let customer of topCustomers | slice:0:8">
+              <div class="customer-header">
+                <div class="customer-info">
+                  <p class="customer-name">{{ customer.nombre }}</p>
+                  <p class="customer-email">{{ customer.email }}</p>
+                </div>
+                <div class="customer-badge" [ngClass]="customer.estado === 'activo' ? 'active' : 'inactive'">
+                  {{ customer.estado }}
+                </div>
+              </div>
+              <div class="customer-metrics">
+                <div class="metric">
+                  <span class="metric-label">Compras</span>
+                  <span class="metric-value">{{ customer.purchaseCount || 0 }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Gasto Total</span>
+                  <span class="metric-value">${{ (customer.totalSpent || 0) | number: '1.0-0' }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Ticket Promedio</span>
+                  <span class="metric-value">${{ (customer.avgOrderValue || 0) | number: '1.0-0' }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Compras Mes</span>
+                  <span class="metric-value">{{ customer.monthlyPurchases || 0 }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="kpi-card">
-          <div class="kpi-icon revenue-icon">
-            <ion-icon name="cash"></ion-icon>
+        <!-- SECCIÓN DE MARCAS TOP -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h2>
+              <ion-icon name="bookmark"></ion-icon>
+              Marcas Principales
+            </h2>
           </div>
-          <div class="kpi-content">
-            <p class="kpi-label">Ingresos Mes</p>
-            <p class="kpi-value">${{ dashboardStats.monthlyRevenue | number: '1.0-0' }}</p>
-            <p class="kpi-subtitle">Total: ${{ dashboardStats.totalRevenue | number: '1.0-0' }}</p>
+
+          <div class="brands-container">
+            <div class="brand-item" *ngFor="let brand of topBrands | slice:0:5">
+              <div class="brand-info">
+                <p class="brand-name">{{ brand.name }}</p>
+                <p class="brand-products">{{ brand.productCount || 0 }} productos</p>
+              </div>
+              <div class="brand-metric">
+                <p class="metric-value">{{ brand.sales || 0 }}</p>
+                <p class="metric-label">ventas</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============= USUARIOS TAB ============= -->
+    <!-- ============= USUARIOS ============= -->
     <div *ngIf="selectedTab === 'users'" class="tab-content">
       <h1>Gestión de Usuarios</h1>
       
-      <!-- Búsqueda y filtros -->
       <ion-card class="filters-card">
         <ion-card-content>
-          <div class="search-bar">
-            <ion-searchbar 
-              placeholder="Buscar por nombre o email..." 
-              [(ngModel)]="userSearchTerm"
-              (ionChange)="searchUsers(userSearchTerm)">
-            </ion-searchbar>
-          </div>
+          <ion-searchbar 
+            placeholder="Buscar por nombre o email..." 
+            [(ngModel)]="userSearchTerm"
+            (ionChange)="searchUsers(userSearchTerm)">
+          </ion-searchbar>
           <ion-segment [(ngModel)]="userFilterStatus" (ionChange)="filterUsersByStatus(userFilterStatus)" class="filter-segment">
             <ion-segment-button value="all">Todos</ion-segment-button>
             <ion-segment-button value="activo">Activos</ion-segment-button>
@@ -100,7 +262,6 @@
 
       <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
 
-      <!-- Tabla de usuarios -->
       <div class="table-container" *ngIf="!isLoading && filteredUsers.length > 0">
         <table class="data-table">
           <thead>
@@ -124,51 +285,47 @@
                 </ion-badge>
               </td>
               <td>
-                <ion-badge [color]="user.estado === 'activo' ? 'success' : user.estado === 'bloqueado' ? 'danger' : 'warning'">
+                <ion-badge [color]="user.estado === 'activo' ? 'success' : 'danger'">
                   {{ user.estado }}
                 </ion-badge>
               </td>
               <td>
-                <div class="actions">
-                  <ion-button size="small" color="primary" (click)="viewUserDetails(user)">
-                    <ion-icon slot="icon-only" name="eye"></ion-icon>
-                  </ion-button>
-                  <ion-button 
-                    size="small" 
-                    [color]="user.estado === 'bloqueado' ? 'success' : 'danger'"
-                    (click)="user.estado === 'bloqueado' ? unbanUser(user.id) : banUser(user.id)">
-                    <ion-icon slot="icon-only" [name]="user.estado === 'bloqueado' ? 'checkmark' : 'close'"></ion-icon>
-                  </ion-button>
-                </div>
+                <ion-button size="small" class="btn-primary" (click)="viewUserDetails(user)">
+                  <ion-icon name="eye"></ion-icon>
+                </ion-button>
+                <ion-button 
+                  size="small" 
+                  [color]="user.estado === 'bloqueado' ? 'success' : 'danger'"
+                  (click)="user.estado === 'bloqueado' ? unbanUser(user.id) : banUser(user.id)">
+                  <ion-icon [name]="user.estado === 'bloqueado' ? 'checkmark' : 'close'"></ion-icon>
+                </ion-button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Paginación -->
       <div class="pagination" *ngIf="totalUserPages > 1">
         <ion-button (click)="userPage = userPage - 1" [disabled]="userPage === 1">
           <ion-icon slot="start" name="chevron-back"></ion-icon>
           Anterior
         </ion-button>
-        <span>Página {{ userPage }} de {{ totalUserPages }}</span>
+        <span>{{ userPage }} / {{ totalUserPages }}</span>
         <ion-button (click)="userPage = userPage + 1" [disabled]="userPage === totalUserPages">
           Siguiente
           <ion-icon slot="end" name="chevron-forward"></ion-icon>
         </ion-button>
       </div>
 
-      <!-- Sin resultados -->
       <div *ngIf="!isLoading && filteredUsers.length === 0" class="no-results">
         <p>No se encontraron usuarios</p>
       </div>
 
-      <!-- Modal de detalles -->
+      <!-- Modal detalles usuario -->
       <div class="detail-modal" *ngIf="selectedUser" (click)="closeUserDetails()">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <ion-button fill="clear" class="close-btn" (click)="closeUserDetails()">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
+            <ion-icon name="close"></ion-icon>
           </ion-button>
           <h2>Detalles del Usuario</h2>
           <div class="detail-info">
@@ -180,132 +337,124 @@
             <p><strong>Estado:</strong> {{ selectedUser.estado }}</p>
             <p><strong>Fecha Registro:</strong> {{ selectedUser.fechaRegistro }}</p>
             <p *ngIf="selectedUser.tienda"><strong>Tienda:</strong> {{ selectedUser.tienda }}</p>
-            <p><strong>Ordenes:</strong> {{ selectedUser.ordenes }}</p>
+            <p><strong>Órdenes:</strong> {{ selectedUser.ordenes }}</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============= TIENDAS TAB ============= -->
-    <div *ngIf="selectedTab === 'stores'" class="tab-content">
-      <h1>Gestión de Tiendas</h1>
+    <!-- ============= MARCAS ============= -->
+    <div *ngIf="selectedTab === 'brands'" class="tab-content">
+      <h1>Gestión de Marcas</h1>
       
-      <!-- Búsqueda y filtros -->
       <ion-card class="filters-card">
         <ion-card-content>
-          <div class="search-bar">
+          <div class="search-with-action">
             <ion-searchbar 
-              placeholder="Buscar tiendas..." 
-              [(ngModel)]="storeSearchTerm"
-              (ionChange)="searchStores(storeSearchTerm)">
+              placeholder="Buscar marcas..." 
+              [(ngModel)]="brandSearchTerm"
+              (ionChange)="searchBrands(brandSearchTerm)">
             </ion-searchbar>
+            <ion-button class="btn-primary" (click)="openCreateBrandStepper()">
+              <ion-icon name="add" slot="start"></ion-icon>
+              Crear
+            </ion-button>
           </div>
-          <ion-segment [(ngModel)]="storeFilterStatus" (ionChange)="filterStoresByStatus(storeFilterStatus)" class="filter-segment">
-            <ion-segment-button value="all">Todas</ion-segment-button>
-            <ion-segment-button value="verificada">Verificadas</ion-segment-button>
-            <ion-segment-button value="pendiente">Pendientes</ion-segment-button>
-            <ion-segment-button value="suspendida">Suspendidas</ion-segment-button>
-          </ion-segment>
         </ion-card-content>
       </ion-card>
 
       <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
 
-      <!-- Tabla de tiendas -->
-      <div class="table-container" *ngIf="!isLoading && filteredStores.length > 0">
+      <div class="grid-container" *ngIf="!isLoading && filteredBrands.length > 0">
+        <div class="grid-item" *ngFor="let brand of paginatedBrands">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ brand.name }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p><strong>Descripción:</strong> {{ brand.description || 'Sin descripción' }}</p>
+              <p><strong>País:</strong> {{ brand.countryOrigin || '-' }}</p>
+              <div class="actions">
+                <ion-button size="small" class="btn-danger" (click)="deleteBrand(brand.id)">
+                  <ion-icon name="trash"></ion-icon> Eliminar
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </div>
+
+      <div class="pagination" *ngIf="totalBrandPages > 1">
+        <ion-button (click)="brandPage = brandPage - 1" [disabled]="brandPage === 1">Anterior</ion-button>
+        <span>{{ brandPage }} / {{ totalBrandPages }}</span>
+        <ion-button (click)="brandPage = brandPage + 1" [disabled]="brandPage === totalBrandPages">Siguiente</ion-button>
+      </div>
+
+      <div *ngIf="!isLoading && filteredBrands.length === 0" class="no-results">
+        <p>No se encontraron marcas</p>
+      </div>
+    </div>
+
+    <!-- ============= PERFUMES ============= -->
+    <div *ngIf="selectedTab === 'perfumes'" class="tab-content">
+      <h1>Gestión de Perfumes</h1>
+      
+      <ion-card class="filters-card">
+        <ion-card-content>
+          <ion-searchbar 
+            placeholder="Buscar perfumes..." 
+            [(ngModel)]="perfumeSearchTerm"
+            (ionChange)="searchPerfumes(perfumeSearchTerm)">
+          </ion-searchbar>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+
+      <div class="table-container" *ngIf="!isLoading && filteredPerfumes.length > 0">
         <table class="data-table">
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Propietario</th>
-              <th>Productos</th>
-              <th>Ventas Mes</th>
-              <th>Estado</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Marca</th>
+              <th>Categoría</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let store of paginatedStores">
-              <td>{{ store.nombre }}</td>
-              <td>{{ store.propietario }}</td>
-              <td>{{ store.productosActivos }}</td>
-              <td>${{ store.ventasMes | number: '1.0-0' }}</td>
+            <tr *ngFor="let perfume of paginatedPerfumes">
+              <td>{{ perfume.name }}</td>
+              <td>${{ perfume.price | number: '1.2-2' }}</td>
+              <td>{{ perfume.stock }}</td>
+              <td>{{ perfume.brand?.name || '-' }}</td>
+              <td>{{ perfume.category?.name || '-' }}</td>
               <td>
-                <ion-badge [color]="store.estado === 'verificada' ? 'success' : store.estado === 'suspendida' ? 'danger' : 'warning'">
-                  {{ store.estado }}
-                </ion-badge>
-              </td>
-              <td>
-                <div class="actions">
-                  <ion-button size="small" color="primary" (click)="viewStoreDetails(store)">
-                    <ion-icon slot="icon-only" name="eye"></ion-icon>
-                  </ion-button>
-                  <ion-button 
-                    *ngIf="store.estado === 'pendiente'"
-                    size="small" 
-                    color="success"
-                    (click)="verifyStore(store.id)">
-                    <ion-icon slot="icon-only" name="checkmark"></ion-icon>
-                  </ion-button>
-                  <ion-button 
-                    *ngIf="store.estado !== 'suspendida'"
-                    size="small" 
-                    color="danger"
-                    (click)="suspendStore(store.id)">
-                    <ion-icon slot="icon-only" name="ban"></ion-icon>
-                  </ion-button>
-                </div>
+                <ion-button size="small" class="btn-danger" (click)="deletePerfume(perfume.id)">
+                  <ion-icon name="trash"></ion-icon>
+                </ion-button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Paginación -->
-      <div class="pagination" *ngIf="totalStorePages > 1">
-        <ion-button (click)="storePage = storePage - 1" [disabled]="storePage === 1">
-          <ion-icon slot="start" name="chevron-back"></ion-icon>
-          Anterior
-        </ion-button>
-        <span>Página {{ storePage }} de {{ totalStorePages }}</span>
-        <ion-button (click)="storePage = storePage + 1" [disabled]="storePage === totalStorePages">
-          Siguiente
-          <ion-icon slot="end" name="chevron-forward"></ion-icon>
-        </ion-button>
+      <div class="pagination" *ngIf="totalPerfumePages > 1">
+        <ion-button (click)="perfumePage = perfumePage - 1" [disabled]="perfumePage === 1">Anterior</ion-button>
+        <span>{{ perfumePage }} / {{ totalPerfumePages }}</span>
+        <ion-button (click)="perfumePage = perfumePage + 1" [disabled]="perfumePage === totalPerfumePages">Siguiente</ion-button>
       </div>
 
-      <!-- Sin resultados -->
-      <div *ngIf="!isLoading && filteredStores.length === 0" class="no-results">
-        <p>No se encontraron tiendas</p>
-      </div>
-
-      <!-- Modal de detalles -->
-      <div class="detail-modal" *ngIf="selectedStore" (click)="closeStoreDetails()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
-          <ion-button fill="clear" class="close-btn" (click)="closeStoreDetails()">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
-          <h2>Detalles de la Tienda</h2>
-          <div class="detail-info">
-            <p><strong>Nombre:</strong> {{ selectedStore.nombre }}</p>
-            <p><strong>Propietario:</strong> {{ selectedStore.propietario }}</p>
-            <p><strong>Email:</strong> {{ selectedStore.email }}</p>
-            <p><strong>Descripción:</strong> {{ selectedStore.descripcion }}</p>
-            <p><strong>Productos Activos:</strong> {{ selectedStore.productosActivos }}</p>
-            <p><strong>Ventas Este Mes:</strong> ${{ selectedStore.ventasMes | number: '1.0-0' }}</p>
-            <p><strong>Calificación:</strong> {{ selectedStore.calificacion }}/5 ⭐</p>
-            <p><strong>Estado:</strong> {{ selectedStore.estado }}</p>
-            <p><strong>Fecha Creación:</strong> {{ selectedStore.fechaCreacion }}</p>
-          </div>
-        </div>
+      <div *ngIf="!isLoading && filteredPerfumes.length === 0" class="no-results">
+        <p>No se encontraron perfumes</p>
       </div>
     </div>
 
-    <!-- ============= PEDIDOS TAB ============= -->
+    <!-- ============= PEDIDOS ============= -->
     <div *ngIf="selectedTab === 'orders'" class="tab-content">
       <h1>Gestión de Pedidos</h1>
       
-      <!-- Filtros -->
       <ion-card class="filters-card">
         <ion-card-content>
           <ion-segment [(ngModel)]="orderFilterStatus" (ionChange)="filterOrdersByStatus(orderFilterStatus)" class="filter-segment">
@@ -320,7 +469,6 @@
 
       <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
 
-      <!-- Tabla de pedidos -->
       <div class="table-container" *ngIf="!isLoading && filteredOrders.length > 0">
         <table class="data-table">
           <thead>
@@ -351,40 +499,30 @@
               </td>
               <td>{{ order.fecha }}</td>
               <td>
-                <div class="actions">
-                  <ion-button size="small" color="primary" (click)="viewOrderDetails(order)">
-                    <ion-icon slot="icon-only" name="eye"></ion-icon>
-                  </ion-button>
-                </div>
+                <ion-button size="small" class="btn-primary" (click)="viewOrderDetails(order)">
+                  <ion-icon name="eye"></ion-icon>
+                </ion-button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Paginación -->
       <div class="pagination" *ngIf="totalOrderPages > 1">
-        <ion-button (click)="orderPage = orderPage - 1" [disabled]="orderPage === 1">
-          <ion-icon slot="start" name="chevron-back"></ion-icon>
-          Anterior
-        </ion-button>
-        <span>Página {{ orderPage }} de {{ totalOrderPages }}</span>
-        <ion-button (click)="orderPage = orderPage + 1" [disabled]="orderPage === totalOrderPages">
-          Siguiente
-          <ion-icon slot="end" name="chevron-forward"></ion-icon>
-        </ion-button>
+        <ion-button (click)="orderPage = orderPage - 1" [disabled]="orderPage === 1">Anterior</ion-button>
+        <span>{{ orderPage }} / {{ totalOrderPages }}</span>
+        <ion-button (click)="orderPage = orderPage + 1" [disabled]="orderPage === totalOrderPages">Siguiente</ion-button>
       </div>
 
-      <!-- Sin resultados -->
       <div *ngIf="!isLoading && filteredOrders.length === 0" class="no-results">
         <p>No se encontraron pedidos</p>
       </div>
 
-      <!-- Modal de detalles -->
+      <!-- Modal detalles pedido -->
       <div class="detail-modal" *ngIf="selectedOrder" (click)="closeOrderDetails()">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <ion-button fill="clear" class="close-btn" (click)="closeOrderDetails()">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
+            <ion-icon name="close"></ion-icon>
           </ion-button>
           <h2>Detalles del Pedido</h2>
           <div class="detail-info">
@@ -407,6 +545,10 @@
     </div>
 
   </div>
+
+  <!-- Stepper Component Overlay -->
+  <app-stepper></app-stepper>
+
 </ion-content>
 
 <app-footer></app-footer>

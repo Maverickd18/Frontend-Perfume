@@ -12,6 +12,25 @@ export interface DashboardStats {
   pendingOrders: number;
   monthlyRevenue: number;
   totalRevenue: number;
+  // Nuevos campos para vendedores
+  totalSellers: number;
+  activeSellers: number;
+  conversionRate: number;
+  avgRating: number;
+  productsPerSeller: number;
+  // Nuevos campos para clientes
+  totalCustomers: number;
+  activeCustomers: number;
+  monthlyPurchases: number;
+  avgOrderValue: number;
+  repeatCustomers: number;
+  // Perfumes
+  totalPerfumes: number;
+  // Vendedores - Detalles
+  sellerRevenue: number;
+  sellerProductCount: number;
+  // Clientes - Detalles
+  customerSpending: number;
 }
 
 export interface User {
@@ -48,6 +67,45 @@ export interface Order {
   productos: string;
   fecha: string;
   estado: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  description: string;
+  countryOrigin: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface Perfume {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  sizeMl: number;
+  genre: string;
+  releaseDate?: string;
+  brand: { id: number; name: string };
+  category: { id: number; name: string };
+  creador?: string;
+}
+
+export interface PerfumeDTO {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  sizeMl: number;
+  genre: string;
+  releaseDate?: string;
+  brandId: number;
+  categoryId: number;
 }
 
 export interface LoginResponse {
@@ -141,7 +199,21 @@ export class AdminService {
             totalOrders: 0,
             pendingOrders: 0,
             monthlyRevenue: 0,
-            totalRevenue: 0
+            totalRevenue: 0,
+            totalSellers: 0,
+            activeSellers: 0,
+            conversionRate: 0,
+            avgRating: 0,
+            productsPerSeller: 0,
+            totalCustomers: 0,
+            activeCustomers: 0,
+            monthlyPurchases: 0,
+            avgOrderValue: 0,
+            repeatCustomers: 0,
+            totalPerfumes: 0,
+            sellerRevenue: 0,
+            sellerProductCount: 0,
+            customerSpending: 0
           });
         })
       );
@@ -242,8 +314,116 @@ export class AdminService {
   }
 
   // Perfumes
-  getPerfumes(filtro?: string, page: number = 0, size: number = 10): Observable<any> {
-    const params = filtro ? `?filtro=${filtro}&page=${page}&size=${size}` : `?page=${page}&size=${size}`;
-    return this.http.get(`${this.API_URL}/perfumes${params}`);
+  getPerfumes(page: number = 0, size: number = 10): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/perfumes?page=${page}&size=${size}`)
+      .pipe(
+        map(response => response?.data || []),
+        catchError(error => {
+          console.error('Error loading perfumes:', error);
+          return of([]);
+        })
+      );
+  }
+
+  createPerfume(perfumeDto: PerfumeDTO): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/perfumes/nuevo`, perfumeDto)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating perfume:', error);
+          throw error;
+        })
+      );
+  }
+
+  deletePerfume(perfumeId: number): Observable<any> {
+    return this.http.delete<any>(`${this.API_URL}/perfumes/${perfumeId}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting perfume:', error);
+          throw error;
+        })
+      );
+  }
+
+  // Marcas
+  getBrands(): Observable<Brand[]> {
+    return this.http.get<Brand[]>(`${this.API_URL}/brands`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading brands:', error);
+          return of([]);
+        })
+      );
+  }
+
+  createBrand(brand: Partial<Brand>): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/brands`, brand)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating brand:', error);
+          throw error;
+        })
+      );
+  }
+
+  updateBrand(id: number, brand: Partial<Brand>): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/brands/${id}`, brand)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating brand:', error);
+          throw error;
+        })
+      );
+  }
+
+  deleteBrand(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.API_URL}/brands/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting brand:', error);
+          throw error;
+        })
+      );
+  }
+
+  // Categorías
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.API_URL}/categories`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading categories:', error);
+          return of([]);
+        })
+      );
+  }
+
+  createCategory(category: Partial<Category>): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/categories`, category)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating category:', error);
+          throw error;
+        })
+      );
+  }
+
+  updateCategory(id: number, category: Partial<Category>): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/categories/${id}`, category)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating category:', error);
+          throw error;
+        })
+      );
+  }
+
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.API_URL}/categories/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting category:', error);
+          throw error;
+        })
+      );
   }
 }
