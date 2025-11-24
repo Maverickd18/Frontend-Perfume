@@ -1,27 +1,23 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Perfumes</ion-title>
-    <ion-buttons slot="end">
-      <!-- Barra de búsqueda integrada en el header -->
+    <ion-buttons slot="end" style="gap: 8px;">
       <ion-searchbar 
         placeholder="Buscar perfumes..."
         [value]="searchQuery"
         (ionInput)="onSearchChange($event)"
         debounce="300"
-        style="padding: 0; margin-right: 1rem;"
+        style="padding: 0; margin-right: 8px;"
         class="custom-searchbar">
       </ion-searchbar>
       
-      <!-- Botones de acciones -->
-      <button class="icon-button" (click)="onCartClick()" title="Carrito">
-        <ion-icon name="cart-outline"></ion-icon>
-      </button>
-      <button class="icon-button" (click)="goProfile()" title="Perfil">
-        <ion-icon name="person-outline"></ion-icon>
-      </button>
-      <button class="icon-button" (click)="logout()" title="Salir">
-        <ion-icon name="log-out-outline"></ion-icon>
-      </button>
+      <!-- Header buttons para CLIENTE (sin campanita de notificaciones) -->
+      <app-header-buttons
+        (homeClicked)="ngOnInit()"
+        (cartClicked)="onCartClick()"
+        (profileClicked)="goProfile()"
+        (logoutClicked)="logout()">
+      </app-header-buttons>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -87,27 +83,23 @@
         <h3 class="filter-title">Precio</h3>
         <div class="price-range">
           <div class="price-display">${{ filterPriceRange[0] }} - ${{ filterPriceRange[1] }}</div>
-          <input 
-            type="range" 
+          <ion-range 
             min="0" 
             max="500" 
             [(ngModel)]="filterPriceRange[0]"
-            (change)="onFilterChange()"
-            class="range-input">
-          <input 
-            type="range" 
-            min="0" 
-            max="500" 
-            [(ngModel)]="filterPriceRange[1]"
-            (change)="onFilterChange()"
-            class="range-input">
+            (ionChange)="onFilterChange()"
+            dualKnobs="true"
+            color="primary">
+            <ion-label slot="start">0</ion-label>
+            <ion-label slot="end">500</ion-label>
+          </ion-range>
         </div>
       </div>
     </div>
 
     <div class="filter-actions">
-      <button class="btn-primary" (click)="applyFilters()">Mostrar resultados</button>
-      <button class="btn-secondary" (click)="clearFilters()">Borrar todo</button>
+      <ion-button expand="block" (click)="applyFilters()">Mostrar resultados</ion-button>
+      <ion-button expand="block" fill="outline" (click)="clearFilters()">Borrar todo</ion-button>
     </div>
   </div>
 
@@ -124,15 +116,17 @@
       <ion-icon name="warning-outline"></ion-icon>
       <h3>Error de conexión</h3>
       <p>{{ errorMessage }}</p>
-      <button class="retry-button" (click)="loadInitialData()">Reintentar</button>
+      <ion-button (click)="loadInitialData()" fill="solid">Reintentar</ion-button>
     </div>
 
     <!-- Contenido cuando hay productos -->
     <div *ngIf="!isLoading && !hasError && allProducts.length > 0">
       <!-- Botón flotante de filtros -->
-      <button class="floating-filter-button" (click)="toggleFilters()" title="Toggle filters">
-        <ion-icon name="filter-outline"></ion-icon>
-      </button>
+      <ion-fab vertical="top" horizontal="end" slot="fixed" *ngIf="!showFilters">
+        <ion-fab-button (click)="toggleFilters()" size="small">
+          <ion-icon name="filter-outline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
 
       <!-- Contador de productos -->
       <div style="padding: 0 12px; margin-bottom: 1rem; text-align: center;">
@@ -142,55 +136,56 @@
       </div>
 
       <!-- Grid de productos -->
-      <div class="grid">
-        <div class="col" *ngFor="let product of products">
-          <!-- Tarjeta de producto -->
-          <ion-card class="product-card" (click)="onView(product)">
-            <img 
-              [src]="product.imageUrl || 'assets/images/placeholder.jpg'" 
-              [alt]="product.name"
-              (error)="product.imageUrl = 'assets/images/placeholder.jpg'"
-              class="product-image">
-            
-            <ion-card-header>
-              <ion-card-title class="product-title">{{ product.name }}</ion-card-title>
-              <ion-card-subtitle class="product-brand">{{ product.brandName }}</ion-card-subtitle>
-            </ion-card-header>
-            
-            <ion-card-content>
-              <p class="product-description">{{ (product.description || '').slice(0, 60) }}...</p>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="4" size-lg="3" *ngFor="let product of products">
+            <ion-card class="product-card" (click)="onView(product)">
+              <img 
+                [src]="product.imageUrl || 'assets/images/placeholder.jpg'" 
+                [alt]="product.name"
+                (error)="product.imageUrl = 'assets/images/placeholder.jpg'"
+                class="product-image">
               
-              <div class="product-details">
-                <div class="product-info">
-                  <span class="product-size">{{ product.sizeMl }}ml</span>
-                  <span class="product-category">{{ product.categoryName }}</span>
-                </div>
+              <ion-card-header>
+                <ion-card-title class="product-title">{{ product.name }}</ion-card-title>
+                <ion-card-subtitle class="product-brand">{{ product.brandName }}</ion-card-subtitle>
+              </ion-card-header>
+              
+              <ion-card-content>
+                <p class="product-description">{{ (product.description || '').slice(0, 60) }}...</p>
                 
-                <div class="product-actions">
-                  <strong class="product-price">${{ product.price }}</strong>
-                  <ion-button 
-                    size="small" 
-                    (click)="addToCart(product); $event.stopPropagation()"
-                    [disabled]="product.stock === 0"
-                    class="add-to-cart-btn">
-                    <ion-icon name="cart-outline" slot="start"></ion-icon>
-                    {{ product.stock === 0 ? 'Sin Stock' : 'Agregar' }}
-                  </ion-button>
+                <div class="product-details">
+                  <div class="product-info">
+                    <span class="product-size">{{ product.sizeMl }}ml</span>
+                    <span class="product-category">{{ product.categoryName }}</span>
+                  </div>
+                  
+                  <div class="product-actions">
+                    <strong class="product-price">${{ product.price }}</strong>
+                    <ion-button 
+                      size="small" 
+                      (click)="addToCart(product); $event.stopPropagation()"
+                      [disabled]="product.stock === 0"
+                      class="add-to-cart-btn">
+                      <ion-icon name="cart-outline" slot="start"></ion-icon>
+                      {{ product.stock === 0 ? 'Sin Stock' : 'Agregar' }}
+                    </ion-button>
+                  </div>
                 </div>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </div>
-      </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 
       <!-- Estado vacío después de filtrar -->
       <div *ngIf="products.length === 0 && allProducts.length > 0" class="empty-state">
         <ion-icon name="search-outline"></ion-icon>
         <h3>No se encontraron productos</h3>
         <p>Intenta ajustar los filtros de búsqueda</p>
-        <button class="btn-secondary" (click)="clearFilters()" style="margin-top: 1rem;">
+        <ion-button (click)="clearFilters()" fill="outline" style="margin-top: 1rem;">
           Limpiar filtros
-        </button>
+        </ion-button>
       </div>
     </div>
 
@@ -199,9 +194,9 @@
       <ion-icon name="cube-outline"></ion-icon>
       <h3>No hay productos disponibles</h3>
       <p>No se encontraron productos en la tienda</p>
-      <button class="retry-button" (click)="loadInitialData()" style="margin-top: 1rem;">
+      <ion-button (click)="loadInitialData()" fill="solid" style="margin-top: 1rem;">
         Reintentar
-      </button>
+      </ion-button>
     </div>
   </div>
 </ion-content>

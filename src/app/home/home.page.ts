@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { ProductService, Perfume, Brand, Category } from '../services/product.service';
 import { CartService } from '../services/cart.service';
 
@@ -27,6 +28,7 @@ export class HomePage implements OnInit {
 
   constructor(
     private navCtrl: NavController,
+    private router: Router,
     private productService: ProductService,
     private cartService: CartService,
     private alertCtrl: AlertController
@@ -83,6 +85,7 @@ export class HomePage implements OnInit {
   }
 
   onFilterChange() {
+    // Este método se llama cuando cambian los sliders de precio
     this.applyFilters();
   }
 
@@ -93,7 +96,6 @@ export class HomePage implements OnInit {
     } else {
       this.filterCategory.push(categoryName);
     }
-    this.onFilterChange();
   }
 
   toggleFilterBrand(brandName: string) {
@@ -103,7 +105,6 @@ export class HomePage implements OnInit {
     } else {
       this.filterBrand.push(brandName);
     }
-    this.onFilterChange();
   }
 
   toggleFilterSize(size: string) {
@@ -113,7 +114,6 @@ export class HomePage implements OnInit {
     } else {
       this.filterSize.push(size);
     }
-    this.onFilterChange();
   }
 
   clearFilters() {
@@ -152,6 +152,8 @@ export class HomePage implements OnInit {
       
       return matchesText && matchesCategory && matchesSize && matchesBrand && matchesPrice;
     });
+
+    this.showFilters = false;
   }
 
   // ========== MÉTODOS DE NAVEGACIÓN ==========
@@ -171,25 +173,15 @@ export class HomePage implements OnInit {
   }
 
   onView(product: Perfume) {
-    this.navCtrl.navigateForward('/product-detail', {
+    // Navegar con ID en la ruta y producto en el state
+    this.router.navigate(['/product-detail', product.id], {
       state: { product }
     });
   }
 
   addToCart(product: Perfume) {
     if (product.stock > 0) {
-      this.cartService.addToCart({
-        id: product.id,
-        title: product.name,
-        description: product.description,
-        price: product.price,
-        image: product.imageUrl,
-        size: product.sizeMl + 'ml',
-        brand: product.brandName,
-        category: product.categoryName,
-        stock: product.stock
-      }, 1);
-      
+      this.cartService.addToCart(product, 1);
       this.showAddToCartAlert(product.name);
     } else {
       this.showErrorAlert('Este producto no está disponible en stock');

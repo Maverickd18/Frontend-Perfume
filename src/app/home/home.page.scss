@@ -238,19 +238,19 @@
 
 .floating-filter-button {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
-  width: 48px;
-  height: 48px;
+  bottom: 2rem;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: #000000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
   z-index: 50;
 
@@ -260,9 +260,9 @@
   }
 
   &:hover {
-    background: #333333;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
   }
 
   &:active {

@@ -4,13 +4,14 @@ import { environment } from '../../environments/environment';
 
 export interface CartItem {
   id: number;
-  title: string;
+  name: string;
   description: string;
   price: number;
-  image: string;
-  brand: string;
-  size: string;
+  imageUrl: string;
+  brandName: string;
+  sizeMl: number;
   quantity: number;
+  perfumeId?: number;
 }
 
 @Injectable({
@@ -57,19 +58,31 @@ export class CartService {
 
   addToCart(product: any, quantity: number = 1): void {
     const currentCart = this.cartItems$.value;
-    const existingItem = currentCart.find(item => item.id === product.id);
+    const productId = product.id;
+    
+    // Buscar si el producto ya está en el carrito
+    const existingItemIndex = currentCart.findIndex(item => item.id === productId);
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
+    if (existingItemIndex > -1) {
+      // Si ya existe, aumentar la cantidad
+      currentCart[existingItemIndex].quantity += quantity;
     } else {
+      // Si no existe, agregar nuevo item
       const cartItem: CartItem = {
-        ...product,
-        quantity: quantity
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        brandName: product.brandName,
+        sizeMl: product.sizeMl,
+        quantity: quantity,
+        perfumeId: product.id
       };
       currentCart.push(cartItem);
     }
 
-    this.cartItems$.next(currentCart);
+    this.cartItems$.next([...currentCart]);
     this.saveCartToLocalStorage();
     this.updateCartCount();
   }
@@ -83,14 +96,14 @@ export class CartService {
 
   updateQuantity(productId: number, quantity: number): void {
     const currentCart = this.cartItems$.value;
-    const item = currentCart.find(i => i.id === productId);
+    const itemIndex = currentCart.findIndex(i => i.id === productId);
     
-    if (item) {
+    if (itemIndex > -1) {
       if (quantity <= 0) {
         this.removeFromCart(productId);
       } else {
-        item.quantity = quantity;
-        this.cartItems$.next(currentCart);
+        currentCart[itemIndex].quantity = quantity;
+        this.cartItems$.next([...currentCart]);
         this.saveCartToLocalStorage();
         this.updateCartCount();
       }
@@ -99,28 +112,32 @@ export class CartService {
 
   clearCart(): void {
     this.cartItems$.next([]);
-    this.saveCartToLocalStorage();
+    localStorage.removeItem('cart');
     this.updateCartCount();
   }
 
-  getCart(): Observable<any> {
+  getCartTotal(): number {
+    return this.cartItems$.value.reduce((total, item) => total + (item.price * item.quantity), 0);
+  }
+
+  getCartSubtotal(): number {
+    return this.getCartTotal();
+  }
+
+  getCart(): Observable<{ items: CartItem[], total: number }> {
     return new Observable(observer => {
-      observer.next({ items: [], total: 0 });
+      const items = this.cartItems$.value;
+      const total = this.getCartTotal();
+      observer.next({ items, total });
       observer.complete();
     });
   }
 
-  checkout(orderData: any): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true, orderId: 'ORD-' + Date.now() });
-      observer.complete();
-    });
-  }
-
-  updateCart(items: any[]): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true, message: 'Carrito actualizado' });
-      observer.complete();
-    });
+  // Método para obtener los items formateados para el checkout
+  getCheckoutItems(): any[] {
+    return this.cartItems$.value.map(item => ({
+      perfumeId: item.id,
+      quantity: item.quantity
+    }));
   }
 }

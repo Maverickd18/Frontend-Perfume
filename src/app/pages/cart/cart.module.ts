@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-import { CartPage } from './cart.page';
-import { SharedModule } from '../../shared/shared-module';
-
 import { CartPageRoutingModule } from './cart-routing.module';
 
 @NgModule({
@@ -13,9 +10,7 @@ import { CartPageRoutingModule } from './cart-routing.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    SharedModule,
     CartPageRoutingModule
-  ],
-  declarations: [CartPage]
+  ]
 })
-export class CartPageModule { }
+export class CartPageModule {}
