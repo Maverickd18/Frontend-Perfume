@@ -1,86 +1,48 @@
-// Asegurar fondo claro y texto visible
-ion-content {
-  --background: #f5f5f5;
-  color: #000000;
-}
-
-ion-header {
-  ion-toolbar {
-    ion-title {
-      color: #ffffff;
-    }
-  }
-}
-
-.checkout-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  color: #000000;
-  background: #f5f5f5;
-  
-  * {
-    color: inherit;
-  }
-  
-  // Forzar colores en elementos específicos
-  p, span, div, ion-label, ion-text {
-    color: #000000;
-  }
-  
-  ion-card-content {
-    color: #000000;
-  }
-}
-
-// ============================================
-// INDICADOR DE PROGRESO
-// ============================================
 .progress-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 16px;
+  padding: 16px;
   background: var(--ion-color-light);
-
+  
   .step {
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 1;
-
+    position: relative;
+    z-index: 2;
+    
     .step-number {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--ion-color-medium);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 4px;
       transition: all 0.3s ease;
     }
-
+    
     .step-label {
       font-size: 12px;
       color: var(--ion-color-medium);
-      font-weight: 500;
       transition: all 0.3s ease;
     }
-
+    
     &.active {
       .step-number {
         background: var(--ion-color-primary);
-        transform: scale(1.1);
       }
       .step-label {
         color: var(--ion-color-primary);
+        font-weight: bold;
       }
     }
-
+    
     &.completed {
       .step-number {
         background: var(--ion-color-success);
@@ -90,390 +52,259 @@ ion-header {
       }
     }
   }
-
+  
   .progress-line {
     flex: 1;
     height: 2px;
     background: var(--ion-color-medium);
     margin: 0 8px;
-    margin-bottom: 28px;
-    transition: all 0.3s ease;
-
+    position: relative;
+    top: -16px;
+    
     &.completed {
       background: var(--ion-color-success);
     }
   }
 }
 
-// ============================================
-// SECCIONES DEL CHECKOUT
-// ============================================
-.checkout-section {
-  animation: fadeIn 0.3s ease;
+.checkout-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.checkout-section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .section-header {
   display: flex;
   align-items: center;
-  gap: 12px;
   margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--ion-color-primary);
-
+  
   ion-icon {
-    font-size: 28px;
+    font-size: 24px;
+    margin-right: 12px;
     color: var(--ion-color-primary);
   }
-
+  
   h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 600;
-    color: #000000 !important;
   }
 }
 
-// ============================================
-// FORMULARIOS
-// ============================================
-ion-list {
-  background: transparent;
-  padding: 0;
-}
-
-ion-item {
-  --background: white;
-  --border-radius: 8px;
-  margin-bottom: 16px;
-  --padding-start: 16px;
-  --inner-padding-end: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-  ion-label {
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #333333 !important;
-
-    .required {
-      color: var(--ion-color-danger);
-    }
-  }
-
-  ion-input {
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-    --color: #000000;
-    color: #000000;
-  }
+.required {
+  color: var(--ion-color-danger);
 }
 
 .error-message {
-  margin-top: -12px;
+  margin-top: 4px;
   margin-bottom: 12px;
-  padding-left: 16px;
-
+  padding: 0 16px;
+  
   small {
     font-size: 12px;
-    color: #eb445a !important;
   }
 }
 
-// ============================================
-// MÉTODOS DE PAGO
-// ============================================
 .payment-methods {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .payment-method-card {
-  background: white;
+  display: flex;
+  align-items: center;
+  padding: 16px;
   border: 2px solid var(--ion-color-light);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
+  
   ion-icon:first-child {
-    font-size: 32px;
+    font-size: 24px;
+    margin-right: 12px;
     color: var(--ion-color-medium);
   }
-
+  
   span {
-    text-align: center;
-    font-size: 14px;
+    flex: 1;
     font-weight: 500;
-    color: #000000 !important;
   }
-
+  
   .check-icon {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 24px;
     color: var(--ion-color-success);
+    font-size: 20px;
   }
-
+  
   &:hover {
     border-color: var(--ion-color-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-
+  
   &.selected {
     border-color: var(--ion-color-primary);
-    background: var(--ion-color-primary-tint);
-
+    background: rgba(var(--ion-color-primary-rgb), 0.05);
+    
     ion-icon:first-child {
       color: var(--ion-color-primary);
     }
   }
 }
 
-// ============================================
-// TARJETAS DE RESUMEN
-// ============================================
-.summary-card {
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-
-  ion-card-header {
-    padding-bottom: 12px;
-  }
-
-  ion-card-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #000000 !important;
-  }
-
-  ion-card-content {
-    p {
-      margin: 4px 0;
-      color: #333333 !important;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      ion-icon {
-        font-size: 18px;
-      }
-    }
-
-    strong {
-      color: #000000 !important;
-    }
-  }
-}
-
 .info-card {
-  background: var(--ion-color-light-tint);
-  margin-top: 16px;
-
+  margin: 16px 0;
+  
   ion-card-content {
     p {
       margin: 8px 0;
-      font-size: 14px;
-      color: #333333 !important;
-    }
-
-    .note {
-      font-size: 12px;
-      font-style: italic;
-      color: #666666 !important;
-      margin-top: 12px;
+      
+      &.note {
+        font-style: italic;
+        color: var(--ion-color-medium);
+        font-size: 14px;
+        margin-top: 12px;
+      }
     }
   }
 }
 
-// ============================================
-// ITEMS DEL CARRITO
-// ============================================
-.cart-items {
-  margin-bottom: 20px;
-}
-
-.cart-item {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--ion-color-light);
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .item-details {
-    flex: 1;
-
-    h4 {
-      margin: 0 0 4px 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: #000000 !important;
+.summary-card {
+  margin: 16px 0;
+  
+  ion-card-content {
+    .empty-cart {
+      text-align: center;
+      padding: 20px;
+      
+      ion-icon {
+        font-size: 48px;
+        color: var(--ion-color-medium);
+        margin-bottom: 12px;
+      }
+      
+      p {
+        color: var(--ion-color-medium);
+        margin: 0;
+      }
     }
-
-    .item-meta {
-      margin: 0 0 4px 0;
-      font-size: 12px;
-      color: #666666 !important;
-    }
-
-    .item-price {
-      margin: 0;
-      font-size: 13px;
-      color: #333333 !important;
-    }
-  }
-
-  .item-total {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 600;
-    color: #3880ff !important;
-  }
-}
-
-// ============================================
-// DESGLOSE DE PRECIOS
-// ============================================
-.price-breakdown {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 2px solid var(--ion-color-light);
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  margin: 8px 0;
-  font-size: 14px;
-  color: #333333 !important;
-
-  &.total {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--ion-color-light);
-    font-size: 18px;
-    color: #000000 !important;
-    font-weight: bold;
-  }
-}
-
-// ============================================
-// BOTONES
-// ============================================
-.button-container {
-  margin-top: 24px;
-  display: flex;
-  gap: 12px;
-
-  ion-button {
-    --border-radius: 8px;
-    font-weight: 600;
-    text-transform: none;
-    letter-spacing: 0.3px;
     
-    &:first-child:last-child {
-      // Si solo hay un botón
-      flex: 1;
+    .cart-items {
+      .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--ion-color-light);
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .item-image {
+          width: 60px;
+          height: 60px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-right: 12px;
+        }
+        
+        .item-details {
+          flex: 1;
+          
+          h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 600;
+          }
+          
+          .item-meta {
+            font-size: 12px;
+            color: var(--ion-color-medium);
+            margin: 0 0 4px 0;
+          }
+          
+          .item-price {
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0;
+          }
+        }
+        
+        .item-total {
+          font-weight: 600;
+          font-size: 16px;
+          color: var(--ion-color-primary);
+        }
+      }
     }
-
-    &:not(:first-child:last-child) {
-      // Si hay múltiples botones
-      flex: 1;
+    
+    .price-breakdown {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ion-color-light);
+      
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        
+        &.total {
+          border-top: 1px solid var(--ion-color-light);
+          padding-top: 8px;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--ion-color-primary);
+        }
+      }
     }
   }
 }
 
-// ============================================
-// RESPONSIVE
-// ============================================
+.button-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  
+  ion-button {
+    flex: 1;
+  }
+}
+
+// Responsive
 @media (max-width: 768px) {
   .checkout-container {
+    padding: 8px;
+  }
+  
+  .checkout-section {
     padding: 16px;
   }
-
-  .progress-indicator {
-    padding: 16px 12px;
-
-    .step {
-      .step-number {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-      }
-
-      .step-label {
-        font-size: 10px;
-      }
-    }
-
-    .progress-line {
-      margin: 0 4px;
-      margin-bottom: 24px;
-    }
-  }
-
-  .section-header {
-    h2 {
-      font-size: 18px;
-    }
-  }
-
-  .payment-methods {
-    grid-template-columns: 1fr;
-  }
-
+  
   .button-container {
     flex-direction: column;
-
-    ion-button {
-      width: 100%;
-    }
   }
-
+  
   .cart-item {
-    img {
-      width: 50px;
-      height: 50px;
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .item-image {
+      margin-bottom: 8px;
     }
-
-    .item-details h4 {
-      font-size: 13px;
+    
+    .item-details {
+      margin-bottom: 8px;
     }
-  }
-}
-
-@media (max-width: 480px) {
-  .progress-indicator .step .step-label {
-    display: none;
+    
+    .item-total {
+      align-self: flex-end;
+    }
   }
 }

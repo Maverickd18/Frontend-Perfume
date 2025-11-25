@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap, map, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -10,7 +11,34 @@ export class FavoritesService {
   private favorites$ = new BehaviorSubject<any[]>([]);
   private favoriteCount$ = new BehaviorSubject<number>(0);
 
-  constructor() {}
+  constructor(private http: HttpClient) {
+    this.loadFavorites();
+  }
+
+  private getHeaders(): HttpHeaders {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
+  }
+
+  private loadFavorites(): void {
+    this.getUserFavorites().subscribe({
+      next: (favorites) => {
+        this.favorites$.next(favorites);
+        this.favoriteCount$.next(favorites.length);
+      },
+      error: (error) => {
+        console.error('Error loading favorites:', error);
+      }
+    });
+  }
 
   getFavorites(): Observable<any[]> {
     return this.favorites$.asObservable();
@@ -20,44 +48,70 @@ export class FavoritesService {
     return this.favoriteCount$.asObservable();
   }
 
-  addToFavorites(product: any): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true, message: 'Agregado a favoritos' });
-      observer.complete();
-    });
+  addToFavorites(perfumeId: number): Observable<any> {
+    const url = `${this.baseUrl}/api/favorites/${perfumeId}`;
+    const headers = this.getHeaders();
+
+    return this.http.post(url, {}, { headers }).pipe(
+      tap(() => {
+        this.loadFavorites();
+      })
+    );
   }
 
-  removeFromFavorites(productId: number): Observable<any> {
-    return new Observable(observer => {
-      observer.next({ success: true, message: 'Removido de favoritos' });
-      observer.complete();
-    });
+  removeFromFavorites(perfumeId: number): Observable<any> {
+    const url = `${this.baseUrl}/api/favorites/${perfumeId}`;
+    const headers = this.getHeaders();
+
+    return this.http.delete(url, { headers }).pipe(
+      tap(() => {
+        this.loadFavorites();
+      })
+    );
   }
 
-  isFavorited(productId: number): Observable<boolean> {
-    return new Observable(observer => {
-      observer.next(false);
-      observer.complete();
-    });
+  isFavorited(perfumeId: number): Observable<boolean> {
+    const url = `${this.baseUrl}/api/favorites/${perfumeId}/is-favorite`;
+    const headers = this.getHeaders();
+
+    return this.http.get<{isFavorite: boolean}>(url, { headers }).pipe(
+      map(response => response.isFavorite)
+    );
   }
 
   toggleFavorite(product: any): Observable<boolean> {
-    return new Observable(observer => {
-      observer.next(true);
-      observer.complete();
-    });
+    const perfumeId = product.id || product.perfumeId;
+    
+    return this.isFavorited(perfumeId).pipe(
+      switchMap(isFavorited => {
+        if (isFavorited) {
+          return this.removeFromFavorites(perfumeId).pipe(map(() => false));
+        } else {
+          return this.addToFavorites(perfumeId).pipe(map(() => true));
+        }
+      })
+    );
+  }
+
+  getUserFavorites(): Observable<any[]> {
+    const url = `${this.baseUrl}/api/favorites`;
+    const headers = this.getHeaders();
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(response => {
+        if (response && response.status === 'success') {
+          return response.data || [];
+        }
+        return [];
+      })
+    );
   }
 
   clearFavorites(): Observable<any> {
     return new Observable(observer => {
+      this.favorites$.next([]);
+      this.favoriteCount$.next(0);
       observer.next({ success: true, message: 'Favoritos vaciados' });
-      observer.complete();
-    });
-  }
-
-  getUserFavorites(userId: number): Observable<any[]> {
-    return new Observable(observer => {
-      observer.next([]);
       observer.complete();
     });
   }
