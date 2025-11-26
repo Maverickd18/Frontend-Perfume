@@ -11,100 +11,149 @@
 
     <!-- Register Form Card -->
     <div class="form-card">
-      <h2 class="form-title">Create Account</h2>
-      <p class="form-subtitle">Join us and start shopping luxury perfumes</p>
+      <!-- ============= PASO 1: EMAIL Y ENVÍO DE CÓDIGO ============= -->
+      <div *ngIf="!codeVerificationStep" class="step-container">
+        <h2 class="form-title">Create Account</h2>
+        <p class="form-subtitle">Ingresa tu email para enviar el código de verificación</p>
 
-      <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-        <!-- Full Name Input -->
+        <form [formGroup]="registerForm">
+          <!-- Full Name Input -->
+          <ion-item>
+            <ion-label position="stacked">Full Name *</ion-label>
+            <ion-input 
+              formControlName="fullName"
+              type="text" 
+              placeholder="Enter your full name">
+            </ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="getFullNameError()">
+            <small>{{ getFullNameError() }}</small>
+          </ion-text>
+
+          <!-- User Type Selection -->
+          <div class="user-type-section">
+            <label class="user-type-label">I am a:</label>
+            <ion-segment formControlName="userType" mode="ios" class="user-type-segment">
+              <ion-segment-button value="CLIENTE">
+                <ion-icon name="person-outline"></ion-icon>
+                <ion-label>Client</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="VENDEDOR">
+                <ion-icon name="storefront-outline"></ion-icon>
+                <ion-label>Seller</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </div>
+
+          <!-- Email Input -->
+          <ion-item>
+            <ion-label position="stacked">Email *</ion-label>
+            <ion-input 
+              formControlName="email"
+              type="email" 
+              placeholder="Enter your email">
+            </ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="getEmailError()">
+            <small>{{ getEmailError() }}</small>
+          </ion-text>
+
+          <!-- Password Input -->
+          <ion-item>
+            <ion-label position="stacked">Password *</ion-label>
+            <ion-input 
+              formControlName="password"
+              type="password" 
+              placeholder="Enter your password">
+            </ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="getPasswordError()">
+            <small>{{ getPasswordError() }}</small>
+          </ion-text>
+
+          <!-- Confirm Password Input -->
+          <ion-item>
+            <ion-label position="stacked">Confirm Password *</ion-label>
+            <ion-input 
+              formControlName="confirmPassword"
+              type="password" 
+              placeholder="Confirm your password">
+            </ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="getConfirmPasswordError()">
+            <small>{{ getConfirmPasswordError() }}</small>
+          </ion-text>
+
+          <!-- Send Code Button -->
+          <ion-button 
+            (click)="sendVerificationCode()"
+            expand="block" 
+            [disabled]="!registerForm.get('email')?.valid || !registerForm.get('fullName')?.valid || isLoading"
+            class="register-button">
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <ion-icon *ngIf="!isLoading" slot="start" name="send"></ion-icon>
+            {{ isLoading ? 'Enviando código...' : 'Enviar código de verificación' }}
+          </ion-button>
+        </form>
+      </div>
+
+      <!-- ============= PASO 2: VERIFICAR CÓDIGO ============= -->
+      <div *ngIf="codeVerificationStep && !codeVerified" class="step-container">
+        <h2 class="form-title">Verify Your Email</h2>
+        <p class="form-subtitle">Ingresa el código enviado a {{ registerForm.get('email')?.value }}</p>
+
+        <!-- Verification Code Input -->
         <ion-item>
-          <ion-label position="stacked">Full Name *</ion-label>
+          <ion-label position="stacked">Código de Verificación *</ion-label>
           <ion-input 
-            formControlName="fullName"
             type="text" 
-            placeholder="Enter your full name">
+            inputmode="numeric"
+            maxlength="10"
+            (input)="onVerificationCodeInput($event)"
+            [value]="verificationCodeInput"
+            placeholder="Ingresa el código">
           </ion-input>
         </ion-item>
-        <ion-text color="danger" *ngIf="getFullNameError()">
-          <small>{{ getFullNameError() }}</small>
+        <ion-text color="danger" *ngIf="codeError">
+          <small>{{ codeError }}</small>
         </ion-text>
 
-        <!-- User Type Selection -->
-        <div class="user-type-section">
-          <label class="user-type-label">I am a:</label>
-          <ion-segment formControlName="userType" mode="ios" class="user-type-segment">
-            <ion-segment-button value="CLIENTE">
-              <ion-icon name="person-outline"></ion-icon>
-              <ion-label>Client</ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="VENDEDOR">
-              <ion-icon name="storefront-outline"></ion-icon>
-              <ion-label>Seller</ion-label>
-            </ion-segment-button>
-          </ion-segment>
-        </div>
-
-        <!-- Email Input -->
-        <ion-item>
-          <ion-label position="stacked">Email *</ion-label>
-          <ion-input 
-            formControlName="email"
-            type="email" 
-            placeholder="Enter your email">
-          </ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="getEmailError()">
-          <small>{{ getEmailError() }}</small>
-        </ion-text>
-
-        <!-- Password Input -->
-        <ion-item>
-          <ion-label position="stacked">Password *</ion-label>
-          <ion-input 
-            formControlName="password"
-            type="password" 
-            placeholder="Enter your password">
-          </ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="getPasswordError()">
-          <small>{{ getPasswordError() }}</small>
-        </ion-text>
-
-        <!-- Confirm Password Input -->
-        <ion-item>
-          <ion-label position="stacked">Confirm Password *</ion-label>
-          <ion-input 
-            formControlName="confirmPassword"
-            type="password" 
-            placeholder="Confirm your password">
-          </ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="getConfirmPasswordError()">
-          <small>{{ getConfirmPasswordError() }}</small>
-        </ion-text>
-
-        <!-- Terms and Conditions -->
-        <ion-item lines="none" class="terms-item">
-          <ion-checkbox slot="start" [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}"></ion-checkbox>
-          <ion-label class="terms-label">
-            I accept the <a class="terms-link">Terms and Conditions</a> and <a class="terms-link">Privacy Policy</a>
-          </ion-label>
-        </ion-item>
-
-        <!-- Register Button -->
+        <!-- Verify Code Button -->
         <ion-button 
-          type="submit"
+          (click)="verifyCode()"
           expand="block" 
-          [disabled]="!registerForm.valid || !acceptTerms || isLoading"
-          class="register-button">
+          [disabled]="verificationCodeInput.length < 4 || isLoading"
+          class="register-button"
+          color="success">
           <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
-          <ion-icon *ngIf="!isLoading" slot="start" name="person-add-outline"></ion-icon>
-          {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+          <ion-icon *ngIf="!isLoading" slot="start" name="checkmark-circle"></ion-icon>
+          {{ isLoading ? 'Verificando...' : 'Verificar Código' }}
         </ion-button>
-      </form>
 
-      <!-- Switch to Login -->
-      <div class="switch-auth">
-        <p>Already have an account? <a (click)="goToLogin()">Log In</a></p>
+        <!-- Resend Code Button -->
+        <ion-button 
+          (click)="resendCode()"
+          expand="block" 
+          fill="outline"
+          [disabled]="resendCountdown > 0"
+          class="resend-button">
+          {{ resendCountdown > 0 ? `Reenviar en ${resendCountdown}s` : 'Reenviar código' }}
+        </ion-button>
+
+        <!-- Back Button -->
+        <ion-button 
+          (click)="codeVerificationStep = false"
+          expand="block" 
+          fill="clear"
+          color="medium">
+          <ion-icon slot="start" name="arrow-back"></ion-icon>
+          Volver
+        </ion-button>
+      </div>
+
+      <!-- Switch to Login (visible en todos los pasos) -->
+      <div class="switch-auth" *ngIf="!codeVerified">
+        <p>¿Ya tienes cuenta? <a (click)="goToLogin()">Inicia sesión</a></p>
       </div>
     </div>
   </div>

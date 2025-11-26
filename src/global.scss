@@ -163,3 +163,27 @@ ion-header {
     margin-bottom: 16px;
   }
 }
+
+/* Ocultar las flechas de spinner de inputs numéricos globalmente */
+input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+/* Para ion-input también */
+ion-input input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+ion-input input[type="number"]::-webkit-outer-spin-button,
+ion-input input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}

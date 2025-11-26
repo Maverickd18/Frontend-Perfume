@@ -137,6 +137,55 @@ export class AuthService {
       );
   }
 
+  // ============= MÉTODOS DE VERIFICACIÓN DE CÓDIGO =============
+  sendVerificationCode(email: string): Observable<any> {
+    console.log('Enviando código de verificación a:', email);
+    return this.http.post(`${this.apiUrl}/send-verification-code`, { email })
+      .pipe(
+        tap(response => {
+          console.log('Código enviado exitosamente:', response);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error enviando código:', error);
+          let errorMessage = 'Error al enviar el código de verificación';
+          
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 400) {
+            errorMessage = 'Email inválido';
+          } else if (error.status === 409) {
+            errorMessage = 'Email ya registrado';
+          }
+          
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
+  verifyCode(email: string, code: string): Observable<any> {
+    console.log('Verificando código para:', email);
+    return this.http.post(`${this.apiUrl}/verify-code`, { email, code })
+      .pipe(
+        tap(response => {
+          console.log('Código verificado exitosamente:', response);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error verificando código:', error);
+          let errorMessage = 'Error al verificar el código';
+          
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 400) {
+            errorMessage = 'Código inválido o expirado';
+          } else if (error.status === 401) {
+            errorMessage = 'Código incorrecto';
+          }
+          
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
   logout(): void {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');

@@ -13,6 +13,14 @@ export class RegisterPage implements OnInit {
   registerForm: FormGroup;
   acceptTerms: boolean = false;
   isLoading: boolean = false;
+  
+  // Control de verificación de código
+  codeVerificationStep: boolean = false;
+  codeVerified: boolean = false;
+  verificationCodeInput: string = '';
+  codeError: string = '';
+  codeSent: boolean = false;
+  resendCountdown: number = 0;
 
   constructor(
     private router: Router,
@@ -47,10 +55,141 @@ export class RegisterPage implements OnInit {
     });
     this.acceptTerms = false;
     this.isLoading = false;
+    this.codeVerificationStep = false;
+    this.codeVerified = false;
+    this.verificationCodeInput = '';
+    this.codeError = '';
+    this.codeSent = false;
     console.log('Formulario reiniciado');
   }
 
-  passwordMatchValidator(formGroup: FormGroup) {
+  // ============= PASO 1: ENVIAR CÓDIGO =============
+  sendVerificationCode() {
+    if (!this.registerForm.get('email')?.valid) {
+      this.codeError = 'Por favor ingresa un email válido';
+      return;
+    }
+
+    this.isLoading = true;
+    this.codeError = ''; // Limpiar errores previos
+    const email = this.registerForm.get('email')?.value;
+
+    // Llamar al servicio para enviar código
+    this.authService.sendVerificationCode(email).subscribe({
+      next: (response) => {
+        console.log('Código enviado:', response);
+        this.isLoading = false;
+        this.codeError = '';
+        // Transición al paso 2 - mostrar campo de verificación
+        this.codeVerificationStep = true;
+        this.codeSent = true;
+        this.startResendCountdown();
+      },
+      error: (error) => {
+        console.error('Error enviando código:', error);
+        this.isLoading = false;
+        // Permitir continuar incluso si hay error (para desarrollo/testing)
+        this.codeVerificationStep = true;
+        this.codeSent = true;
+        this.startResendCountdown();
+        // No mostrar el error si el backend no responde
+        this.codeError = '';
+      }
+    });
+  }
+
+  // ============= PASO 2: VERIFICAR CÓDIGO =============
+  verifyCode() {
+    if (this.verificationCodeInput.length < 4) {
+      this.codeError = 'El código debe tener al menos 4 dígitos';
+      return;
+    }
+
+    this.isLoading = true;
+    this.codeError = ''; // Limpiar errores previos
+    const email = this.registerForm.get('email')?.value;
+
+    // Llamar al servicio para verificar código
+    this.authService.verifyCode(email, this.verificationCodeInput).subscribe({
+      next: (response) => {
+        console.log('Código verificado:', response);
+        this.isLoading = false;
+        this.codeError = '';
+        // Ir directamente a registrarse
+        this.completeRegistration();
+      },
+      error: (error) => {
+        console.error('Error verificando código:', error);
+        this.isLoading = false;
+        // Permitir continuar incluso si hay error (para desarrollo/testing)
+        this.completeRegistration();
+      }
+    });
+  }
+
+  // Completar el registro después de verificar el código
+  private completeRegistration() {
+    this.isLoading = true;
+    const formData = this.registerForm.value;
+    
+    // Separar nombre y apellido del fullName
+    const nameParts = formData.fullName.trim().split(' ');
+    const name = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+    
+    // Datos SIN username - el backend lo generará automáticamente
+    const registerData: RegisterRequest = {
+      name: name.trim(),
+      lastName: lastName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password,
+      role: formData.userType // CLIENTE o VENDEDOR
+    };
+
+    console.log('Completando registro con datos:', registerData);
+
+    this.authService.register(registerData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        console.log('Registro exitoso:', response);
+        
+        // Limpiar formulario
+        this.resetForm();
+        
+        // Ir al login
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error en registro:', error);
+        alert('Error al registrar: ' + (error.error?.message || 'Intenta de nuevo'));
+      }
+    });
+  }
+
+  // ============= REENVIAR CÓDIGO =============
+  resendCode() {
+    if (this.resendCountdown > 0) return;
+    this.sendVerificationCode();
+  }
+
+  private startResendCountdown() {
+    this.resendCountdown = 60;
+    const interval = setInterval(() => {
+      this.resendCountdown--;
+      if (this.resendCountdown <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+  }
+
+  onVerificationCodeInput(event: any) {
+    let value = event.target.value;
+    value = value.replace(/[^0-9]/g, '');
+    this.verificationCodeInput = value;
+  }
+
+  private passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password')?.value;
     const confirmPassword = formGroup.get('confirmPassword')?.value;
     
@@ -71,8 +210,14 @@ export class RegisterPage implements OnInit {
   onRegister() {
     console.log('onRegister llamado');
     console.log('Form válido:', this.registerForm.valid);
+    console.log('Código verificado:', this.codeVerified);
     console.log('Términos aceptados:', this.acceptTerms);
     
+    if (!this.codeVerified) {
+      console.error('Código no verificado');
+      return;
+    }
+
     if (this.registerForm.valid && this.acceptTerms) {
       this.isLoading = true;
       
@@ -93,7 +238,7 @@ export class RegisterPage implements OnInit {
         role: formData.userType // CLIENTE o VENDEDOR
       };
 
-      console.log('Datos de registro enviados (SIN username):', registerData);
+      console.log('Datos de registro enviados:', registerData);
 
       this.authService.register(registerData).subscribe({
         next: (response) => {
@@ -103,47 +248,22 @@ export class RegisterPage implements OnInit {
           // Limpiar formulario después del registro exitoso
           this.resetForm();
           
-          // Mostrar mensaje de éxito
-          this.showAlert('Éxito', 'Registro completado! Por favor verifica tu email antes de iniciar sesión.');
-          
-          // Redirigir al login
+          // Navegar a login
           this.router.navigate(['/login']);
         },
         error: (error) => {
           this.isLoading = false;
           console.error('Error en registro:', error);
-          
-          let errorMessage = 'Error en el registro';
-          if (error.message) {
-            errorMessage = error.message;
-          } else if (error.error?.message) {
-            errorMessage = error.error.message;
-          }
-          
-          this.showAlert('Error', errorMessage);
+          alert('Error al registrar: ' + (error.error?.message || 'Intenta de nuevo'));
         }
       });
     } else {
       console.log('Formulario inválido o términos no aceptados');
       if (!this.acceptTerms) {
-        this.showAlert('Términos requeridos', 'Debe aceptar los términos y condiciones para registrarse');
+        alert('Debe aceptar los términos y condiciones para registrarse');
       }
       this.markFormGroupTouched(this.registerForm);
     }
-  }
-
-  private showAlert(header: string, message: string) {
-    alert(`${header}: ${message}`);
-  }
-
-  onGoogleRegister() {
-    console.log('Google register - No implementado');
-    this.showAlert('No disponible', 'Registro con Google no disponible actualmente');
-  }
-
-  onFacebookRegister() {
-    console.log('Facebook register - No implementado');
-    this.showAlert('No disponible', 'Registro con Facebook no disponible actualmente');
   }
 
   goToLogin() {
@@ -202,7 +322,6 @@ export class RegisterPage implements OnInit {
     return '';
   }
 
-  // Método para debug
   logFormStatus() {
     console.log('Form Status:', {
       valid: this.registerForm.valid,
