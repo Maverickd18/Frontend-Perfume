@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
+// ========== INTERFACES ==========
 
 export interface DashboardStats {
   totalUsers: number;
@@ -91,8 +94,8 @@ export interface Perfume {
   sizeMl: number;
   genre: string;
   releaseDate?: string;
-  brand: { id: number; name: string };
-  category: { id: number; name: string };
+  brand?: { id: number; name: string };
+  category?: { id: number; name: string };
   creador?: string;
 }
 
@@ -118,26 +121,128 @@ export interface LoginResponse {
   };
 }
 
+// Interfaces para gestión de usuarios
+export interface UserManagement {
+  id: number;
+  username: string;
+  email: string;
+  enabled: boolean;
+  role: string;
+  createdAt: string;
+  lastLogin?: string;
+}
+
+// Interfaces para moderación
+export interface ModerationStats {
+  totalPending: number;
+  totalApproved: number;
+  totalRejected: number;
+  approvalRate: number;
+  avgReviewTime: number;
+}
+
+export interface PerfumeModeration {
+  id: number;
+  name: string;
+  seller: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  submittedDate: string;
+  reviewDate?: string;
+  rejectionReason?: string;
+}
+
+// Interfaces para órdenes
+export interface OrderManagement {
+  id: number;
+  orderNumber: string;
+  customer: string;
+  seller: string;
+  totalAmount: number;
+  status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  items: number;
+  orderDate: string;
+  lastUpdated: string;
+}
+
+// Interfaces para reportes
+export interface SalesReport {
+  totalSales: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  totalOrders: number;
+  period: string;
+}
+
+export interface SellerReport {
+  id: number;
+  name: string;
+  email: string;
+  totalSales: number;
+  revenue: number;
+  activeProducts: number;
+  rating: number;
+  nombre?: string;
+  estado?: string;
+  productCount?: number;
+  totalRevenue?: number;
+  orderCount?: number;
+}
+
+export interface ProductReport {
+  id: number;
+  name: string;
+  seller: string;
+  totalSold: number;
+  revenue: number;
+  rating: number;
+}
+
+export interface UserActivityReport {
+  id: number;
+  username: string;
+  email: string;
+  purchases: number;
+  totalSpent: number;
+  lastActivity: string;
+  status: string;
+  estado?: string;
+  purchaseCount?: number;
+  avgOrderValue?: number;
+  monthlyPurchases?: number;
+  name?: string;
+  nombre?: string;
+}
+
+export interface SystemStats {
+  uptime: number;
+  totalRequests: number;
+  activeConnections: number;
+  cpuUsage: number;
+  memoryUsage: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private API_URL = 'http://localhost:8080/api';
+  private apiBase = `${environment.apiUrl}/api`;
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
+    console.log('AdminService initialized with API base:', this.apiBase);
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       this.currentUserSubject.next(JSON.parse(savedUser));
     }
   }
 
+  // ========== AUTHENTICATION ==========
+
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, { email, password })
+    return this.http.post<LoginResponse>(`${this.apiBase}/auth/login`, { email, password })
       .pipe(
         tap(response => {
-          // Guardar token y información del usuario
           localStorage.setItem('adminToken', response.token);
           localStorage.setItem('currentUser', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
@@ -158,13 +263,7 @@ export class AdminService {
   isAuthenticated(): boolean {
     const token = localStorage.getItem('adminToken');
     const user = localStorage.getItem('currentUser');
-    
-    if (!token || !user) {
-      return false;
-    }
-
-
-    return true;
+    return !!(token && user);
   }
 
   isAdmin(): boolean {
@@ -180,49 +279,27 @@ export class AdminService {
     return user.role === 'admin';
   }
 
-  getCurrentUser() {
-    return this.currentUserSubject.value;
-  }
+  // ========== DASHBOARD ==========
 
-  // Dashboard
-  getDashboardStats(): Observable<DashboardStats> {
-    return this.http.get<DashboardStats>(`${this.API_URL}/admin/dashboard`)
+  getDashboardStats(): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/dashboard`)
       .pipe(
+        tap(response => console.log('Dashboard stats received:', response)),
         catchError(error => {
           console.error('Error loading dashboard:', error);
-          // Retornar datos mock en caso de error
-          return of({
-            totalUsers: 0,
-            activeUsers: 0,
-            totalStores: 0,
-            pendingStores: 0,
-            totalOrders: 0,
-            pendingOrders: 0,
-            monthlyRevenue: 0,
-            totalRevenue: 0,
-            totalSellers: 0,
-            activeSellers: 0,
-            conversionRate: 0,
-            avgRating: 0,
-            productsPerSeller: 0,
-            totalCustomers: 0,
-            activeCustomers: 0,
-            monthlyPurchases: 0,
-            avgOrderValue: 0,
-            repeatCustomers: 0,
-            totalPerfumes: 0,
-            sellerRevenue: 0,
-            sellerProductCount: 0,
-            customerSpending: 0
-          });
+          return of({});
         })
       );
   }
 
-  // Usuarios
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.API_URL}/admin/users`)
+  // ========== USERS ==========
+
+  getUsers(page = 0, size = 50, search?: string): Observable<any> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+    if (search) params = params.set('search', search);
+    return this.http.get(`${this.apiBase}/admin/users`, { params })
       .pipe(
+        tap(response => console.log('Users received:', response)),
         catchError(error => {
           console.error('Error loading users:', error);
           return of([]);
@@ -230,9 +307,44 @@ export class AdminService {
       );
   }
 
-  banUser(userId: number): Observable<any> {
-    return this.http.put(`${this.API_URL}/admin/users/${userId}/ban`, {})
+  patchUserStatus(userId: number | string, enabled: boolean): Observable<any> {
+    return this.http.patch(`${this.apiBase}/admin/users/${userId}/status`, { enabled })
       .pipe(
+        tap(response => console.log('User status updated:', response)),
+        catchError(error => {
+          console.error('Error changing user status:', error);
+          throw error;
+        })
+      );
+  }
+
+  patchUserRole(userId: number | string, role: string): Observable<any> {
+    return this.http.patch(`${this.apiBase}/admin/users/${userId}/role`, { role })
+      .pipe(
+        tap(response => console.log('User role updated:', response)),
+        catchError(error => {
+          console.error('Error changing user role:', error);
+          throw error;
+        })
+      );
+  }
+
+  changeUserStatus(userId: number | string, enabled: boolean): Observable<any> {
+    return this.patchUserStatus(userId, enabled);
+  }
+
+  changeUserRole(userId: number | string, role: string): Observable<any> {
+    return this.patchUserRole(userId, role);
+  }
+
+  searchUsers(term: string): Observable<any> {
+    return this.getUsers(0, 50, term);
+  }
+
+  banUser(userId: number | string): Observable<any> {
+    return this.http.post(`${this.apiBase}/admin/users/${userId}/ban`, {})
+      .pipe(
+        tap(response => console.log('User banned:', response)),
         catchError(error => {
           console.error('Error banning user:', error);
           throw error;
@@ -240,9 +352,10 @@ export class AdminService {
       );
   }
 
-  unbanUser(userId: number): Observable<any> {
-    return this.http.put(`${this.API_URL}/admin/users/${userId}/unban`, {})
+  unbanUser(userId: number | string): Observable<any> {
+    return this.http.post(`${this.apiBase}/admin/users/${userId}/unban`, {})
       .pipe(
+        tap(response => console.log('User unbanned:', response)),
         catchError(error => {
           console.error('Error unbanning user:', error);
           throw error;
@@ -250,94 +363,58 @@ export class AdminService {
       );
   }
 
-  // Tiendas
-  getStores(): Observable<Store[]> {
-    return this.http.get<Store[]>(`${this.API_URL}/admin/stores`)
+  // ========== PERFUMES ==========
+
+  getPendingPerfumes(): Observable<any> {
+    return this.http.get(`${this.apiBase}/perfumes/admin/pendientes`)
       .pipe(
+        tap(response => console.log('Pending perfumes received:', response)),
         catchError(error => {
-          console.error('Error loading stores:', error);
+          console.error('Error loading pending perfumes:', error);
           return of([]);
         })
       );
   }
 
-  verifyStore(storeId: number): Observable<any> {
-    return this.http.put(`${this.API_URL}/admin/stores/${storeId}/verify`, {})
+  getAllPerfumes(page = 0, size = 20): Observable<any> {
+    return this.http.get(`${this.apiBase}/perfumes/admin`, {
+      params: new HttpParams().set('page', String(page)).set('size', String(size))
+    })
       .pipe(
+        tap(response => console.log('All perfumes received:', response)),
         catchError(error => {
-          console.error('Error verifying store:', error);
-          throw error;
-        })
-      );
-  }
-
-  suspendStore(storeId: number): Observable<any> {
-    return this.http.put(`${this.API_URL}/admin/stores/${storeId}/suspend`, {})
-      .pipe(
-        catchError(error => {
-          console.error('Error suspending store:', error);
-          throw error;
-        })
-      );
-  }
-
-  // Pedidos
-  getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.API_URL}/admin/orders`)
-      .pipe(
-        catchError(error => {
-          console.error('Error loading orders:', error);
+          console.error('Error loading all perfumes:', error);
           return of([]);
         })
       );
   }
 
-  updateOrderStatus(orderId: number, newStatus: string): Observable<any> {
-    return this.http.put(`${this.API_URL}/admin/orders/${orderId}/status`, { estado: newStatus })
+  approvePerfume(id: number | string): Observable<any> {
+    return this.http.post(`${this.apiBase}/perfumes/admin/${id}/aprobar`, {})
       .pipe(
+        tap(response => console.log('Perfume approved:', response)),
         catchError(error => {
-          console.error('Error updating order status:', error);
+          console.error('Error approving perfume:', error);
           throw error;
         })
       );
   }
 
-  // Productos
-  deleteProduct(productId: number): Observable<any> {
-    return this.http.delete(`${this.API_URL}/admin/products/${productId}`)
+  rejectPerfume(id: number | string, motivo: string): Observable<any> {
+    return this.http.post(`${this.apiBase}/perfumes/admin/${id}/rechazar`, { motivo })
       .pipe(
+        tap(response => console.log('Perfume rejected:', response)),
         catchError(error => {
-          console.error('Error deleting product:', error);
+          console.error('Error rejecting perfume:', error);
           throw error;
         })
       );
   }
 
-  // Perfumes
-  getPerfumes(page: number = 0, size: number = 10): Observable<any> {
-    return this.http.get<any>(`${this.API_URL}/perfumes?page=${page}&size=${size}`)
+  deletePerfume(id: number | string): Observable<any> {
+    return this.http.delete(`${this.apiBase}/perfumes/admin/${id}`)
       .pipe(
-        map(response => response?.data || []),
-        catchError(error => {
-          console.error('Error loading perfumes:', error);
-          return of([]);
-        })
-      );
-  }
-
-  createPerfume(perfumeDto: PerfumeDTO): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/perfumes/nuevo`, perfumeDto)
-      .pipe(
-        catchError(error => {
-          console.error('Error creating perfume:', error);
-          throw error;
-        })
-      );
-  }
-
-  deletePerfume(perfumeId: number): Observable<any> {
-    return this.http.delete<any>(`${this.API_URL}/perfumes/${perfumeId}`)
-      .pipe(
+        tap(response => console.log('Perfume deleted:', response)),
         catchError(error => {
           console.error('Error deleting perfume:', error);
           throw error;
@@ -345,10 +422,81 @@ export class AdminService {
       );
   }
 
-  // Marcas
-  getBrands(): Observable<Brand[]> {
-    return this.http.get<Brand[]>(`${this.API_URL}/brands`)
+  getAllPerfumesAdmin(page = 0, size = 50): Observable<any> {
+    return this.getAllPerfumes(page, size);
+  }
+
+  // ========== ORDERS ==========
+
+  getOrders(page = 0, size = 20, status?: string): Observable<any> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+    if (status) params = params.set('status', status);
+    return this.http.get(`${this.apiBase}/admin/orders`, { params })
       .pipe(
+        tap(response => console.log('Orders received:', response)),
+        catchError(error => {
+          console.error('Error loading orders:', error);
+          return of([]);
+        })
+      );
+  }
+
+  getOrderDetails(orderId: number | string): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/orders/${orderId}`)
+      .pipe(
+        tap(response => console.log('Order details received:', response)),
+        catchError(error => {
+          console.error('Error loading order details:', error);
+          return of({});
+        })
+      );
+  }
+
+  cancelOrder(orderId: number | string): Observable<any> {
+    return this.http.post(`${this.apiBase}/admin/orders/${orderId}/cancel`, {})
+      .pipe(
+        tap(response => console.log('Order canceled:', response)),
+        catchError(error => {
+          console.error('Error canceling order:', error);
+          throw error;
+        })
+      );
+  }
+
+  updateOrderStatus(orderId: number | string, newStatus: string): Observable<any> {
+    return this.http.patch(`${this.apiBase}/admin/orders/${orderId}/status`, { status: newStatus })
+      .pipe(
+        tap(response => console.log('Order status updated:', response)),
+        catchError(error => {
+          console.error('Error updating order status:', error);
+          throw error;
+        })
+      );
+  }
+
+  getOrdersByStatus(status: string, page = 0, size = 20): Observable<any> {
+    return this.getOrders(page, size, status);
+  }
+
+  getModerationStats(): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/moderation/stats`)
+      .pipe(
+        tap(response => console.log('Moderation stats received:', response)),
+        catchError(error => {
+          console.error('Error loading moderation stats:', error);
+          return of({});
+        })
+      );
+  }
+
+  // ========== BRANDS ==========
+
+  getBrands(page = 0, size = 20): Observable<any> {
+    return this.http.get(`${this.apiBase}/brands/admin`, {
+      params: new HttpParams().set('page', String(page)).set('size', String(size))
+    })
+      .pipe(
+        tap(response => console.log('Brands received:', response)),
         catchError(error => {
           console.error('Error loading brands:', error);
           return of([]);
@@ -356,9 +504,10 @@ export class AdminService {
       );
   }
 
-  createBrand(brand: Partial<Brand>): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/brands`, brand)
+  createBrand(payload: any): Observable<any> {
+    return this.http.post(`${this.apiBase}/brands`, payload)
       .pipe(
+        tap(response => console.log('Brand created:', response)),
         catchError(error => {
           console.error('Error creating brand:', error);
           throw error;
@@ -366,9 +515,10 @@ export class AdminService {
       );
   }
 
-  updateBrand(id: number, brand: Partial<Brand>): Observable<any> {
-    return this.http.put<any>(`${this.API_URL}/brands/${id}`, brand)
+  updateBrand(id: number | string, payload: any): Observable<any> {
+    return this.http.put(`${this.apiBase}/brands/${id}`, payload)
       .pipe(
+        tap(response => console.log('Brand updated:', response)),
         catchError(error => {
           console.error('Error updating brand:', error);
           throw error;
@@ -376,9 +526,10 @@ export class AdminService {
       );
   }
 
-  deleteBrand(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.API_URL}/brands/${id}`)
+  deleteBrand(id: number | string): Observable<any> {
+    return this.http.delete(`${this.apiBase}/brands/${id}`)
       .pipe(
+        tap(response => console.log('Brand deleted:', response)),
         catchError(error => {
           console.error('Error deleting brand:', error);
           throw error;
@@ -386,10 +537,14 @@ export class AdminService {
       );
   }
 
-  // Categorías
-  getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.API_URL}/categories`)
+  // ========== CATEGORIES ==========
+
+  getCategories(page = 0, size = 20): Observable<any> {
+    return this.http.get(`${this.apiBase}/categories/admin`, {
+      params: new HttpParams().set('page', String(page)).set('size', String(size))
+    })
       .pipe(
+        tap(response => console.log('Categories received:', response)),
         catchError(error => {
           console.error('Error loading categories:', error);
           return of([]);
@@ -397,9 +552,10 @@ export class AdminService {
       );
   }
 
-  createCategory(category: Partial<Category>): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/categories`, category)
+  createCategory(payload: any): Observable<any> {
+    return this.http.post(`${this.apiBase}/categories`, payload)
       .pipe(
+        tap(response => console.log('Category created:', response)),
         catchError(error => {
           console.error('Error creating category:', error);
           throw error;
@@ -407,9 +563,10 @@ export class AdminService {
       );
   }
 
-  updateCategory(id: number, category: Partial<Category>): Observable<any> {
-    return this.http.put<any>(`${this.API_URL}/categories/${id}`, category)
+  updateCategory(id: number | string, payload: any): Observable<any> {
+    return this.http.put(`${this.apiBase}/categories/${id}`, payload)
       .pipe(
+        tap(response => console.log('Category updated:', response)),
         catchError(error => {
           console.error('Error updating category:', error);
           throw error;
@@ -417,13 +574,103 @@ export class AdminService {
       );
   }
 
-  deleteCategory(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.API_URL}/categories/${id}`)
+  deleteCategory(id: number | string): Observable<any> {
+    return this.http.delete(`${this.apiBase}/categories/${id}`)
       .pipe(
+        tap(response => console.log('Category deleted:', response)),
         catchError(error => {
           console.error('Error deleting category:', error);
           throw error;
         })
       );
+  }
+
+  // ========== REPORTS / STATS ==========
+
+  getSalesReport(startDate: string, endDate: string): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/reports/sales`, {
+      params: new HttpParams().set('startDate', startDate).set('endDate', endDate)
+    })
+      .pipe(
+        tap(response => console.log('Sales report received:', response)),
+        catchError(error => {
+          console.error('Error loading sales report:', error);
+          return of({});
+        })
+      );
+  }
+
+  getTopSellers(): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/reports/top-sellers`)
+      .pipe(
+        tap(response => console.log('Top sellers received:', response)),
+        catchError(error => {
+          console.error('Error loading top sellers:', error);
+          return of([]);
+        })
+      );
+  }
+
+  getTopProducts(): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/reports/top-products`)
+      .pipe(
+        tap(response => console.log('Top products received:', response)),
+        catchError(error => {
+          console.error('Error loading top products:', error);
+          return of([]);
+        })
+      );
+  }
+
+  getActiveUsers(): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/reports/active-users`)
+      .pipe(
+        tap(response => console.log('Active users received:', response)),
+        catchError(error => {
+          console.error('Error loading active users:', error);
+          return of([]);
+        })
+      );
+  }
+
+  // ========== SYSTEM ==========
+
+  getSystemLogs(page = 0, size = 100): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/system/logs`, {
+      params: new HttpParams().set('page', String(page)).set('size', String(size))
+    })
+      .pipe(
+        tap(response => console.log('System logs received:', response)),
+        catchError(error => {
+          console.error('Error loading system logs:', error);
+          return of([]);
+        })
+      );
+  }
+
+  getSystemStats(): Observable<any> {
+    return this.http.get(`${this.apiBase}/admin/system/stats`)
+      .pipe(
+        tap(response => console.log('System stats received:', response)),
+        catchError(error => {
+          console.error('Error loading system stats:', error);
+          return of({});
+        })
+      );
+  }
+
+  backupData(): Observable<any> {
+    return this.http.post(`${this.apiBase}/admin/system/backup`, {})
+      .pipe(
+        tap(response => console.log('Backup created:', response)),
+        catchError(error => {
+          console.error('Error creating backup:', error);
+          throw error;
+        })
+      );
+  }
+
+  createSystemBackup(): Observable<any> {
+    return this.backupData();
   }
 }

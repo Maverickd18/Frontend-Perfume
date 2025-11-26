@@ -34,7 +34,13 @@
       
       <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
 
-      <div class="dashboard-wrapper" *ngIf="dashboardStats && !isLoading">
+      <div class="dashboard-wrapper" *ngIf="!isLoading">
+        <!-- Mostrar contenido aunque no haya datos (mejor UX) -->
+        <div *ngIf="!dashboardStats" class="no-data-message">
+          <p>Cargando datos del servidor...</p>
+        </div>
+
+        <ng-container *ngIf="dashboardStats">
         <!-- KPI PRINCIPALES -->
         <div class="kpi-grid">
           <div class="kpi-card gradient-primary">
@@ -238,6 +244,7 @@
             </div>
           </div>
         </div>
+        </ng-container>
       </div>
     </div>
 
