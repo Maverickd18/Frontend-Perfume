@@ -5,41 +5,49 @@
     </ion-buttons>
     <ion-title>Producto</ion-title>
     <ion-buttons slot="end">
-      <!-- Cambiar a app-header y usar los outputs correctos -->
-      <app-header
-        [showBackButton]="false"
-        (cartClicked)="onCartClick()"
-        (profileClicked)="goProfile()"
-        (logoutClicked)="logout()">
-        <!-- Agregar botón home manualmente -->
-        <button slot="end" class="icon-button" (click)="goHome()" title="Inicio">
-          <ion-icon name="home-outline"></ion-icon>
-        </button>
-      </app-header>
+      <ion-button (click)="onCartClick()">
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goProfile()">
+        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="product-detail">
-  <div *ngIf="product" class="detail-wrapper">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Cargando producto...</p>
+  </div>
+
+  <!-- Product Content -->
+  <div *ngIf="product && !isLoading" class="detail-wrapper">
     <div class="product-layout">
       <div class="image-section">
-        <img [src]="product.imageUrl || product.image || 'assets/images/placeholder.jpg'" [alt]="product.name || product.title" class="product-image"/>
+        <img 
+          [src]="product.imageUrl || 'assets/images/placeholder.jpg'" 
+          [alt]="product.name" 
+          class="product-image"
+          (error)="product.imageUrl = 'assets/images/placeholder.jpg'"/>
       </div>
 
       <div class="info-section">
         <div class="header-info">
           <div>
-            <p class="brand">{{ product.brandName || product.brand }}</p>
-            <h1 class="title">{{ product.name || product.title }}</h1>
+            <p class="brand">{{ product.brandName || 'Marca' }}</p>
+            <h1 class="title">{{ product.name }}</h1>
           </div>
-          <button class="heart-button" (click)="toggleFavorite()" [class.active]="isFavorite" title="Agregar a favoritos">
-            <svg *ngIf="!isFavorite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-            <svg *ngIf="isFavorite" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
+          <button 
+            class="heart-button" 
+            (click)="toggleFavorite()" 
+            [class.active]="isFavorite" 
+            title="Agregar a favoritos">
+            <ion-icon 
+              [name]="isFavorite ? 'heart' : 'heart-outline'" 
+              [color]="isFavorite ? 'danger' : 'medium'">
+            </ion-icon>
           </button>
         </div>
 
@@ -48,38 +56,73 @@
         <div class="specs-grid">
           <div class="spec-item">
             <span class="spec-label">Tamaño</span>
-            <span class="spec-value">{{ product.sizeMl || product.size }}ml</span>
+            <span class="spec-value">{{ product.sizeMl }}ml</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">Categoría</span>
-            <span class="spec-value">{{ product.categoryName || product.category }}</span>
+            <span class="spec-value">{{ product.categoryName || 'Perfume' }}</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">Stock</span>
-            <span class="spec-value">{{ product.stock }}</span>
+            <span class="spec-value" [class.low-stock]="product.stock <= 5">
+              {{ product.stock }} unidades
+            </span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Género</span>
+            <span class="spec-value">{{ product.genre }}</span>
           </div>
         </div>
 
         <div class="price-box">
-          <p class="price">{{ product.price | currency:'USD' }}</p>
+          <p class="price">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</p>
+          <p *ngIf="product.stock <= 5 && product.stock > 0" class="stock-warning">
+            ¡Últimas unidades!
+          </p>
+          <p *ngIf="product.stock === 0" class="out-of-stock">
+            Agotado
+          </p>
         </div>
 
         <div class="actions-buttons">
-          <button class="btn-primary" (click)="addToCart()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            Agregar
-          </button>
-          <button class="btn-secondary" (click)="goBack()">Volver</button>
+          <ion-button 
+            expand="block" 
+            color="primary" 
+            (click)="addToCart()"
+            [disabled]="product.stock === 0">
+            <ion-icon slot="start" name="cart-outline"></ion-icon>
+            Agregar al Carrito
+          </ion-button>
+          
+          <ion-button 
+            expand="block" 
+            color="success" 
+            (click)="goToCheckout()"
+            [disabled]="product.stock === 0">
+            <ion-icon slot="start" name="bag-check-outline"></ion-icon>
+            Comprar Ahora
+          </ion-button>
+          
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            (click)="goBack()">
+            <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+            Volver
+          </ion-button>
         </div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="!product" class="no-product">
-    <p>Producto no encontrado</p>
+  <!-- Error State -->
+  <div *ngIf="!product && !isLoading" class="error-container">
+    <ion-icon name="warning-outline" size="large"></ion-icon>
+    <h3>Producto no encontrado</h3>
+    <p>El producto que buscas no está disponible.</p>
+    <ion-button (click)="goHome()" fill="solid">
+      <ion-icon slot="start" name="home-outline"></ion-icon>
+      Volver al Inicio
+    </ion-button>
   </div>
 </ion-content>

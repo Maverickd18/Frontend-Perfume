@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map, catchError, throwError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 const API_URL = environment.apiUrl + '/api';
@@ -82,31 +82,74 @@ export class ProductService {
 
   // ========== MARCAS PÚBLICAS ==========
   
-getBrands(): Observable<Brand[]> {
-  return this.http.get(`${API_URL}/brands/public`, { responseType: 'text' })
-    .pipe(
-      map(responseText => {
-        console.log('Raw Brands API Response:', responseText);
-        
-        try {
-          // Intentar parsear como JSON
-          const response = JSON.parse(responseText);
-          console.log('Parsed Brands API Response:', response);
+  getBrands(): Observable<Brand[]> {
+    return this.http.get(`${API_URL}/brands/public`, { responseType: 'text' })
+      .pipe(
+        map(responseText => {
+          console.log('Raw Brands API Response:', responseText);
           
-          if (response && response.status === 'success' && response.data) {
-            return response.data;
+          try {
+            // Si la respuesta es un string que contiene JSON, parsearlo
+            let parsedResponse;
+            
+            // Verificar si ya es un objeto (caso improbable pero por seguridad)
+            if (typeof responseText === 'object') {
+              parsedResponse = responseText;
+            } else {
+              // Parsear el string como JSON
+              parsedResponse = JSON.parse(responseText);
+            }
+            
+            console.log('Parsed Brands Response:', parsedResponse);
+            
+            // Extraer los datos según diferentes posibles estructuras
+            if (parsedResponse && parsedResponse.status === 'success' && parsedResponse.data) {
+              return parsedResponse.data;
+            } else if (Array.isArray(parsedResponse)) {
+              return parsedResponse; // Si la respuesta es directamente un array
+            } else if (parsedResponse.data && Array.isArray(parsedResponse.data)) {
+              return parsedResponse.data; // Si está en propiedad data
+            } else if (parsedResponse.brands && Array.isArray(parsedResponse.brands)) {
+              return parsedResponse.brands; // Si está en propiedad brands
+            }
+            
+            console.warn('Unexpected response format for brands:', parsedResponse);
+            return [];
+            
+          } catch (parseError) {
+            console.error('JSON Parse Error:', parseError);
+            console.error('Raw response that failed to parse:', responseText);
+            
+            // Intentar extraer JSON del string si hay contenido alrededor
+            const jsonMatch = responseText.match(/\{.*\}/s) || responseText.match(/\[.*\]/s);
+            if (jsonMatch) {
+              try {
+                const extractedJson = JSON.parse(jsonMatch[0]);
+                console.log('Extracted JSON from string:', extractedJson);
+                
+                if (Array.isArray(extractedJson)) {
+                  return extractedJson;
+                } else if (extractedJson.data && Array.isArray(extractedJson.data)) {
+                  return extractedJson.data;
+                } else if (extractedJson.status === 'success' && Array.isArray(extractedJson.data)) {
+                  return extractedJson.data;
+                }
+              } catch (extractError) {
+                console.error('Failed to extract JSON from string:', extractError);
+              }
+            }
+            
+            // Si todo falla, retornar array vacío
+            return [];
           }
-          console.warn('Unexpected response format for brands:', response);
-          return [];
-        } catch (parseError) {
-          console.error('JSON Parse Error:', parseError);
-          console.error('Raw response that failed to parse:', responseText);
-          return [];
-        }
-      }),
-      catchError(this.handleError)
-    );
-}
+        }),
+        catchError(error => {
+          console.error('Brands API Error:', error);
+          // En caso de error, retornar array vacío para que la app no se rompa
+          return of([]);
+        })
+      );
+  }
 
   getBrandById(id: number): Observable<Brand> {
     return this.http.get<any>(`${API_URL}/brands/public/${id}`)
@@ -138,7 +181,7 @@ getBrands(): Observable<Brand[]> {
   // ========== CATEGORÍAS PÚBLICAS ==========
   
   getCategories(): Observable<Category[]> {
-    return this.http.get<any>(`${API_URL}/categories`)
+    return this.http.get<any>(`${API_URL}/categories/public`)
       .pipe(
         map(response => {
           console.log('Categories API Response:', response);

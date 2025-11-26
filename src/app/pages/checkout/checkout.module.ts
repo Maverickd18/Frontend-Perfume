@@ -13,7 +13,6 @@ import { CheckoutPage } from './checkout.page';
     ReactiveFormsModule,
     IonicModule,
     CheckoutPageRoutingModule
-  ],
-  declarations: [CheckoutPage]
+  ]
 })
 export class CheckoutPageModule {}

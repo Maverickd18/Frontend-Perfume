@@ -288,7 +288,7 @@
           <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
           Regresar
         </ion-button>
-        <ion-button expand="block" (click)="goToReview()">
+        <ion-button expand="block" (click)="goToReview()" [disabled]="!isPaymentFormValid()">
           Revisar Orden
           <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
         </ion-button>
@@ -347,36 +347,48 @@
           <ion-card-title>Resumen del Pedido</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <div class="cart-items">
+          <!-- Estado vacío del carrito -->
+          <div *ngIf="cartItems.length === 0" class="empty-cart">
+            <ion-icon name="cart-outline"></ion-icon>
+            <p>No hay productos en el carrito</p>
+          </div>
+
+          <!-- Lista de productos -->
+          <div class="cart-items" *ngIf="cartItems.length > 0">
             <div class="cart-item" *ngFor="let item of cartItems">
-              <img [src]="item.image" [alt]="item.title">
+              <img 
+                [src]="item.imageUrl || 'assets/images/placeholder.jpg'" 
+                [alt]="item.name" 
+                (error)="item.imageUrl = 'assets/images/placeholder.jpg'"
+                class="item-image" />
               <div class="item-details">
-                <h4>{{ item.title }}</h4>
-                <p class="item-meta">{{ item.brand }} | {{ item.size }}</p>
-                <p class="item-price">{{ item.price | currency:'MXN':'symbol' }} x {{ item.quantity }}</p>
+                <h4>{{ item.name }}</h4>
+                <p class="item-meta">{{ item.brandName }} | {{ item.sizeMl }}ml</p>
+                <p class="item-price">{{ item.price | currency:'USD':'symbol':'1.2-2' }} x {{ item.quantity }}</p>
               </div>
               <div class="item-total">
-                {{ (item.price * item.quantity) | currency:'MXN':'symbol' }}
+                {{ (item.price * item.quantity) | currency:'USD':'symbol':'1.2-2' }}
               </div>
             </div>
           </div>
 
-          <div class="price-breakdown">
+          <!-- Desglose de precios -->
+          <div class="price-breakdown" *ngIf="cartItems.length > 0">
             <div class="price-row">
-              <span>Subtotal:</span>
-              <span>{{ subtotal | currency:'MXN':'symbol' }}</span>
+              <span>Subtotal ({{ getTotalItems() }} items):</span>
+              <span>{{ subtotal | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
             <div class="price-row">
               <span>Envío:</span>
-              <span>{{ shipping | currency:'MXN':'symbol' }}</span>
+              <span>{{ shipping | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
             <div class="price-row">
               <span>IVA (16%):</span>
-              <span>{{ tax | currency:'MXN':'symbol' }}</span>
+              <span>{{ tax | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
             <div class="price-row total">
               <span><strong>Total:</strong></span>
-              <span><strong>{{ total | currency:'MXN':'symbol' }}</strong></span>
+              <span><strong>{{ total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
             </div>
           </div>
         </ion-card-content>
@@ -391,7 +403,7 @@
           expand="block" 
           color="success" 
           (click)="processOrder()"
-          [disabled]="isProcessing">
+          [disabled]="isProcessing || cartItems.length === 0">
           <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
           {{ isProcessing ? 'Procesando...' : 'Confirmar Compra' }}
         </ion-button>

@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
-
-// ============================================
-// INTERFACES DE DATOS
-// ============================================
 
 export interface ShippingAddress {
   fullName: string;
@@ -16,60 +12,35 @@ export interface ShippingAddress {
   email: string;
 }
 
-export interface PaymentMethod {
-  type: 'card' | 'transfer' | 'cash_on_delivery';
-  cardNumber?: string;
-  cardHolderName?: string;
-  expirationDate?: string;
-  cvv?: string;
-  transferReference?: string;
-}
-
-export interface OrderItem {
-  productId: number;
-  title: string;
-  price: number;
-  quantity: number;
-  size?: string;
-  image?: string;
-}
-
 export interface CheckoutRequest {
-  shippingAddress: ShippingAddress;
-  paymentMethod: PaymentMethod;
-  items: OrderItem[];
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  total: number;
-  notes?: string;
+  items: Array<{
+    perfumeId: number;
+    quantity: number;
+  }>;
+  shippingAddress: string;
+  billingAddress: string;
+  customerEmail: string;
+  customerPhone: string;
+  paymentMethod: string;
 }
 
 export interface OrderResponse {
-  orderId: string;
   status: string;
   message: string;
-  trackingNumber?: string;
-  estimatedDelivery?: string;
+  data: {
+    orderId: number;
+    orderNumber: string;
+    status: string;
+    subtotal: number;
+    tax: number;
+    shipping: number;
+    total: number;
+    paymentUrl?: string;
+    clientSecret?: string;
+    items: any[];
+    createdAt: string;
+  };
 }
-
-export interface PaymentValidationResponse {
-  valid: boolean;
-  message?: string;
-}
-
-// ============================================
-// CONFIGURACIÓN DE ENDPOINTS
-// ============================================
-// Modifica estos endpoints según tu API real
-const API_ENDPOINTS = {
-  processOrder: '/api/orders/process',
-  validatePayment: '/api/payments/validate',
-  calculateShipping: '/api/shipping/calculate',
-  getPaymentMethods: '/api/payments/methods',
-  createOrder: '/api/orders/create',
-  confirmPayment: '/api/payments/confirm'
-};
 
 @Injectable({
   providedIn: 'root'
@@ -79,155 +50,69 @@ export class CheckoutService {
 
   constructor(private http: HttpClient) { }
 
-  // ============================================
-  // MÉTODO PRINCIPAL - PROCESAR ORDEN COMPLETA
-  // ============================================
-  /**
-   * Procesa la orden completa incluyendo pago y envío
-   * @param checkoutData - Datos completos del checkout
-   * @returns Observable con la respuesta de la orden
-   */
   processOrder(checkoutData: CheckoutRequest): Observable<OrderResponse> {
-    const url = `${this.baseUrl}${API_ENDPOINTS.processOrder}`;
+    const url = `${this.baseUrl}/api/orders/checkout`;
     const headers = this.getHeaders();
     
-    return this.http.post<OrderResponse>(url, checkoutData, { headers });
-  }
-
-  // ============================================
-  // CREAR ORDEN SIN PROCESAR PAGO
-  // ============================================
-  /**
-   * Crea una orden sin procesar el pago
-   * Útil para pagos en dos pasos o contraentrega
-   */
-  createOrder(checkoutData: CheckoutRequest): Observable<OrderResponse> {
-    const url = `${this.baseUrl}${API_ENDPOINTS.createOrder}`;
-    const headers = this.getHeaders();
+    console.log('Sending checkout data:', checkoutData);
     
-    return this.http.post<OrderResponse>(url, checkoutData, { headers });
+    return this.http.post<OrderResponse>(url, checkoutData, { headers }).pipe(
+      map(response => {
+        console.log('Checkout response:', response);
+        return response;
+      })
+    );
   }
 
-  // ============================================
-  // VALIDAR MÉTODO DE PAGO
-  // ============================================
-  /**
-   * Valida los datos del método de pago antes de procesar
-   * @param paymentMethod - Datos del método de pago
-   */
-  validatePayment(paymentMethod: PaymentMethod): Observable<PaymentValidationResponse> {
-    const url = `${this.baseUrl}${API_ENDPOINTS.validatePayment}`;
-    const headers = this.getHeaders();
-    
-    return this.http.post<PaymentValidationResponse>(url, paymentMethod, { headers });
-  }
-
-  // ============================================
-  // CONFIRMAR PAGO
-  // ============================================
-  /**
-   * Confirma el pago de una orden existente
-   * @param orderId - ID de la orden
-   * @param paymentMethod - Método de pago a confirmar
-   */
-  confirmPayment(orderId: string, paymentMethod: PaymentMethod): Observable<any> {
-    const url = `${this.baseUrl}${API_ENDPOINTS.confirmPayment}`;
-    const headers = this.getHeaders();
-    
-    return this.http.post<any>(url, { orderId, paymentMethod }, { headers });
-  }
-
-  // ============================================
-  // CALCULAR COSTO DE ENVÍO
-  // ============================================
-  /**
-   * Calcula el costo de envío según la dirección
-   * @param address - Dirección de envío
-   */
   calculateShipping(address: ShippingAddress): Observable<{ shipping: number; tax: number }> {
-    const url = `${this.baseUrl}${API_ENDPOINTS.calculateShipping}`;
-    const headers = this.getHeaders();
+    // Cálculo simple - puedes ajustar según tu lógica de negocio
+    const shipping = 50; // Costo fijo de envío
+    const tax = 0.16; // 16% IVA
     
-    return this.http.post<{ shipping: number; tax: number }>(url, address, { headers });
+    return new Observable(observer => {
+      setTimeout(() => {
+        observer.next({ shipping, tax });
+        observer.complete();
+      }, 500);
+    });
   }
 
-  // ============================================
-  // OBTENER MÉTODOS DE PAGO DISPONIBLES
-  // ============================================
-  /**
-   * Obtiene los métodos de pago disponibles
-   */
-  getAvailablePaymentMethods(): Observable<any[]> {
-    const url = `${this.baseUrl}${API_ENDPOINTS.getPaymentMethods}`;
+  confirmPayment(paymentIntentId: string): Observable<any> {
+    const url = `${this.baseUrl}/api/orders/confirm-payment`;
     const headers = this.getHeaders();
     
-    return this.http.get<any[]>(url, { headers });
+    return this.http.post(url, { paymentIntentId }, { headers });
   }
 
-  // ============================================
-  // UTILIDADES
-  // ============================================
-  
-  /**
-   * Genera los headers necesarios para las peticiones HTTP
-   * Incluye el token de autenticación si existe
-   */
+  simulatePayment(paymentId: string, success: boolean = true): Observable<any> {
+    const url = `${this.baseUrl}/api/payments/simulate-payment?payment_id=${paymentId}&success=${success}`;
+    return this.http.get(url);
+  }
+
+  getOrderStatus(orderNumber: string): Observable<any> {
+    const url = `${this.baseUrl}/api/orders/${orderNumber}`;
+    const headers = this.getHeaders();
+    
+    return this.http.get(url, { headers });
+  }
+
+  getUserOrders(): Observable<any> {
+    const url = `${this.baseUrl}/api/orders/my-orders`;
+    const headers = this.getHeaders();
+    
+    return this.http.get(url, { headers });
+  }
+
   private getHeaders(): HttpHeaders {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    // Agregar token de autenticación si existe
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
     return headers;
-  }
-
-  /**
-   * Valida el formato de email
-   */
-  isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  /**
-   * Valida el formato de número de tarjeta
-   */
-  isValidCardNumber(cardNumber: string): boolean {
-    const cleaned = cardNumber.replace(/\s/g, '');
-    return /^\d{13,19}$/.test(cleaned);
-  }
-
-  /**
-   * Valida el CVV de la tarjeta
-   */
-  isValidCVV(cvv: string): boolean {
-    return /^\d{3,4}$/.test(cvv);
-  }
-
-  /**
-   * Formatea el número de tarjeta con espacios
-   */
-  formatCardNumber(cardNumber: string): string {
-    const cleaned = cardNumber.replace(/\s/g, '');
-    return cleaned.match(/.{1,4}/g)?.join(' ') || cleaned;
-  }
-
-  /**
-   * Obtiene el tipo de tarjeta según el número
-   */
-  getCardType(cardNumber: string): string {
-    const cleaned = cardNumber.replace(/\s/g, '');
-    
-    if (/^4/.test(cleaned)) return 'visa';
-    if (/^5[1-5]/.test(cleaned)) return 'mastercard';
-    if (/^3[47]/.test(cleaned)) return 'amex';
-    if (/^6(?:011|5)/.test(cleaned)) return 'discover';
-    
-    return 'unknown';
   }
 }
